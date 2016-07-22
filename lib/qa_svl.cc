@@ -26,7 +26,7 @@
  */
 
 #include "qa_svl.h"
-#include "qa_svl-sink.h"
+#include "qa_svl_sink.h"
 
 CppUnit::TestSuite *
 qa_svl::suite()

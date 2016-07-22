@@ -26,7 +26,7 @@
 #include <gnuradio/fft/fft.h>
 #include <string.h>
 
-#include "svl-sink_impl.h"
+#include "svl_sink_impl.h"
 
 namespace gr {
   namespace svl {
@@ -62,10 +62,14 @@ namespace gr {
 				g_ifft_complex = sfft_complex(new gr::fft::fft_complex(fft_n_len, false) ) ;
 			}
 
-
 			size_t const get_subcarriers()
 			{
 				return fft_n_len;	
+			}
+
+			void set_subcarriers(size_t _fft_n_len)
+			{
+				fft_n_len = _fft_n_len;
 			}
 
 			void set_tx_samples(const samples_vec &tx_samples)
@@ -156,10 +160,21 @@ namespace gr {
 					 g_rx_iq_vec.resize(fft_m_len);
 		     };
 
-			 void add_radio(vradio_ptr vradio)
+			 size_t create_vradio()
 			 {
+				vradio_ptr vradio(new VirtualRadio(0));
 				g_vradios.push_back( vradio );
+
+				// ID representing the radio;
+				return g_vradios.size() - 1;
 			 };
+
+			 int set_vradio_subcarriers(size_t vradio_id, size_t bandwidth)
+			 {
+					 g_vradios[vradio_id]->set_subcarriers(bandwidth);
+
+					 return 1;
+			 }
 
 			 void set_radio_mapping()
 			 {
@@ -240,8 +255,8 @@ namespace gr {
               gr::io_signature::make(1, 2, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex)))
     {
-		g_hypervisor = hypervisor_ptr(new Hypervisor(128));	
-	}
+	    g_hypervisor = hypervisor_ptr(new Hypervisor(128));	
+    }
 
     /*
      * Our virtual destructor.
@@ -249,6 +264,18 @@ namespace gr {
     svl_sink_impl::~svl_sink_impl()
     {
     }
+
+
+	size_t svl_sink_impl::create_vradio()
+	{
+		return g_hypervisor->create_vradio();	
+	}
+
+	int svl_sink_impl::set_vradio_subcarriers(size_t vradio_id, size_t bandwidth)
+	{
+		return g_hypervisor->set_vradio_subcarriers(vradio_id, bandwidth);	
+	}
+
 
     int
     svl_sink_impl::work(int noutput_items,

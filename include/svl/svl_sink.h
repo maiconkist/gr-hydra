@@ -47,6 +47,15 @@ namespace gr {
        * creating new instances.
        */
       static sptr make();
+
+
+      /**
+       */
+      virtual size_t create_vradio() = 0;
+
+      /**
+       */
+      virtual int set_vradio_subcarriers(size_t vradio_id, size_t bandwidth) = 0;
     };
 
   } // namespace svl

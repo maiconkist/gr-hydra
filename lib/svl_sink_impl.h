@@ -18,21 +18,40 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#ifndef INCLUDED_SVL_SVL_SINK_IMPL_H
+#define INCLUDED_SVL_SVL_SINK_IMPL_H
 
-#include <gnuradio/attributes.h>
-#include <cppunit/TestAssert.h>
-#include "qa_svl-sink.h"
-#include <svl/svl-sink.h>
+#include <svl/svl_sink.h>
 
 namespace gr {
   namespace svl {
 
-    void
-    qa_svl_sink::t1()
-    {
-      // Put test here
-    }
+	class Hypervisor;
 
-  } /* namespace svl */
-} /* namespace gr */
+    class svl_sink_impl : public svl_sink
+    {
+     private:
+			 typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
+
+			 hypervisor_ptr g_hypervisor;
+
+     public:
+      svl_sink_impl();
+      ~svl_sink_impl();
+
+      // Where all the action really happens
+      int work(int noutput_items,
+         gr_vector_const_void_star &input_items,
+         gr_vector_void_star &output_items);
+
+
+	  // implementation of svl_sink virtual methods
+	 virtual size_t create_vradio(); 
+	 virtual int set_vradio_subcarriers(size_t vradio_id, size_t bandwidth);
+    };
+
+  } // namespace svl
+} // namespace gr
+
+#endif /* INCLUDED_SVL_SVL-SINK_IMPL_H */
 

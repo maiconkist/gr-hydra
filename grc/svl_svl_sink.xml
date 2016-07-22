@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <block>
-  <name>svl-sink</name>
-  <key>svl_svl-sink</key>
+  <name>svl_sink</name>
+  <key>svl_svl_sink</key>
   <category>svl</category>
   <import>import svl</import>
   <make>svl.svl_sink()</make>
@@ -10,11 +10,14 @@
        * name
        * key (makes the value accessible as $keyname, e.g. in the make node)
        * type -->
+
+<!--
   <param>
     <name>...</name>
     <key>...</key>
     <type>...</type>
   </param>
+-->
 
   <!-- Make one 'sink' node per input. Sub-nodes:
        * name (an identifier for the GUI)
@@ -25,7 +28,6 @@
     <name>in0</name>
     <type>complex</type>
   </sink>
-
   <sink>
     <name>in1</name>
     <type>complex</type>

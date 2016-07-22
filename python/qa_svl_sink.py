@@ -20,22 +20,44 @@
 # 
 
 from gnuradio import gr, gr_unittest
-from gnuradio import blocks
+from gnuradio import analog, blocks
 import svl_swig as svl
 
-class qa_svl-sink (gr_unittest.TestCase):
 
-    def setUp (self):
-        self.tb = gr.top_block ()
+class qa_svl_sink (gr_unittest.TestCase):
 
-    def tearDown (self):
+    def setUp(self):
+        self.tb = gr.top_block()
+
+    def tearDown(self):
         self.tb = None
 
-    def test_001_t (self):
+    def test_001_t(self):
         # set up fg
-        self.tb.run ()
+        print "1"
+        src1 = analog.sig_source_c(1e6, analog.GR_COS_WAVE, 0, 1.5)
+        src2 = analog.sig_source_c(1e6, analog.GR_COS_WAVE, 0, 1.5)
+
+        dst = blocks.vector_sink_f()
+        op1 = blocks.head(gr.sizeof_gr_complex, 64)
+        op2 = blocks.head(gr.sizeof_gr_complex, 64)
+        print "1"
+        print "3"
+
+        #hypervisor = svl.svl_sink()
+        #print "4"
+        #vr1 = hypervisor.create_vradio()
+        #print "5"
+        #vr2 = hypervisor.create_vradio()
+        #print "6"
+
+        #self.tb.connect(src1, op1, (hypervisor, 0))
+        #self.tb.connect(src2, op2, (hypervisor, 1))
+        #self.tb.connect(hypervisor, dst)
+
+        #self.tb.run()
         # check data
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_svl-sink, "qa_svl-sink.xml")
+    gr_unittest.run(qa_svl_sink, "qa_svl_sink.xml")

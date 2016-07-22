@@ -22,5 +22,6 @@
 ########################################################################
 install(FILES
     api.h
-    svl-sink.h DESTINATION include/svl
+    svl_sink.h
+    DESTINATION include/svl
 )

@@ -24,10 +24,9 @@ include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
-
 list(APPEND svl_sources
-    svl-sink_impl.cc
-)
+    svl_sink_impl.cc
+    )
 
 set(svl_sources "${svl_sources}" PARENT_SCOPE)
 if(NOT svl_sources)
@@ -64,7 +63,7 @@ include_directories(${CPPUNIT_INCLUDE_DIRS})
 list(APPEND test_svl_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/test_svl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_svl.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_svl-sink.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/qa_svl_sink.cc
 )
 
 add_executable(test-svl ${test_svl_sources})

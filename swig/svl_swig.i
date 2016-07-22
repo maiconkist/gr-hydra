@@ -8,9 +8,9 @@
 %include "svl_swig_doc.i"
 
 %{
-#include "svl/svl-sink.h"
+#include "svl/svl_sink.h"
 %}
 
 
-%include "svl/svl-sink.h"
+%include "svl/svl_sink.h"
 GR_SWIG_BLOCK_MAGIC2(svl, svl_sink);
