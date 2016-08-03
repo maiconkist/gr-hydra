@@ -34,30 +34,24 @@ class qa_svl_sink (gr_unittest.TestCase):
 
     def test_001_t(self):
         # set up fg
-        print "1"
-        src1 = analog.sig_source_c(1e6, analog.GR_COS_WAVE, 0, 1.5)
-        src2 = analog.sig_source_c(1e6, analog.GR_COS_WAVE, 0, 1.5)
+        src1 = analog.sig_source_c(300e3, analog.GR_SIN_WAVE, 100e3, 1)
 
-        dst = blocks.vector_sink_f()
+        dst = blocks.vector_sink_c(128)
         op1 = blocks.head(gr.sizeof_gr_complex, 64)
         op2 = blocks.head(gr.sizeof_gr_complex, 64)
-        print "1"
-        print "3"
 
-        #hypervisor = svl.svl_sink()
-        #print "4"
-        #vr1 = hypervisor.create_vradio()
-        #print "5"
-        #vr2 = hypervisor.create_vradio()
-        #print "6"
+        hypervisor = svl.svl_sink()
+        vr1 = hypervisor.create_vradio()
+        vr2 = hypervisor.create_vradio()
 
-        #self.tb.connect(src1, op1, (hypervisor, 0))
-        #self.tb.connect(src2, op2, (hypervisor, 1))
-        #self.tb.connect(hypervisor, dst)
+        self.tb.connect(src1, op1, (hypervisor, 0))
+        self.tb.connect(op1, (hypervisor, 1))
+        self.tb.connect(hypervisor, dst)
 
-        #self.tb.run()
+        self.tb.run()
+
+        output = dst.data()
         # check data
-
 
 if __name__ == '__main__':
     gr_unittest.run(qa_svl_sink, "qa_svl_sink.xml")

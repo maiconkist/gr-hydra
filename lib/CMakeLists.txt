@@ -35,7 +35,7 @@ if(NOT svl_sources)
 endif(NOT svl_sources)
 
 add_library(gnuradio-svl SHARED ${svl_sources})
-target_link_libraries(gnuradio-svl ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-svl ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} ${FFTW_LIBRARIES})
 set_target_properties(gnuradio-svl PROPERTIES DEFINE_SYMBOL "gnuradio_svl_EXPORTS")
 
 if(APPLE)

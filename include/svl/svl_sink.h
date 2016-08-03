@@ -23,7 +23,7 @@
 #define INCLUDED_SVL_SVL_SINK_H
 
 #include <svl/api.h>
-#include <gnuradio/sync_block.h>
+#include <gnuradio/block.h>
 
 namespace gr {
   namespace svl {
@@ -33,7 +33,7 @@ namespace gr {
      * \ingroup svl
      *
      */
-    class SVL_API svl_sink : virtual public gr::sync_block
+    class SVL_API svl_sink : virtual public gr::block
     {
      public:
       typedef boost::shared_ptr<svl_sink> sptr;
@@ -48,12 +48,13 @@ namespace gr {
        */
       static sptr make();
 
-
       /**
        */
       virtual size_t create_vradio() = 0;
 
       /**
+							* @param vradio_id
+							* @param bandwidth
        */
       virtual int set_vradio_subcarriers(size_t vradio_id, size_t bandwidth) = 0;
     };

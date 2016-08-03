@@ -105,8 +105,10 @@ endif(APPLE)
 ########################################################################
 find_package(CppUnit)
 find_package(Doxygen)
+find_package(FFTW)
 
-# Search for GNU Radio and its components and versions. Add any
+# SearLibXML++ ch for GNU Radio and its components and versions. Add any
+
 # components required to the list of GR_REQUIRED_COMPONENTS (in all
 # caps such as FILTER or FFT) and change the version to the minimum
 # API compatible version required.
@@ -143,6 +145,7 @@ link_directories(
     ${Boost_LIBRARY_DIRS}
     ${CPPUNIT_LIBRARY_DIRS}
     ${GNURADIO_RUNTIME_LIBRARY_DIRS}
+    ${FFTW_LIBRARIES}
 )
 
 # Set component parameters
