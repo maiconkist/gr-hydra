@@ -45,18 +45,25 @@ namespace gr {
        * constructor is in a private implementation
        * class. svl::svl_sink::make is the public interface for
        * creating new instances.
+       *
+       * @param _n_inputs Number of VRadios
+       * @param _fft_m_len Size of the FFT M
+       * @param _fft_n_len Vector with the size of FFT N for each VRadio. Format: [fft_n_for_vr1, fft_n_for_vr2, ..., fft_n_for_vrk]
        */
-      static sptr make();
+      static sptr make(size_t _n_inputs,
+                      size_t _fft_m_len,
+                      const std::vector<int> _fft_n_len);
 
       /**
+       * @param _fft_n_len
        */
-      virtual size_t create_vradio() = 0;
+      virtual size_t create_vradio(size_t _fft_n_len) = 0;
 
       /**
-							* @param vradio_id
-							* @param bandwidth
+       * @param _vradio_id
+       * @param _fft_n_len
        */
-      virtual int set_vradio_subcarriers(size_t vradio_id, size_t bandwidth) = 0;
+      virtual int set_vradio_subcarriers(size_t _vradio_id, size_t _fft_n_len) = 0;
     };
 
   } // namespace svl
