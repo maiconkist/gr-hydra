@@ -24,11 +24,10 @@ description here (python/__init__.py).
 '''
 
 # import swig generated symbols into the svl namespace
+import os
 try:
-	# this might fail if the module is python-only
-	from svl_swig import *
+    from svl_swig import *
 except ImportError:
-	pass
-
-# import any pure python here
-#
+    dirname, filename = os.path.split(os.path.abspath(__file__))
+    __path__.append(os.path.join(dirname, "..", "..", "swig"))
+    from svl_swig import *

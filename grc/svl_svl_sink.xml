@@ -4,7 +4,7 @@
   <key>svl_svl_sink</key>
   <category>svl</category>
   <import>import svl</import>
-  <make>svl.svl_sink($num_inputs, , $fft_m_size)</make>
+  <make>svl.svl_sink($num_inputs, $fft_m_size, $fft_n_size)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
@@ -53,5 +53,6 @@
   <source>
     <name>out</name>
     <type>complex</type>
+    <vlen>$fft_m_size</vlen>
   </source>
 </block>

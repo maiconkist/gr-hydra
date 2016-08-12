@@ -138,6 +138,7 @@ namespace gr {
             add_iq_sample(const gr_complex *samples, size_t len)
             {
                g_tx_samples.insert(g_tx_samples.end(), samples, samples + len);
+               std::cout << "g_tx_samples.size(): " <<  g_tx_samples.size() << std::endl;
             }
 
             void
@@ -202,6 +203,8 @@ namespace gr {
                {
                   samples_buf[(*it)] = tx_samples_freq[idx]; 
                }
+
+               g_tx_samples.clear();
 
                return true;
             }
@@ -331,7 +334,6 @@ namespace gr {
          samples_vec
          get_tx_outbuf()
          {
-            std::cout << __FUNCTION__ << "[" << __LINE__ << "]" << std::endl;
             /* Return the vector with samples
              * @return Vector of samples to transmit in TIME domain.
              */
@@ -359,8 +361,6 @@ namespace gr {
                g_tx_iq_vec[i] = g_ifft_complex->get_outbuf()[i];
 
             // Finished
-            PRINT_VEC_SAMPLES(samp_freq_vec);
-            PRINT_VEC_SAMPLES(g_tx_iq_vec);
             return g_tx_iq_vec;
          }
       };
@@ -441,9 +441,8 @@ namespace gr {
             //         ........................... 1 .......................... 1
             //         ........................... 2 .......................... 2
             //         ........................... N .......................... N
-            std::cout << __FUNCTION__	<< ": Forwarding samples to Radio " << i << std::endl;
             const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[i]);
-            g_hypervisor->get_vradio(i)->add_iq_sample(in, ninput_items[i]);
+            g_hypervisor->get_vradio(i)->add_iq_sample(in, 1);
 
             // Consume the items in the input port i
             consume(i, ninput_items[i]);
@@ -461,7 +460,7 @@ namespace gr {
                   out_samples_vec.size());
 
             // Return what GNURADIO expects
-            return noutput_items;
+            return 1;
          }
 
          // No outputs generated.
