@@ -36,10 +36,10 @@ class qa_svl_sink (gr_unittest.TestCase):
         # set up fg
         src1 = analog.sig_source_c(32e3, analog.GR_SIN_WAVE, 5e3, 1)
 
-        dst = blocks.vector_sink_c(128)
-        op1 = blocks.head(gr.sizeof_gr_complex, 128)
+        dst = blocks.vector_sink_c(512)
+        op1 = blocks.head(gr.sizeof_gr_complex, 1024)
 
-        hypervisor = svl.svl_sink(1, 128, (128,))
+        hypervisor = svl.svl_sink(1, 512, (512,))
         self.tb.connect(src1, op1, (hypervisor, 0))
         self.tb.connect(hypervisor, dst)
 

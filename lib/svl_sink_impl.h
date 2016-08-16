@@ -56,7 +56,7 @@ namespace gr {
              * @param noutput_items
              * @param ninput_items_required
              */ 
-            void forecast(int noutput_items, gr_vector_int &ninput_items_required);
+            //void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
 
             // implementation of svl_sink virtual methods

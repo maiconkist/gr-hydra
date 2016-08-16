@@ -141,10 +141,8 @@ namespace gr {
             int
             forecast(int noutput_items)
             {
-
                if (0 == g_tx_samples.size())
                        return noutput_items * fft_n_len;
-
 
                int required = noutput_items - g_tx_samples.size();
                if (required <= 0) return 0;
@@ -179,29 +177,27 @@ namespace gr {
 
                //
                if (0 == g_tx_samples.size())
-               {
-                  g_tx_samples.push_back(samples_vec());
-               }
+                       g_tx_samples.push_back(samples_vec(0));
 
                // While we have samples to transfer
                while (consumed < len)
                {
-
                   // If we filled the last samples_vec, create a new one
                   if (g_tx_samples.back().size() == fft_n_len)
-                  {
                      g_tx_samples.push_back(samples_vec());
-                  }
 
-                  // Copy the quantity necessary until:
-                  //  i.  ls has exactly fft_n_len elements or
-                  //  ii. our samples buf ended
-                  for (size_t it = consumed % fft_n_len;
-                        (it < fft_n_len) && (consumed < len);
-                        ++it, ++consumed)
-                  {
-                     g_tx_samples.back().push_back( samples[consumed] );
-                  }
+                  std::cout << "cheking 1"  << std::endl;
+                  size_t rest = std::min(len - consumed,
+                                  fft_n_len - g_tx_samples.back().size());
+
+                  std::cout << "cheking 2:"  <<  rest  << std::endl;
+                  std::cout << "cheking 2:"  <<  consumed+rest << std::endl;
+
+                  // TRICKY: use std::copy instead of this loop. Was seg faulting
+                  for (int i = 0; i < rest; ++i )
+                     g_tx_samples.back().push_back( samples[consumed+i] );
+
+                  consumed += rest;
                }
 
                if (consumed > len) std::cout << __FUNCTION__ << ": ERROR" << std::endl;
@@ -239,7 +235,8 @@ namespace gr {
                }
 
                // Transfer samples to fft_complex buff and perform fft
-               memcpy(g_ifft_complex->get_inbuf(), &rx_samples_freq[0], fft_n_len);
+               std::copy(rx_samples_freq.begin(), rx_samples_freq.end(),
+                               g_ifft_complex->get_inbuf());
                g_ifft_complex->execute();
 
                // Copy buff from fft_complex
@@ -269,9 +266,11 @@ namespace gr {
                if (!ready_to_map_iq_samples()) return false;
 
                // Copy samples in TIME domain to FFT buffer, execute FFT
-               memcpy(g_fft_complex->get_inbuf(), &g_tx_samples.begin()[0], fft_n_len);
+               std::copy(g_tx_samples[0].begin(), g_tx_samples[0].end(), g_fft_complex->get_inbuf());
+
                g_fft_complex->execute();
                samples_vec tx_samples_freq(g_fft_complex->get_outbuf(), g_fft_complex->get_outbuf() + fft_n_len);
+
 
                g_tx_samples.erase( g_tx_samples.begin() );
 
@@ -283,6 +282,7 @@ namespace gr {
                {
                   samples_buf[(*it)] = tx_samples_freq[idx]; 
                }
+
 
                return true;
             }
@@ -445,7 +445,7 @@ namespace gr {
          void
          demultiplex()
          {
-            memcpy(g_fft_complex->get_inbuf(), &g_rx_iq_vec[0], sizeof(gr_complex) * fft_m_len);
+            std::copy(g_rx_iq_vec.begin(), g_rx_iq_vec.end(), g_fft_complex->get_inbuf());
             g_fft_complex->execute();
             samples_vec rx_samples_freq(g_fft_complex->get_outbuf(), g_fft_complex->get_outbuf() + fft_m_len);
          }
@@ -477,29 +477,20 @@ namespace gr {
                }
    
                // Transform buffer from FREQ domain to TIME domain using IFFT
-               memcpy(g_ifft_complex->get_inbuf(),
-                               &samp_freq_vec[0],
-                               sizeof(gr_complex)* fft_m_len);
+               std::copy(samp_freq_vec.begin(), samp_freq_vec.end(),
+                               g_ifft_complex->get_inbuf() );
                g_ifft_complex->execute();
    
                // Copy to GNURADIO buffer
-               memcpy(&output_buff[noutput_items * fft_m_len],
-                               g_ifft_complex->get_outbuf(),
-                               fft_m_len);
+               /*
+               for (int i = 0; i < fft_m_len; ++i)
+                       output_buff[noutput_items + i] = g_ifft_complex->get_outbuf()[i];
+                */
+               std::copy(g_ifft_complex->get_outbuf(),
+                               &g_ifft_complex->get_outbuf()[fft_m_len],
+                               &output_buff[noutput_items]);
                noutput_items++;
-
-               std::cout << "XXX" << std::endl;
-               if (noutput_items == 1)
-               {
-                  for (int ii = 0; ii < fft_m_len; ii++)
-                     std::cout << output_buff[ii] << ", ";
-                  std::cout << std::endl;
-                 
-               
-               }
             }
-
-
 
             return noutput_items;
          }
@@ -571,11 +562,13 @@ namespace gr {
        * @param noutput_items
        * @param ninput_items_required
        */
+      /*
       void
       svl_sink_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
       {
          g_hypervisor->forecast(noutput_items, ninput_items_required);
       }
+      */
 
       /**
        * @param noutput_items
@@ -589,13 +582,11 @@ namespace gr {
             gr_vector_const_void_star &input_items,
             gr_vector_void_star &output_items)
       {
-//         std::cout << "----- work \n"
-//            << "input_items.size(): " << input_items.size() << "\n"
-//           << "ninput_items[0]: " << ninput_items[0] << "\n"
-//            << "ninput_items[1]: " << ninput_items[1] << "\n"
-//            << "output_items.size(): " << output_items.size() << "\n"
-//            << "noutput_items: " << noutput_items << "\n"
- //           << std::endl;
+         std::cout << "----- work \n"
+            << "input_items.size(): " << input_items.size() << "\n"
+            << "output_items.size(): " << output_items.size() << "\n"
+            << "noutput_items: " << noutput_items << "\n"
+         << std::endl;
 
          for (size_t i = 0; i < ninput_items.size(); ++i)
          {
@@ -610,6 +601,7 @@ namespace gr {
             const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[i]);
             g_hypervisor->get_vradio(i)->add_iq_sample(in, ninput_items[i]);
 
+
             // Consume the items in the input port i
             consume(i, ninput_items[i]);
          }
@@ -620,6 +612,7 @@ namespace gr {
             // Get buffer in TIME domain
             // Return what GNURADIO expects
             size_t t =  g_hypervisor->get_tx_outbuf(reinterpret_cast<gr_complex *>(output_items[0]), noutput_items);
+
             return t;
          }
 
