@@ -32,7 +32,7 @@
     <type>raw</type>
   </param>
 
-  <check>$num_inputs &gt; 1</check>
+  <check>$num_inputs &gt; 0</check>
  
   <!-- Make one 'sink' node per input. Sub-nodes:
        * name (an identifier for the GUI)

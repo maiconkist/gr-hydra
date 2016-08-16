@@ -41,16 +41,22 @@ namespace gr {
 				 * @param _fft_n_len
 				 */
             svl_sink_impl(size_t _n_inputs,
-									 size_t _fft_m_len,
-									 const std::vector<int> _fft_n_len);
+                            size_t _fft_m_len,
+                            const std::vector<int> _fft_n_len);
 
             ~svl_sink_impl();
 
             // Where all the action really happens
 				int general_work(int noutput_items,
-									 gr_vector_int &ninput_items,
-									 gr_vector_const_void_star &input_items,
-									 gr_vector_void_star &output_items);
+                            gr_vector_int &ninput_items,
+                            gr_vector_const_void_star &input_items,
+                            gr_vector_void_star &output_items);
+
+            /**
+             * @param noutput_items
+             * @param ninput_items_required
+             */ 
+            void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
 
             // implementation of svl_sink virtual methods
@@ -62,4 +68,3 @@ namespace gr {
 } // namespace gr
 
 #endif /* INCLUDED_SVL_SVL-SINK_IMPL_H */
-
