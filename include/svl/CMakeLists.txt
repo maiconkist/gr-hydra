@@ -23,5 +23,5 @@
 install(FILES
     api.h
     svl_sink.h
-    DESTINATION include/svl
+    svl_source.h DESTINATION include/svl
 )

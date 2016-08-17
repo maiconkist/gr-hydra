@@ -18,5 +18,5 @@
 # Boston, MA 02110-1301, USA.
 install(FILES
     svl_svl_sink.xml
-    DESTINATION share/gnuradio/grc/blocks
+    svl_svl_source.xml DESTINATION share/gnuradio/grc/blocks
 )

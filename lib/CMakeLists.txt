@@ -26,7 +26,7 @@ include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND svl_sources
     svl_sink_impl.cc
-    )
+    svl_source_impl.cc )
 
 set(svl_sources "${svl_sources}" PARENT_SCOPE)
 if(NOT svl_sources)

@@ -9,8 +9,11 @@
 
 %{
 #include "svl/svl_sink.h"
+#include "svl/svl_source.h"
 %}
 
 
 %include "svl/svl_sink.h"
 GR_SWIG_BLOCK_MAGIC2(svl, svl_sink);
+%include "svl/svl_source.h"
+GR_SWIG_BLOCK_MAGIC2(svl, svl_source);
