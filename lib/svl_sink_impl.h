@@ -35,11 +35,11 @@ namespace gr {
             hypervisor_ptr g_hypervisor;
 
          public:
-				/**
-				 * @param _n_inputs
-				 * @param _fft_m_len
-				 * @param _fft_n_len
-				 */
+	    /**
+	     * @param _n_inputs
+	     * @param _fft_m_len
+	     * @param _fft_n_len
+	     */
             svl_sink_impl(size_t _n_inputs,
                             size_t _fft_m_len,
                             const std::vector<int> _fft_n_len);
