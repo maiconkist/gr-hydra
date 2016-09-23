@@ -42,6 +42,10 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
     add_definitions(-fvisibility=hidden)
 endif()
 
+if (APPLE)
+	add_definitions(-std=c++11 -stdlib=libc++)
+endif()
+
 ########################################################################
 # Find boost
 ########################################################################
