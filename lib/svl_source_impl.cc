@@ -41,7 +41,7 @@ namespace gr {
     svl_source_impl::svl_source_impl()
       : gr::sync_block("svl_source",
               gr::io_signature::make(0, 0, 0),
-              gr::io_signature::make(<+MIN_OUT+>, <+MAX_OUT+>, sizeof(<+OTYPE+>)))
+              gr::io_signature::make(0, 0, 0))
     {}
 
     /*
@@ -56,8 +56,6 @@ namespace gr {
         gr_vector_const_void_star &input_items,
         gr_vector_void_star &output_items)
     {
-      <+OTYPE+> *out = (<+OTYPE+> *) output_items[0];
-
       // Do <+signal processing+>
 
       // Tell runtime system how many output items we produced.

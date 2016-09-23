@@ -22,11 +22,10 @@
 #define INCLUDED_SVL_SVL_SINK_IMPL_H
 
 #include <svl/svl_sink.h>
+#include <svl/svl_hypervisor.h>
 
 namespace gr {
    namespace svl {
-
-      class Hypervisor;
 
       class svl_sink_impl : public svl_sink
       {
