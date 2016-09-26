@@ -33,16 +33,16 @@ namespace gr {
    namespace svl {
 
 /*
- * @param _n_inputs
+ * @param _n_ports
  * @param _fft_m_len
  * @param _fft_n_len
  */
-svl_sink::sptr
-svl_sink::make(size_t _n_inputs,
+svl_block::sptr
+svl_block::make(size_t _n_ports,
                size_t _fft_m_len,
                const std::vector<int> _fft_n_len)
 {
-	return gnuradio::get_initial_sptr(new svl_sink_impl(_n_inputs,
+	return gnuradio::get_initial_sptr(new svl_sink_impl(_n_ports,
       _fft_m_len,
       _fft_n_len));
 }

@@ -21,49 +21,44 @@
 #ifndef INCLUDED_SVL_SVL_SINK_IMPL_H
 #define INCLUDED_SVL_SVL_SINK_IMPL_H
 
-#include <svl/svl_sink.h>
+#include <svl/svl_block.h>
 #include <svl/svl_hypervisor.h>
 
 namespace gr {
    namespace svl {
 
-      class svl_sink_impl : public svl_sink
-      {
-         private:
-            typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
-            hypervisor_ptr g_hypervisor;
+class svl_sink_impl : public svl_block
+{
+   private:
+      typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
+      hypervisor_ptr g_hypervisor;
 
-         public:
-	    /**
-	     * @param _n_inputs
-	     * @param _fft_m_len
-	     * @param _fft_n_len
-	     */
-            svl_sink_impl(size_t _n_inputs,
-                            size_t _fft_m_len,
-                            const std::vector<int> _fft_n_len);
+   public:
+      /**
+       * @param _n_inputs
+       * @param _fft_m_len
+       * @param _fft_n_len
+       */
+      svl_sink_impl(size_t _n_inputs,
+                      size_t _fft_m_len,
+                      const std::vector<int> _fft_n_len);
 
-            ~svl_sink_impl();
+      ~svl_sink_impl();
 
-            // Where all the action really happens
-				int general_work(int noutput_items,
-                            gr_vector_int &ninput_items,
-                            gr_vector_const_void_star &input_items,
-                            gr_vector_void_star &output_items);
-
-            /**
-             * @param noutput_items
-             * @param ninput_items_required
-             */ 
-            //void forecast(int noutput_items, gr_vector_int &ninput_items_required);
+      // Where all the action really happens
+		int general_work(int noutput_items,
+                      gr_vector_int &ninput_items,
+                      gr_vector_const_void_star &input_items,
+                      gr_vector_void_star &output_items);
 
 
-            // implementation of svl_sink virtual methods
-            virtual size_t create_vradio(size_t _fft_n_len); 
-            virtual int set_vradio_subcarriers(size_t _vradio_id, size_t _fft_n_len);
-         };
+      // implementation of svl_sink virtual methods
+      virtual size_t create_vradio(size_t _fft_n_len); 
+      virtual int set_vradio_subcarriers(size_t _vradio_id,
+                      size_t _fft_n_len);
+};
 
-  } // namespace svl
+} // namespace svl
 } // namespace gr
 
 #endif /* INCLUDED_SVL_SVL-SINK_IMPL_H */

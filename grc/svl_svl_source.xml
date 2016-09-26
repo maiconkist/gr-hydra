@@ -4,17 +4,29 @@
   <key>svl_svl_source</key>
   <category>svl</category>
   <import>import svl</import>
-  <make>svl.svl_source()</make>
-  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
-       Sub-nodes:
-       * name
-       * key (makes the value accessible as $keyname, e.g. in the make node)
-       * type -->
+  <make>svl.svl_source($num_outputs, $fft_m_size, $fft_n_size)</make>
+
+
   <param>
-    <name>...</name>
-    <key>...</key>
-    <type>...</type>
+    <name>Num VRadios</name>
+    <key>num_outputs</key>
+    <value>2</value>
+    <type>int</type>
   </param>
+  <param>
+    <name>FFT M Size</name>
+    <key>fft_m_size</key>
+    <value>1024</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>FFT N Size</name>
+    <key>fft_n_size</key>
+    <value>()</value>
+    <type>raw</type>
+  </param>
+
+  <check>$num_outputs &gt; 0</check>
 
   <!-- Make one 'sink' node per input. Sub-nodes:
        * name (an identifier for the GUI)
@@ -23,7 +35,7 @@
        * optional (set to 1 for optional inputs) -->
   <sink>
     <name>in</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>complex</type>
   </sink>
 
   <!-- Make one 'source' node per output. Sub-nodes:
@@ -33,6 +45,9 @@
        * optional (set to 1 for optional inputs) -->
   <source>
     <name>out</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>complex</type>
+    <nports>$num_outputs</nports>
+    <vlen>$fft_m_size</vlen>
   </source>
+
 </block>

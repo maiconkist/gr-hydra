@@ -25,6 +25,8 @@
 #include "config.h"
 #endif
 
+#include <svl/api.h>
+
 #include <boost/shared_ptr.hpp>
 #include <fftw3.h>
 #include <gnuradio/types.h>
@@ -35,7 +37,7 @@ namespace gr {
 // Implemented my own fft_complex clas.
 // GNURADIO's one was not working properly. To work, I would need to perform memory aligments in the input buffers
 // So, I implemented this one which has the same function signatures.
-class fft_complex 
+class SVL_API fft_complex 
 {
 	private:
 		size_t g_fft_size;
@@ -44,24 +46,12 @@ class fft_complex
 
 
 	public:
-		fft_complex(size_t fft_size, bool forward = true)
-		{
-	   	g_inbuf = new gr_complex[fft_size];
-			g_outbuf = new gr_complex[fft_size];
+		fft_complex(size_t fft_size, bool forward = true);
 
-			g_plan = fftwf_plan_dft_1d(fft_size,
-								 reinterpret_cast<fftwf_complex *>(g_inbuf),
-								 reinterpret_cast<fftwf_complex *>(g_outbuf),
-								 forward? FFTW_FORWARD:FFTW_BACKWARD,
-								 FFTW_MEASURE);
+		gr_complex* get_inbuf();
+		gr_complex* get_outbuf();
 
-
-		}
-
-		gr_complex* get_inbuf(){ return g_inbuf; }
-		gr_complex* get_outbuf() { return g_outbuf; }
-
-		void execute() { fftwf_execute(g_plan); }
+		void execute();
 };
 
 /* TYPEDEFS for this class */

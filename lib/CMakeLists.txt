@@ -26,6 +26,7 @@ include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND svl_sources
     svl_virtual_radio.cc
+    svl_fft.cc
 	 svl_hypervisor.cc
     svl_sink_impl.cc
     svl_source_impl.cc )

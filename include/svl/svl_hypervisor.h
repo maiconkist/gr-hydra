@@ -2,6 +2,7 @@
 #define INCLUDED_SVL_SVL_HYPERVISOR_H
 
 #include "svl_virtual_radio.h"
+#include "svl_fft.h"
 
 #include <vector>
 

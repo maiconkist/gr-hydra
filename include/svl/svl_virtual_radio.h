@@ -9,6 +9,10 @@
 namespace gr {
 	namespace svl {
 
+/** TYPEDEFS **/
+typedef std::vector<size_t> iq_map_vec;
+typedef std::vector<gr_complex> samples_vec;
+
 /**
  */
 class VirtualRadio
