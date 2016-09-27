@@ -18,54 +18,60 @@
  * Boston, MA 02110-1301, USA.
  */
 
-
-#ifndef INCLUDED_SVL_SVL_SINK_H
-#define INCLUDED_SVL_SVL_SINK_H
+#ifndef INCLUDED_SVL_SVL_SINK_IMPL_H
+#define INCLUDED_SVL_SVL_SINK_IMPL_H
 
 #include <svl/api.h>
-#include <gnuradio/block.h>
+
+#include <svl/svl_block.h>
+#include <svl/svl_hypervisor.h>
 
 namespace gr {
    namespace svl {
 
-      /*!
-       * \brief Multiplex and demultiplex multiple waveforms in the spectrum band
-       * \ingroup svl
+class SVL_API svl_sink : public svl_block
+{
+   private:
+
+      typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
+      hypervisor_ptr g_hypervisor;
+
+   public:
+      typedef boost::shared_ptr<svl_sink> svl_sink_ptr;
+
+      /**
+       * @param _n_inputs
+       * @param _fft_m_len
+       * @param _fft_n_len
        */
-      class SVL_API svl_sink : virtual public gr::block
-      {
-         public:
-            // gr::svl::sptr
-            typedef boost::shared_ptr<svl_sink> sptr;
+      static svl_block_ptr make(size_t _n_ports,
+            size_t _fft_m_len,
+            const std::vector<int> _fft_n_len);
 
-            /*!
-             * \brief Return a shared_ptr to a new instance of svl::svl_sink.
-             *
-             * To avoid accidental use of raw pointers, svl::svl_sink's
-             * constructor is in a private implementation
-             * class. svl::svl_sink::make is the public interface for
-             * creating new instances.
-             *
-             * @param _n_inputs Number of VRadios
-             * @param _fft_m_len Size of the FFT M
-             * @param _fft_n_len Vector with the size of FFT N for each VRadio. Format: [fft_n_for_vr1, fft_n_for_vr2, ..., fft_n_for_vrk]
-             */
-            static sptr make(size_t _n_inputs,
-                  size_t _fft_m_len,
-                  const std::vector<int> _fft_n_len);
+      /** CTOR
+       */
+      svl_sink(size_t _n_inputs,
+            size_t _fft_m_len,
+            const std::vector<int> _fft_n_len);
 
-            /**
-             * @param _fft_n_len
-             */
-            virtual size_t create_vradio(size_t _fft_n_len) = 0;
+      /** DTOR
+       */
+      ~svl_sink();
 
-            /**
-             * @param _vradio_id
-             * @param _fft_n_len
-             */
-            virtual int set_vradio_subcarriers(size_t _vradio_id, size_t _fft_n_len) = 0;
-      };
-   } // namespace svl
+      // Where all the action really happens
+		int general_work(int noutput_items,
+                      gr_vector_int &ninput_items,
+                      gr_vector_const_void_star &input_items,
+                      gr_vector_void_star &output_items);
+
+
+      // implementation of svl_sink virtual methods
+      virtual size_t create_vradio(size_t _fft_n_len); 
+      virtual int set_vradio_subcarriers(size_t _vradio_id,
+                      size_t _fft_n_len);
+};
+
+} // namespace svl
 } // namespace gr
 
-#endif /* INCLUDED_SVL_SVL-SINK_H */
+#endif /* INCLUDED_SVL_SVL-SINK_IMPL_H */

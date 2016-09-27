@@ -17,8 +17,6 @@
  * the Free Software Foundation, Inc., 51 Franklin Street,
  * Boston, MA 02110-1301, USA.
  */
-
-
 #ifndef INCLUDED_SVL_SVL_BLOCK_H
 #define INCLUDED_SVL_SVL_BLOCK_H
 
@@ -28,44 +26,28 @@
 namespace gr {
    namespace svl {
 
-      /*!
-       * \brief Multiplex and demultiplex multiple waveforms in the spectrum band
-       * \ingroup svl
+/*!
+ * \brief Multiplex and demultiplex multiple waveforms in the spectrum band
+ * \ingroup svl
+ */
+class SVL_API svl_block : virtual public gr::block
+{
+   public:
+      /**
+       * @param _fft_n_len
        */
-      class SVL_API svl_block : virtual public gr::block
-      {
-         public:
-            // gr::svl::sptr
-            typedef boost::shared_ptr<svl_block> sptr;
+      virtual size_t create_vradio(size_t _fft_n_len) = 0;
 
-            /*!
-             * \brief Return a shared_ptr to a new instance of svl::svl_sink.
-             *
-             * To avoid accidental use of raw pointers, svl::svl_sink's
-             * constructor is in a private implementation
-             * class. svl::svl_sink::make is the public interface for
-             * creating new instances.
-             *
-             * @param _n_ports Number of VRadios
-             * @param _fft_m_len Size of the FFT M
-             * @param _fft_n_len Vector with the size of FFT N for each VRadio. Format: [fft_n_for_vr1, fft_n_for_vr2, ..., fft_n_for_vrk]
-             */
-            static sptr make(size_t _n_ports,
-                  size_t _fft_m_len,
-                  const std::vector<int> _fft_n_len);
+      /**
+       * @param _vradio_id
+       * @param _fft_n_len
+       */
+      virtual int set_vradio_subcarriers(size_t _vradio_id,
+            size_t _fft_n_len) = 0;
+};
 
-            /**
-             * @param _fft_n_len
-             */
-            virtual size_t create_vradio(size_t _fft_n_len) = 0;
 
-            /**
-             * @param _vradio_id
-             * @param _fft_n_len
-             */
-            virtual int set_vradio_subcarriers(size_t _vradio_id, size_t _fft_n_len) = 0;
-      };
-   } // namespace svl
+} // namespace svl
 } // namespace gr
 
 #endif /* INCLUDED_SVL_SVL-SINK_H */

@@ -28,8 +28,7 @@ list(APPEND svl_sources
     svl_virtual_radio.cc
     svl_fft.cc
 	 svl_hypervisor.cc
-    svl_sink_impl.cc
-    svl_source_impl.cc )
+    svl_sink.cc)
 
 set(svl_sources "${svl_sources}" PARENT_SCOPE)
 if(NOT svl_sources)

@@ -23,9 +23,8 @@
 install(FILES
     api.h
 	 types.h
-    svl_sink.h
-    svl_source.h
     svl_block.h
+    svl_sink.h
 	 svl_fft.h
 	 svl_virtual_radio.h
 	 svl_hypervisor.h

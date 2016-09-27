@@ -1,10 +1,11 @@
 #ifndef INCLUDED_SVL_SVL_VIRTUAL_RADIO_H
 #define INCLUDED_SVL_SVL_VIRTUAL_RADIO_H
 
-#include <vector>
-#include "types.h"
+#include <svl/api.h>
+#include <svl/svl_fft.h>
+#include <svl/types.h>
 
-#include "svl_fft.h"
+#include <vector>
 
 namespace gr {
 	namespace svl {
@@ -15,7 +16,7 @@ typedef std::vector<gr_complex> samples_vec;
 
 /**
  */
-class VirtualRadio
+class SVL_API VirtualRadio
 {
 	private:
 		size_t fft_n_len;

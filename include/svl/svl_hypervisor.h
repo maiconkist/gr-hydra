@@ -1,6 +1,8 @@
 #ifndef INCLUDED_SVL_SVL_HYPERVISOR_H
 #define INCLUDED_SVL_SVL_HYPERVISOR_H
 
+#include <svl/api.h>
+
 #include "svl_virtual_radio.h"
 #include "svl_fft.h"
 
@@ -9,7 +11,7 @@
 namespace gr {
    namespace svl {
 
-class Hypervisor
+class SVL_API Hypervisor
 {
    private:
       typedef std::vector<vradio_ptr> vradio_vec;

@@ -23,45 +23,40 @@
 #endif
 
 #include <gnuradio/io_signature.h>
-#include "svl_source_impl.h"
+#include <svl/svl_source.h>
 
 namespace gr {
-  namespace svl {
+   namespace svl {
 
-    svl_source::sptr
-    svl_source::make()
-    {
-      return gnuradio::get_initial_sptr
-        (new svl_source_impl());
-    }
+svl_block::sptr
+svl_source::make(size_t _n_ports,
+               size_t _fft_m_len,
+               const std::vector<int> _fft_n_len)
+{
+	return gnuradio::get_initial_sptr(new svl_source());
+}
 
-    /*
-     * The private constructor
-     */
-    svl_source_impl::svl_source_impl()
-      : gr::sync_block("svl_source",
-              gr::io_signature::make(0, 0, 0),
-              gr::io_signature::make(0, 0, 0))
-    {}
 
-    /*
-     * Our virtual destructor.
-     */
-    svl_source_impl::~svl_source_impl()
-    {
-    }
+svl_source::svl_source() : gr::block("svl_source",
+      gr::io_signature::make(0, 0, 0),
+      gr::io_signature::make(0, 0, 0))
+{
 
-    int
-    svl_source_impl::work(int noutput_items,
-        gr_vector_const_void_star &input_items,
-        gr_vector_void_star &output_items)
-    {
-      // Do <+signal processing+>
+}
 
-      // Tell runtime system how many output items we produced.
-      return noutput_items;
-    }
+svl_source::~svl_source()
+{
+}
 
-  } /* namespace svl */
+int
+svl_source::work(int noutput_items,
+      gr_vector_const_void_star &input_items,
+      gr_vector_void_star &output_items)
+{
+   // Tell runtime system how many output items we produced.
+   return noutput_items;
+}
+
+
+   } /* namespace svl */
 } /* namespace gr */
-

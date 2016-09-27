@@ -25,9 +25,11 @@
 #include <gnuradio/io_signature.h>
 #include <string.h>
 
-#include "svl_sink_impl.h"
-#include "svl/svl_fft.h"
-#include "svl/svl_virtual_radio.h"
+#include <svl/svl_sink.h>
+#include <svl/svl_fft.h>
+#include <svl/svl_virtual_radio.h>
+
+#include "easylogging++.h"
 
 namespace gr {
    namespace svl {
@@ -37,14 +39,14 @@ namespace gr {
  * @param _fft_m_len
  * @param _fft_n_len
  */
-svl_block::sptr
-svl_block::make(size_t _n_ports,
-               size_t _fft_m_len,
-               const std::vector<int> _fft_n_len)
+svl_sink::svl_sink_ptr
+svl_sink::make(size_t _n_ports,
+      size_t _fft_m_len,
+      const std::vector<int> _fft_n_len)
 {
-	return gnuradio::get_initial_sptr(new svl_sink_impl(_n_ports,
-      _fft_m_len,
-      _fft_n_len));
+   return gnuradio::get_initial_sptr(new svl_sink(_n_ports,
+         _fft_m_len,
+         _fft_n_len));
 }
 
 /**
@@ -53,13 +55,14 @@ svl_block::make(size_t _n_ports,
  * @param _fft_m_len
  * @param _fft_n_len
  */
-svl_sink_impl::svl_sink_impl(size_t _n_inputs,
-                size_t _fft_m_len,
-                const std::vector<int> _fft_n_len): gr::block("svl_sink",
-      gr::io_signature::make(_n_inputs, _n_inputs, sizeof(gr_complex)),
-      gr::io_signature::make(1, 1, sizeof(gr_complex)*_fft_m_len))
+svl_sink::svl_sink(size_t _n_inputs,
+      size_t _fft_m_len,
+      const std::vector<int> _fft_n_len):gr::block("svl_sink",
+   gr::io_signature::make(_n_inputs, _n_inputs, sizeof(gr_complex)),
+   gr::io_signature::make(1, 1, sizeof(gr_complex)*_fft_m_len))
 {
-   g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len));  
+   LOG(INFO) << "New svl_sink created: inputs: " << _n_inputs;
+   g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len));
 
    for (size_t i = 0; i < _n_inputs; ++i)
       create_vradio(_fft_n_len[i]);
@@ -70,7 +73,7 @@ svl_sink_impl::svl_sink_impl(size_t _n_inputs,
 /**
  * Our virtual destructor.
  */
-svl_sink_impl::~svl_sink_impl()
+svl_sink::~svl_sink()
 {
 }
 
@@ -78,7 +81,7 @@ svl_sink_impl::~svl_sink_impl()
  * @param _fft_n_len
  */
 size_t
-svl_sink_impl::create_vradio(size_t _fft_n_len)
+svl_sink::create_vradio(size_t _fft_n_len)
 {
    return  g_hypervisor->create_vradio(_fft_n_len);  
 }
@@ -88,7 +91,7 @@ svl_sink_impl::create_vradio(size_t _fft_n_len)
  * @param _fft_n_len
  */
 int
-svl_sink_impl::set_vradio_subcarriers(size_t _vradio_id, size_t _fft_n_len)
+svl_sink::set_vradio_subcarriers(size_t _vradio_id, size_t _fft_n_len)
 {
    return g_hypervisor->set_vradio_subcarriers(_vradio_id, _fft_n_len);   
 }
@@ -112,7 +115,7 @@ svl_sink_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
  * @param output_items
  */
 int
-svl_sink_impl::general_work(int noutput_items,
+svl_sink::general_work(int noutput_items,
       gr_vector_int &ninput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
@@ -152,5 +155,7 @@ svl_sink_impl::general_work(int noutput_items,
    // No outputs generated.
    return 0;
 }
+
+
 } /* namespace svl */
 } /* namespace gr */

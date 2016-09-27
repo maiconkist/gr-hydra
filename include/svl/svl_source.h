@@ -18,39 +18,44 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#ifndef INCLUDED_SVL_SVL_SOURCE_IMPL_H
+#define INCLUDED_SVL_SVL_SOURCE_IMPL_H
 
-#ifndef INCLUDED_SVL_SVL_SOURCE_H
-#define INCLUDED_SVL_SVL_SOURCE_H
-
-#include <svl/api.h>
-#include <gnuradio/sync_block.h>
+#include <svl/svl_block.h>
+#include <svl/svl_source.h>
 
 namespace gr {
-  namespace svl {
+   namespace svl {
 
-    /*!
-     * \brief <+description of block+>
-     * \ingroup svl
-     *
-     */
-    class SVL_API svl_source : virtual public gr::sync_block
-    {
-     public:
-      typedef boost::shared_ptr<svl_source> sptr;
+class SVL_API svl_source : public svl_block
+{
+   private:
+      // Nothing to declare in this block.
 
-      /*!
-       * \brief Return a shared_ptr to a new instance of svl::svl_source.
-       *
-       * To avoid accidental use of raw pointers, svl::svl_source's
-       * constructor is in a private implementation
-       * class. svl::svl_source::make is the public interface for
-       * creating new instances.
+   public:
+      static sptr make(size_t _n_ports,
+                      size_t _fft_m_len,
+                      const std::vector<int> _fft_n_len);
+
+      /** CTOR
        */
-      static sptr make();
-    };
+      svl_source();
 
-  } // namespace svl
+      /** DTOR
+       */
+      ~svl_source();
+
+      int work(int noutput_items,
+         gr_vector_const_void_star &input_items,
+         gr_vector_void_star &output_items);
+
+      virtual size_t create_vradio(size_t _fft_n_len) { return 0; }
+
+      virtual int set_vradio_subcarriers(size_t _vradio_id,
+                      size_t _fft_n_len) { return 0; }
+};
+
+   } // namespace svl
 } // namespace gr
 
-#endif /* INCLUDED_SVL_SVL_SOURCE_H */
-
+#endif /* INCLUDED_SVL_SVL_SOURCE_IMPL_H */

@@ -23,7 +23,6 @@ from gnuradio import gr, gr_unittest
 from gnuradio import analog, blocks
 import svl_swig as svl
 
-
 class qa_svl_sink (gr_unittest.TestCase):
 
     def setUp(self):
@@ -39,10 +38,8 @@ class qa_svl_sink (gr_unittest.TestCase):
         dst = blocks.vector_sink_c(512)
         op1 = blocks.head(gr.sizeof_gr_complex, 51200)
 
-        hypervisor = svl.svl_sink(1, 512, (512,))
-        self.tb.connect(src1, op1, (hypervisor, 0))
-        self.tb.connect(hypervisor, dst)
-
+        sink = svl.svl_sink(1, 512, (512,))
+        self.tb.connect(src1, op1, sink, dst)
         self.tb.run()
 
         # check data
