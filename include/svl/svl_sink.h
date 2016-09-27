@@ -44,7 +44,7 @@ class SVL_API svl_sink : public svl_block
        * @param _fft_m_len
        * @param _fft_n_len
        */
-      static svl_block_ptr make(size_t _n_ports,
+      static svl_sink_ptr make(size_t _n_ports,
             size_t _fft_m_len,
             const std::vector<int> _fft_n_len);
 
