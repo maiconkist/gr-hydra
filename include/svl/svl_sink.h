@@ -22,20 +22,13 @@
 #define INCLUDED_SVL_SVL_SINK_IMPL_H
 
 #include <svl/api.h>
-
 #include <svl/svl_block.h>
-#include <svl/svl_hypervisor.h>
 
 namespace gr {
    namespace svl {
 
-class SVL_API svl_sink : public svl_block
+class SVL_API svl_sink: public svl_block
 {
-   private:
-
-      typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
-      hypervisor_ptr g_hypervisor;
-
    public:
       typedef boost::shared_ptr<svl_sink> svl_sink_ptr;
 
@@ -60,15 +53,9 @@ class SVL_API svl_sink : public svl_block
 
       // Where all the action really happens
 		int general_work(int noutput_items,
-                      gr_vector_int &ninput_items,
-                      gr_vector_const_void_star &input_items,
-                      gr_vector_void_star &output_items);
-
-
-      // implementation of svl_sink virtual methods
-      virtual size_t create_vradio(size_t _fft_n_len); 
-      virtual int set_vradio_subcarriers(size_t _vradio_id,
-                      size_t _fft_n_len);
+              gr_vector_int &ninput_items,
+              gr_vector_const_void_star &input_items,
+              gr_vector_void_star &output_items);
 };
 
 } // namespace svl

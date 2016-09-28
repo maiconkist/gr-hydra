@@ -46,7 +46,6 @@
   <source>
     <name>out</name>
     <type>complex</type>
-    <nports>$num_outputs</nports>
     <vlen>$fft_m_size</vlen>
   </source>
 

@@ -21,41 +21,44 @@
 #ifndef INCLUDED_SVL_SVL_SOURCE_IMPL_H
 #define INCLUDED_SVL_SVL_SOURCE_IMPL_H
 
+#include <svl/api.h>
 #include <svl/svl_block.h>
-#include <svl/svl_source.h>
 
 namespace gr {
    namespace svl {
 
-class SVL_API svl_source : public svl_block
+class SVL_API svl_source: public svl_block
 {
-   private:
-      // Nothing to declare in this block.
-
    public:
-      static sptr make(size_t _n_ports,
+      typedef boost::shared_ptr<svl_source> svl_source_ptr;
+
+      /**
+       * \param _n_ports
+       * \param _fft_m_len
+       * \param _fft_n_len
+       */
+      static svl_source_ptr make(size_t _n_ports,
                       size_t _fft_m_len,
                       const std::vector<int> _fft_n_len);
 
       /** CTOR
        */
-      svl_source();
+      svl_source(size_t _n_inputs,
+            size_t _fft_m_len,
+            const std::vector<int> _fft_n_len);
 
       /** DTOR
        */
       ~svl_source();
 
-      int work(int noutput_items,
-         gr_vector_const_void_star &input_items,
-         gr_vector_void_star &output_items);
-
-      virtual size_t create_vradio(size_t _fft_n_len) { return 0; }
-
-      virtual int set_vradio_subcarriers(size_t _vradio_id,
-                      size_t _fft_n_len) { return 0; }
+      // Where all the action really happens
+		int general_work(int noutput_items,
+                      gr_vector_int &ninput_items,
+                      gr_vector_const_void_star &input_items,
+                      gr_vector_void_star &output_items);
 };
 
-   } // namespace svl
+} // namespace svl
 } // namespace gr
 
 #endif /* INCLUDED_SVL_SVL_SOURCE_IMPL_H */

@@ -22,23 +22,15 @@
 #include "config.h"
 #endif
 
-#include <gnuradio/io_signature.h>
-#include <string.h>
-
 #include <svl/svl_sink.h>
-#include <svl/svl_fft.h>
-#include <svl/svl_virtual_radio.h>
+#include <gnuradio/io_signature.h>
 
+#include <string.h>
 #include "easylogging++.h"
 
 namespace gr {
    namespace svl {
 
-/*
- * @param _n_ports
- * @param _fft_m_len
- * @param _fft_n_len
- */
 svl_sink::svl_sink_ptr
 svl_sink::make(size_t _n_ports,
       size_t _fft_m_len,
@@ -49,12 +41,7 @@ svl_sink::make(size_t _n_ports,
          _fft_n_len));
 }
 
-/**
- * The private constructor
- * @param _n_inputs
- * @param _fft_m_len
- * @param _fft_n_len
- */
+
 svl_sink::svl_sink(size_t _n_inputs,
       size_t _fft_m_len,
       const std::vector<int> _fft_n_len):gr::block("svl_sink",
@@ -70,92 +57,41 @@ svl_sink::svl_sink(size_t _n_inputs,
    g_hypervisor->set_radio_mapping();
 }
 
-/**
- * Our virtual destructor.
- */
+
 svl_sink::~svl_sink()
 {
 }
 
-/**
- * @param _fft_n_len
- */
-size_t
-svl_sink::create_vradio(size_t _fft_n_len)
-{
-   return  g_hypervisor->create_vradio(_fft_n_len);  
-}
 
-/**
- * @param _vradio_id
- * @param _fft_n_len
- */
-int
-svl_sink::set_vradio_subcarriers(size_t _vradio_id, size_t _fft_n_len)
-{
-   return g_hypervisor->set_vradio_subcarriers(_vradio_id, _fft_n_len);   
-}
-
-/**
- * @param noutput_items
- * @param ninput_items_required
- */
-/*
-void
-svl_sink_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
-{
-   g_hypervisor->forecast(noutput_items, ninput_items_required);
-}
-*/
-
-/**
- * @param noutput_items
- * @param ninput_items
- * @param input_items
- * @param output_items
- */
 int
 svl_sink::general_work(int noutput_items,
       gr_vector_int &ninput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
 {
-   std::cout << "----- work \n"
-      << "input_items.size(): " << input_items.size() << "\n"
-      << "output_items.size(): " << output_items.size() << "\n"
-      << "noutput_items: " << noutput_items << "\n"
-   << std::endl;
+   LOG(INFO) << "input_items.size(): " << input_items.size();
+   LOG(INFO) << "output_items.size(): " << output_items.size();
+   LOG(INFO) << "noutput_items: " << noutput_items;
 
+   // Consume the items in the input port i
    for (size_t i = 0; i < ninput_items.size(); ++i)
-   {
-      // For each input port
-      // Get the input port buffer
-      // Send the buffer to the correct virtual radio
-      //
-      // TRICKY: Im assuming that input port 0 is mapped to Virtual Radio 0
-      //         ........................... 1 .......................... 1
-      //         ........................... 2 .......................... 2
-      //         ........................... N .......................... N
-      const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[i]);
-      g_hypervisor->get_vradio(i)->add_iq_sample(in, ninput_items[i]);
-
-      // Consume the items in the input port i
       consume(i, ninput_items[i]);
-   }
+
+   // forward to hypervisor
+   g_hypervisor->tx_add_samples(ninput_items, input_items);
 
    // Check if hypervisor is ready to transmit
    if (g_hypervisor->tx_ready())
    {
       // Get buffer in TIME domain
       // Return what GNURADIO expects
-      size_t t =  g_hypervisor->get_tx_outbuf(reinterpret_cast<gr_complex *>(output_items[0]), noutput_items);
+      size_t t =  g_hypervisor->tx_outbuf(reinterpret_cast<gr_complex *>(output_items[0]), noutput_items);
       return t;
    }
 
    // No outputs generated.
    return 0;
 }
-
 
 } /* namespace svl */
 } /* namespace gr */

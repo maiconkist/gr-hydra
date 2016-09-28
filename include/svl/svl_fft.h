@@ -44,7 +44,6 @@ class SVL_API fft_complex
 		gr_complex *g_inbuf, *g_outbuf;
 		fftwf_plan g_plan;
 
-
 	public:
 		fft_complex(size_t fft_size, bool forward = true);
 

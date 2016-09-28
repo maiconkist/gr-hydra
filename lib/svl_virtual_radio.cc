@@ -1,4 +1,4 @@
-#include "svl/svl_virtual_radio.h"
+#include <svl/svl_virtual_radio.h>
 
 #include "easylogging++.h"
 
@@ -47,14 +47,14 @@ VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
    size_t consumed = 0;
    
    if (0 == g_tx_samples.size())
-      g_tx_samples.push_back(samples_vec(0));
+      g_tx_samples.push(samples_vec());
    
    // While we have samples to transfer
    while (consumed < len)
    {
       // If we filled the last samples_vec, create a new one
       if (g_tx_samples.back().size() == fft_n_len)
-         g_tx_samples.push_back(samples_vec());
+         g_tx_samples.push(samples_vec());
       
       size_t rest = std::min(len - consumed,
                       fft_n_len - g_tx_samples.back().size());
@@ -87,36 +87,47 @@ VirtualRadio::set_iq_mapping(const iq_map_vec &iq_map)
  * @param samples_buf
  */
 void
-VirtualRadio::demap_iq_samples(samples_vec samples_buf)
+VirtualRadio::demap_iq_samples(const samples_vec &samples_buf)
 {
-        samples_vec rx_samples_freq(fft_n_len);
+	samples_vec rx_samples_freq(fft_n_len);
+	
+	// Copy the samples used by this radio
+	size_t idx(0);
+	for (iq_map_vec::iterator it = g_iq_map.begin();
+			it != g_iq_map.end();
+			++it, ++idx)
+	{
+		rx_samples_freq[idx] = samples_buf[*it];  
+	}
+	
+	// Transfer samples to fft_complex buff and perform fft
+	std::copy(rx_samples_freq.begin(), rx_samples_freq.end(),
+			g_ifft_complex->get_inbuf());
+	g_ifft_complex->execute();
 
-        // Copy the samples used by this radio
-        size_t idx(0);
-        for (iq_map_vec::iterator it = g_iq_map.begin();
-                        it != g_iq_map.end();
-                        ++it, ++idx)
-        {
-                rx_samples_freq[idx] = samples_buf[*it];  
-        }
-
-        // Transfer samples to fft_complex buff and perform fft
-        std::copy(rx_samples_freq.begin(), rx_samples_freq.end(),
-                        g_ifft_complex->get_inbuf());
-        g_ifft_complex->execute();
-
-        // Copy buff from fft_complex
-        g_rx_samples = samples_vec(g_ifft_complex->get_outbuf(),
-                        g_ifft_complex->get_outbuf() + fft_n_len);
+	g_rx_samples.push(samples_vec(g_ifft_complex->get_outbuf(),
+				  g_ifft_complex->get_outbuf() + fft_n_len)
+	);
 }
 
+/**
+ */
+void
+VirtualRadio::get_rx_samples(gr_complex *samples_buff, size_t len)
+{
+	LOG_IF(g_rx_samples.front().size() != fft_n_len, ERROR) << "wrong number of samples";
+
+	std::copy(g_rx_samples.front().begin(), g_rx_samples.front().end(),
+			samples_buff);
+	g_rx_samples.pop();
+}
 
 /**
 */
 bool const
 VirtualRadio::ready_to_map_iq_samples()
 {
-   if (g_tx_samples.size() == 0 || (g_tx_samples[0].size() < fft_n_len))
+   if (g_tx_samples.size() == 0 || (g_tx_samples.front().size() < fft_n_len))
    {
       return false;
    }
@@ -133,26 +144,25 @@ VirtualRadio::map_iq_samples(samples_vec &samples_buf)
    if (!ready_to_map_iq_samples()) return false;
 
    // Copy samples in TIME domain to FFT buffer, execute FFT
-   std::copy(g_tx_samples[0].begin(),
-                   g_tx_samples[0].end(),
-                   g_fft_complex->get_inbuf());
+	samples_vec tx_time_samples = g_tx_samples.front();
+		g_tx_samples.pop();
+
+   std::copy(tx_time_samples.begin(), tx_time_samples.end(),
+			g_fft_complex->get_inbuf());
 
    g_fft_complex->execute();
 
    samples_vec tx_samples_freq(g_fft_complex->get_outbuf(),
-                   g_fft_complex->get_outbuf() + fft_n_len);
-
-   g_tx_samples.erase(g_tx_samples.begin());
+			g_fft_complex->get_outbuf() + fft_n_len);
 
    // map samples in FREQ domain to samples_buff
    size_t idx(0);
    for (iq_map_vec::iterator it = g_iq_map.begin();
-                   it != g_iq_map.end();
-                   ++it, ++idx)
+			it != g_iq_map.end();
+         ++it, ++idx)
    {
-           samples_buf[(*it)] = tx_samples_freq[idx]; 
+		samples_buf[*it] = tx_samples_freq[idx]; 
    }
-
 
    return true;
 }

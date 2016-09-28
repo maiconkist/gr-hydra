@@ -20,7 +20,8 @@
 # 
 
 from gnuradio import gr, gr_unittest
-from gnuradio import blocks
+from gnuradio import analog, blocks
+import numpy as np
 import svl_swig as svl
 
 class qa_svl_source (gr_unittest.TestCase):
@@ -33,8 +34,20 @@ class qa_svl_source (gr_unittest.TestCase):
 
     def test_001_t (self):
         # set up fg
-        self.tb.run ()
-        # check data
+        src1 = analog.sig_source_c(32e3, analog.GR_SIN_WAVE, 5e3, 1)
+
+        dst = blocks.vector_sink_c(512)
+        op1 = blocks.head(gr.sizeof_gr_complex, 512)
+
+        source = svl.svl_source(1, 512, (512,))
+        self.tb.connect(src1, op1, source, dst)
+        self.tb.run()
+
+        # get data
+        output = np.absolute(dst.data())
+
+        # check if it is ok
+        print output
 
 
 if __name__ == '__main__':

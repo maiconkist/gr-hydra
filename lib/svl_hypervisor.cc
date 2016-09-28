@@ -3,7 +3,6 @@
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP;
 
-
 namespace gr {
    namespace svl {
 
@@ -13,7 +12,6 @@ Hypervisor::Hypervisor(size_t _fft_m_len):
    g_fft_complex = sfft_complex(new gr::svl::fft_complex(fft_m_len));
    g_ifft_complex = sfft_complex(new gr::svl::fft_complex(fft_m_len, false));
 };
-
 
 /**
  * @param _fft_n_len
@@ -38,24 +36,6 @@ Hypervisor::get_vradio(size_t idx)
 {
    LOG_IF(idx > g_vradios.size(), WARNING) << "ERROR";
    return g_vradios[idx];
-}
-
-/**
- * @return true if can generate output
- */
-bool const
-Hypervisor::tx_ready()
-{
-   for (vradio_vec::iterator it = g_vradios.begin();
-         it != g_vradios.end();
-         ++it)
-   {
-      if (!(*it)->ready_to_map_iq_samples())
-      {
-         return false;
-      }
-   }
-   return true;
 }
 
 /**
@@ -108,33 +88,46 @@ Hypervisor::set_radio_mapping()
    }
 }
 
-/**
- */
 void
-Hypervisor::demultiplex()
+Hypervisor::tx_add_samples(gr_vector_int &ninput_items,
+      gr_vector_const_void_star &input_items)
 {
-   std::copy(g_rx_iq_vec.begin(),
-                   g_rx_iq_vec.end(),
-                   g_fft_complex->get_inbuf());
+   for (size_t i = 0; i < ninput_items.size(); ++i)
+   {
+      // For each input port
+      // Get the input port buffer
+      // Send the buffer to the correct virtual radio
+      //
+      // TRICKY: Im assuming that input port 0 is mapped to Virtual Radio 0
+      //         ........................... 1 .......................... 1
+      //         ........................... 2 .......................... 2
+      //         ........................... N .......................... N
+      const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[i]);
 
-   g_fft_complex->execute();
-
-   samples_vec rx_samples_freq(g_fft_complex->get_outbuf(),
-                   g_fft_complex->get_outbuf() + fft_m_len);
+      get_vradio(i)->add_iq_sample(in, ninput_items[i]);
+   }
 }
 
-/*
- * @param output_buff
- * @param max_noutput_items
- * @return 
- */
-size_t
-Hypervisor::get_tx_outbuf(gr_complex *output_items, size_t max_noutput_items)
-{
-   /* Return the vector with samples
-    * @return Vector of samples to transmit in TIME domain.
-    */
 
+bool const
+Hypervisor::tx_ready()
+{
+   for (vradio_vec::iterator it = g_vradios.begin();
+         it != g_vradios.end();
+         ++it)
+   {
+      if (!(*it)->ready_to_map_iq_samples())
+      {
+         return false;
+      }
+   }
+   return true;
+}
+
+
+size_t
+Hypervisor::tx_outbuf(gr_complex *output_items, size_t max_noutput_items)
+{
    // While we can generate samples to transmit
    size_t noutput_items = 0;
    while (tx_ready() && noutput_items < max_noutput_items)
@@ -143,25 +136,104 @@ Hypervisor::get_tx_outbuf(gr_complex *output_items, size_t max_noutput_items)
       // func passing our buffer as parameter
       samples_vec samp_freq_vec(fft_m_len);
       for (vradio_vec::iterator it = g_vradios.begin();
-                      it != g_vradios.end();
-                      ++it)
+				it != g_vradios.end();
+				++it)
       {
-              (*it)->map_iq_samples(samp_freq_vec);
+      	(*it)->map_iq_samples(samp_freq_vec);
       }
 
       // Transform buffer from FREQ domain to TIME domain using IFFT
       std::copy(samp_freq_vec.begin(), samp_freq_vec.end(),
-                      g_ifft_complex->get_inbuf() );
+      		g_ifft_complex->get_inbuf());
       g_ifft_complex->execute();
 
       // Copy to GNURADIO buffer
       std::copy(g_ifft_complex->get_outbuf(),
-                      &g_ifft_complex->get_outbuf()[fft_m_len],
-                      &output_items[0]);
+				&g_ifft_complex->get_outbuf()[fft_m_len],
+				&output_items[0]);
 
       noutput_items++;
       output_items += fft_m_len;
    }
+
+   return noutput_items;
+}
+
+void 
+Hypervisor::rx_add_samples(const gr_complex *samples, size_t len)
+{
+   // the total of if itens we have transfered so far
+   size_t consumed = 0;
+
+   if (0 == g_rx_samples.size())
+      g_rx_samples.push(samples_vec());
+
+   // While we have samples to transfer
+   while (consumed < len)
+   {
+   	LOG_IF(g_rx_samples.back().size() > fft_m_len, INFO) << "ERROR";
+
+      // If we filled the last samples_vec, create a new one
+      if (g_rx_samples.back().size() == fft_m_len)
+         g_rx_samples.push(samples_vec());
+
+      size_t rest = std::min(len - consumed,
+				fft_m_len - g_rx_samples.back().size());
+
+      // TRICKY: use std::copy instead of this loop.
+      // Was seg faulting
+      for (int i = 0; i < rest; ++i )
+         g_rx_samples.back().push_back(samples[consumed+i]);
+         consumed += rest;
+   }
+
+   LOG_IF(consumed > len, INFO) << "ERROR";
+}
+
+
+bool const
+Hypervisor::rx_ready()
+{
+   if (g_rx_samples.size() == 0 || (g_rx_samples.front().size() < fft_m_len))
+   {
+      return false;
+   }
+
+   return true;
+}
+
+
+size_t
+Hypervisor::rx_outbuf(gr_complex *output_items, size_t max_noutput_items)
+{
+   size_t noutput_items = 0;
+	while (rx_ready() && noutput_items < max_noutput_items)
+	{
+	   samples_vec samp_time_vec = g_rx_samples.front();
+			g_rx_samples.pop();
+
+		// Transform buffer from TIME domain to FREQ domain using FFT
+		std::copy(samp_time_vec.begin(), samp_time_vec.end(),
+				g_fft_complex->get_inbuf());
+
+		g_fft_complex->execute();
+		
+		//  Copy from fft buffer
+		samples_vec samp_freq_vec = samples_vec(g_fft_complex->get_outbuf(),
+				g_fft_complex->get_outbuf() + fft_m_len);
+
+		// Demap samples and fill buffer to forward to rx chain
+		size_t idx = 0;
+		for (vradio_vec::iterator it = g_vradios.begin();
+				it != g_vradios.end();
+				++it, ++idx)
+		{
+			(*it)->demap_iq_samples(samp_freq_vec);
+			(*it)->get_rx_samples(&output_items[idx], 666);
+		}
+
+		noutput_items++;
+	}
 
    return noutput_items;
 }

@@ -25,10 +25,11 @@ include(GrPlatform) #define LIB_SUFFIX
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND svl_sources
-    svl_virtual_radio.cc
     svl_fft.cc
+    svl_virtual_radio.cc
 	 svl_hypervisor.cc
-    svl_sink.cc)
+    svl_sink.cc
+	 svl_source.cc)
 
 set(svl_sources "${svl_sources}" PARENT_SCOPE)
 if(NOT svl_sources)

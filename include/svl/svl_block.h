@@ -20,32 +20,39 @@
 #ifndef INCLUDED_SVL_SVL_BLOCK_H
 #define INCLUDED_SVL_SVL_BLOCK_H
 
-#include <svl/api.h>
 #include <gnuradio/block.h>
+
+#include <svl/api.h>
+#include <svl/svl_hypervisor.h>
 
 namespace gr {
    namespace svl {
 
-/*!
- * \brief Multiplex and demultiplex multiple waveforms in the spectrum band
- * \ingroup svl
- */
 class SVL_API svl_block : virtual public gr::block
 {
+   protected:
+      typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
+      hypervisor_ptr g_hypervisor;
+
+
    public:
       /**
        * @param _fft_n_len
        */
-      virtual size_t create_vradio(size_t _fft_n_len) = 0;
+      size_t create_vradio(size_t _fft_n_len){
+         return  g_hypervisor->create_vradio(_fft_n_len);  
+      }
 
       /**
        * @param _vradio_id
        * @param _fft_n_len
        */
-      virtual int set_vradio_subcarriers(size_t _vradio_id,
-            size_t _fft_n_len) = 0;
+      int set_vradio_subcarriers(size_t _vradio_id,
+            size_t _fft_n_len)
+      {
+         return g_hypervisor->set_vradio_subcarriers(_vradio_id, _fft_n_len);
+      }
 };
-
 
 } // namespace svl
 } // namespace gr

@@ -17,14 +17,14 @@
 # along with this software; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
-# 
-
+#
 from gnuradio import gr, gr_unittest
 from gnuradio import analog, blocks
+import numpy as np
 import svl_swig as svl
 
-class qa_svl_sink (gr_unittest.TestCase):
 
+class qa_svl_sink (gr_unittest.TestCase):
     def setUp(self):
         self.tb = gr.top_block()
 
@@ -36,14 +36,17 @@ class qa_svl_sink (gr_unittest.TestCase):
         src1 = analog.sig_source_c(32e3, analog.GR_SIN_WAVE, 5e3, 1)
 
         dst = blocks.vector_sink_c(512)
-        op1 = blocks.head(gr.sizeof_gr_complex, 51200)
+        op1 = blocks.head(gr.sizeof_gr_complex, 512)
 
         sink = svl.svl_sink(1, 512, (512,))
         self.tb.connect(src1, op1, sink, dst)
         self.tb.run()
 
-        # check data
-        output = dst.data()
+        # get data
+        output = np.absolute(dst.data())
+
+        # check if it is ok
+        print output
 
 if __name__ == '__main__':
     gr_unittest.run(qa_svl_sink, "qa_svl_sink.xml")
