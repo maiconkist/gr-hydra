@@ -33,9 +33,9 @@ class SVL_API svl_source: public svl_block
       typedef boost::shared_ptr<svl_source> svl_source_ptr;
 
       /**
-       * \param _n_ports
-       * \param _fft_m_len
-       * \param _fft_n_len
+       * @param _n_ports
+       * @param _fft_m_len
+       * @param _fft_n_len
        */
       static svl_source_ptr make(size_t _n_ports,
                       size_t _fft_m_len,
@@ -56,6 +56,7 @@ class SVL_API svl_source: public svl_block
                       gr_vector_int &ninput_items,
                       gr_vector_const_void_star &input_items,
                       gr_vector_void_star &output_items);
+
 };
 
 } // namespace svl

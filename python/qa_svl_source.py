@@ -24,31 +24,29 @@ from gnuradio import analog, blocks
 import numpy as np
 import svl_swig as svl
 
+
 class qa_svl_source (gr_unittest.TestCase):
 
-    def setUp (self):
-        self.tb = gr.top_block ()
+    def setUp(self):
+        self.tb = gr.top_block()
 
-    def tearDown (self):
+    def tearDown(self):
         self.tb = None
 
-    def test_001_t (self):
+    def test_001_t(self):
         # set up fg
-        src1 = analog.sig_source_c(32e3, analog.GR_SIN_WAVE, 5e3, 1)
-
-        dst = blocks.vector_sink_c(512)
+        src1 = analog.sig_source_c(512, analog.GR_COS_WAVE, 32, 1, 0)
         op1 = blocks.head(gr.sizeof_gr_complex, 512)
+        dst = blocks.vector_sink_c(512)
 
         source = svl.svl_source(1, 512, (512,))
+
         self.tb.connect(src1, op1, source, dst)
         self.tb.run()
 
         # get data
         output = np.absolute(dst.data())
-
-        # check if it is ok
         print output
-
 
 if __name__ == '__main__':
     gr_unittest.run(qa_svl_source, "qa_svl_source.xml")

@@ -32,13 +32,15 @@ class qa_svl_sink (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t(self):
+        return
         # set up fg
-        src1 = analog.sig_source_c(32e3, analog.GR_SIN_WAVE, 5e3, 1)
+        src1 = analog.sig_source_c(512, analog.GR_COS_WAVE, 128, 1, 0)
 
         dst = blocks.vector_sink_c(512)
         op1 = blocks.head(gr.sizeof_gr_complex, 512)
 
         sink = svl.svl_sink(1, 512, (512,))
+
         self.tb.connect(src1, op1, sink, dst)
         self.tb.run()
 

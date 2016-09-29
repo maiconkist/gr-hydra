@@ -9,7 +9,7 @@ namespace gr {
 Hypervisor::Hypervisor(size_t _fft_m_len):
         fft_m_len(_fft_m_len)
 {
-   g_fft_complex = sfft_complex(new gr::svl::fft_complex(fft_m_len));
+   g_fft_complex  = sfft_complex(new gr::svl::fft_complex(fft_m_len));
    g_ifft_complex = sfft_complex(new gr::svl::fft_complex(fft_m_len, false));
 };
 
@@ -171,7 +171,7 @@ Hypervisor::rx_add_samples(const gr_complex *samples, size_t len)
    // While we have samples to transfer
    while (consumed < len)
    {
-   	LOG_IF(g_rx_samples.back().size() > fft_m_len, INFO) << "ERROR";
+   	LOG_IF(g_rx_samples.back().size() > fft_m_len, ERROR) << "g_rx_samples.back().size() > fft_m_len";
 
       // If we filled the last samples_vec, create a new one
       if (g_rx_samples.back().size() == fft_m_len)
@@ -187,9 +187,8 @@ Hypervisor::rx_add_samples(const gr_complex *samples, size_t len)
          consumed += rest;
    }
 
-   LOG_IF(consumed > len, INFO) << "ERROR";
+   LOG_IF(consumed > len, INFO) << "consumed > len";
 }
-
 
 bool const
 Hypervisor::rx_ready()
@@ -207,6 +206,7 @@ size_t
 Hypervisor::rx_outbuf(gr_complex *output_items, size_t max_noutput_items)
 {
    size_t noutput_items = 0;
+
 	while (rx_ready() && noutput_items < max_noutput_items)
 	{
 	   samples_vec samp_time_vec = g_rx_samples.front();
@@ -217,7 +217,7 @@ Hypervisor::rx_outbuf(gr_complex *output_items, size_t max_noutput_items)
 				g_fft_complex->get_inbuf());
 
 		g_fft_complex->execute();
-		
+
 		//  Copy from fft buffer
 		samples_vec samp_freq_vec = samples_vec(g_fft_complex->get_outbuf(),
 				g_fft_complex->get_outbuf() + fft_m_len);

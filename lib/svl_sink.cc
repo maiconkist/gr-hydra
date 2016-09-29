@@ -41,7 +41,6 @@ svl_sink::make(size_t _n_ports,
          _fft_n_len));
 }
 
-
 svl_sink::svl_sink(size_t _n_inputs,
       size_t _fft_m_len,
       const std::vector<int> _fft_n_len):gr::block("svl_sink",
@@ -52,7 +51,7 @@ svl_sink::svl_sink(size_t _n_inputs,
    g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len));
 
    for (size_t i = 0; i < _n_inputs; ++i)
-      create_vradio(_fft_n_len[i]);
+   	create_vradio(_fft_n_len[i]);
 
    g_hypervisor->set_radio_mapping();
 }

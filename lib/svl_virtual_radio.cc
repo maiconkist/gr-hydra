@@ -75,16 +75,12 @@ VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
 void
 VirtualRadio::set_iq_mapping(const iq_map_vec &iq_map)
 {
-   if (iq_map.size() != fft_n_len)
-   {
-      // Error msg
-   }
-
+	LOG_IF(iq_map.size() != fft_n_len, ERROR)  << "iq_map.size() != fft_n_len";
    g_iq_map = iq_map;
 }
 
 /**
- * @param samples_buf
+ * @param samples_buf FREQ domain samples
  */
 void
 VirtualRadio::demap_iq_samples(const samples_vec &samples_buf)
@@ -98,8 +94,11 @@ VirtualRadio::demap_iq_samples(const samples_vec &samples_buf)
 			++it, ++idx)
 	{
 		rx_samples_freq[idx] = samples_buf[*it];  
+	   std::cout << samples_buf[*it] << ",";
 	}
-	
+	std::cout << std::endl;
+
+
 	// Transfer samples to fft_complex buff and perform fft
 	std::copy(rx_samples_freq.begin(), rx_samples_freq.end(),
 			g_ifft_complex->get_inbuf());

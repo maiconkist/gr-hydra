@@ -27,6 +27,6 @@ install(FILES
 	 svl_virtual_radio.h
 	 svl_hypervisor.h
     svl_block.h
-    svl_source.h
     svl_sink.h
+    svl_source.h
 	 DESTINATION include/svl)
