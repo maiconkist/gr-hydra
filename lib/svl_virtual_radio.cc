@@ -94,10 +94,7 @@ VirtualRadio::demap_iq_samples(const samples_vec &samples_buf)
 			++it, ++idx)
 	{
 		rx_samples_freq[idx] = samples_buf[*it];  
-	   std::cout << samples_buf[*it] << ",";
 	}
-	std::cout << std::endl;
-
 
 	// Transfer samples to fft_complex buff and perform fft
 	std::copy(rx_samples_freq.begin(), rx_samples_freq.end(),
@@ -118,6 +115,12 @@ VirtualRadio::get_rx_samples(gr_complex *samples_buff, size_t len)
 
 	std::copy(g_rx_samples.front().begin(), g_rx_samples.front().end(),
 			samples_buff);
+
+	LOG(INFO) << "get_rx_samples";
+	for (int i =0; i < g_rx_samples.front().size(); i++)
+		std::cout << g_rx_samples.front()[i] << ", ";
+	std::cout << std::endl;
+
 	g_rx_samples.pop();
 }
 

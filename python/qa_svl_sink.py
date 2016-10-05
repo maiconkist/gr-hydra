@@ -45,7 +45,7 @@ class qa_svl_sink (gr_unittest.TestCase):
         self.tb.run()
 
         # get data
-        output = np.absolute(dst.data())
+        output = dst.data()
 
         # check if it is ok
         print output

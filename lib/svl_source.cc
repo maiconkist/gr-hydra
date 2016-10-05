@@ -35,7 +35,6 @@ svl_source::make(size_t _n_ports,
 		size_t _fft_m_len,
       const std::vector<int> _fft_n_len)
 {
-   LOG(INFO) << "making svl_source";
    return gnuradio::get_initial_sptr(new svl_source(_n_ports,
          _fft_m_len,
          _fft_n_len));
@@ -53,7 +52,6 @@ svl_source::svl_source(size_t _n_outputs,
       create_vradio(_fft_n_len[i]);
 
    g_hypervisor->set_radio_mapping();
-   LOG(INFO) << "New svl_source created: outputs: " << _n_outputs;
 }
 
 svl_source::~svl_source()
@@ -66,22 +64,15 @@ svl_source::general_work(int noutput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
 {
-   LOG(INFO) << "input_items.size(): "  << input_items.size();
-   LOG(INFO) << "output_items.size(): " << output_items.size();
-   LOG(INFO) << "noutput_items: "       << noutput_items;
-
    // Get input buffer
    const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[0]);
 
    g_hypervisor->rx_add_samples(in, ninput_items[0]);
-   consume_each(ninput_items[0]);
+   consume(0, ninput_items[0]);
 
    if (g_hypervisor->rx_ready())
    {
       size_t t =  g_hypervisor->rx_outbuf(reinterpret_cast<gr_complex *>(output_items[0]), noutput_items);
-
-      // Tell runtime system how many output items we produced.
-   	LOG(INFO) << "Output generated";
       return t;
    }
 

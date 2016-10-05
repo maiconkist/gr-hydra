@@ -145,12 +145,13 @@ Hypervisor::tx_outbuf(gr_complex *output_items, size_t max_noutput_items)
       // Transform buffer from FREQ domain to TIME domain using IFFT
       std::copy(samp_freq_vec.begin(), samp_freq_vec.end(),
       		g_ifft_complex->get_inbuf());
+
       g_ifft_complex->execute();
 
       // Copy to GNURADIO buffer
       std::copy(g_ifft_complex->get_outbuf(),
 				&g_ifft_complex->get_outbuf()[fft_m_len],
-				&output_items[0]);
+				&output_items[noutput_items]);
 
       noutput_items++;
       output_items += fft_m_len;
@@ -168,6 +169,9 @@ Hypervisor::rx_add_samples(const gr_complex *samples, size_t len)
    if (0 == g_rx_samples.size())
       g_rx_samples.push(samples_vec());
 
+
+	size_t old_size = g_rx_samples.size();
+
    // While we have samples to transfer
    while (consumed < len)
    {
@@ -182,7 +186,7 @@ Hypervisor::rx_add_samples(const gr_complex *samples, size_t len)
 
       // TRICKY: use std::copy instead of this loop.
       // Was seg faulting
-      for (int i = 0; i < rest; ++i )
+      for (int i = 0; i < rest; ++i)
          g_rx_samples.back().push_back(samples[consumed+i]);
          consumed += rest;
    }
@@ -210,7 +214,7 @@ Hypervisor::rx_outbuf(gr_complex *output_items, size_t max_noutput_items)
 	while (rx_ready() && noutput_items < max_noutput_items)
 	{
 	   samples_vec samp_time_vec = g_rx_samples.front();
-			g_rx_samples.pop();
+		g_rx_samples.pop();
 
 		// Transform buffer from TIME domain to FREQ domain using FFT
 		std::copy(samp_time_vec.begin(), samp_time_vec.end(),
@@ -229,7 +233,7 @@ Hypervisor::rx_outbuf(gr_complex *output_items, size_t max_noutput_items)
 				++it, ++idx)
 		{
 			(*it)->demap_iq_samples(samp_freq_vec);
-			(*it)->get_rx_samples(&output_items[idx], 666);
+			(*it)->get_rx_samples(&output_items[idx], fft_m_len);
 		}
 
 		noutput_items++;

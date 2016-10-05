@@ -47,7 +47,6 @@ svl_sink::svl_sink(size_t _n_inputs,
    gr::io_signature::make(_n_inputs, _n_inputs, sizeof(gr_complex)),
    gr::io_signature::make(1, 1, sizeof(gr_complex)*_fft_m_len))
 {
-   LOG(INFO) << "New svl_sink created: inputs: " << _n_inputs;
    g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len));
 
    for (size_t i = 0; i < _n_inputs; ++i)
@@ -68,16 +67,12 @@ svl_sink::general_work(int noutput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
 {
-   LOG(INFO) << "input_items.size(): " << input_items.size();
-   LOG(INFO) << "output_items.size(): " << output_items.size();
-   LOG(INFO) << "noutput_items: " << noutput_items;
+   // forward to hypervisor
+   g_hypervisor->tx_add_samples(ninput_items, input_items);
 
    // Consume the items in the input port i
    for (size_t i = 0; i < ninput_items.size(); ++i)
       consume(i, ninput_items[i]);
-
-   // forward to hypervisor
-   g_hypervisor->tx_add_samples(ninput_items, input_items);
 
    // Check if hypervisor is ready to transmit
    if (g_hypervisor->tx_ready())
