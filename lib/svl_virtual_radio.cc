@@ -57,7 +57,7 @@ VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
          g_tx_samples.push(samples_vec());
       
       size_t rest = std::min(len - consumed,
-                      fft_n_len - g_tx_samples.back().size());
+				fft_n_len - g_tx_samples.back().size());
       
       // TRICKY: use std::copy instead of this loop.
       // Was seg faulting

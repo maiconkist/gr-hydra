@@ -130,6 +130,7 @@ Hypervisor::tx_outbuf(gr_complex *output_items, size_t max_noutput_items)
 {
    // While we can generate samples to transmit
    size_t noutput_items = 0;
+   //while (tx_ready() && noutput_items < max_noutput_items)
    while (tx_ready() && noutput_items < max_noutput_items)
    {
       // For each VirtualRadio call the map_iq_samples
@@ -149,9 +150,13 @@ Hypervisor::tx_outbuf(gr_complex *output_items, size_t max_noutput_items)
       g_ifft_complex->execute();
 
       // Copy to GNURADIO buffer
+#if 0
+		for (int i = 0; i < fft_m_len; ++i)
+	   	output_items[noutput_items * fft_m_len + i] = g_ifft_complex->get_outbuf()[i];
+#endif
       std::copy(g_ifft_complex->get_outbuf(),
-				&g_ifft_complex->get_outbuf()[fft_m_len],
-				&output_items[noutput_items]);
+				g_ifft_complex->get_outbuf() + fft_m_len,
+				output_items + noutput_items);
 
       noutput_items++;
       output_items += fft_m_len;

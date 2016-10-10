@@ -80,10 +80,13 @@ svl_sink::general_work(int noutput_items,
       // Get buffer in TIME domain
       // Return what GNURADIO expects
       size_t t =  g_hypervisor->tx_outbuf(reinterpret_cast<gr_complex *>(output_items[0]), noutput_items);
+
+		LOG(INFO) << "Gen outputs: " << t << "/" << noutput_items;
       return t;
    }
 
    // No outputs generated.
+	LOG(INFO) << "No outputs generated";
    return 0;
 }
 
