@@ -57,12 +57,6 @@ class SVL_API svl_sink: public svl_block
               gr_vector_const_void_star &input_items,
               gr_vector_void_star &output_items);
 
-		/*
-		void forecast(int noutput_items, gr_vector_int &ninput_items_required)
-		{
-				  return g_hypervisor->forecast(noutput_items, ninput_items_required);
-		}
-		*/
 };
 
 } // namespace svl

@@ -13,8 +13,6 @@ fft_complex::fft_complex(size_t fft_size, bool forward)
                    reinterpret_cast<fftwf_complex *>(g_outbuf),
                    forward? FFTW_FORWARD:FFTW_BACKWARD,
                    FFTW_MEASURE);
-
-
 }
 
 gr_complex*

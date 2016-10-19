@@ -10,6 +10,7 @@
 namespace gr {
 		  namespace svl {
 
+	   typedef boost::shared_ptr<gr_complex[]> samples_ptr;
       typedef std::vector<gr_complex> samples_vec;
       typedef std::queue<samples_vec> samples_vec_vec;
 

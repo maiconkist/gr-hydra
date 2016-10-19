@@ -52,6 +52,16 @@ class SVL_API svl_block : virtual public gr::block
       {
          return g_hypervisor->set_vradio_subcarriers(_vradio_id, _fft_n_len);
       }
+
+		/**
+		 * @param noutput_items
+		 * @param ninput_items_required
+		 */
+		void forecast(int noutput_items,gr_vector_int &ninput_items_required)
+		{
+			return g_hypervisor->forecast(noutput_items,
+					ninput_items_required);
+		}
 };
 
 } // namespace svl

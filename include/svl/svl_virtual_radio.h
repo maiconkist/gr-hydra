@@ -18,7 +18,7 @@ class SVL_API VirtualRadio
 		size_t fft_n_len;
 		size_t g_idx;
 
-		samples_vec_vec g_tx_samples;
+		samples_vec g_tx_samples;
 		samples_vec_vec g_rx_samples;
 
 		sfft_complex g_fft_complex;
@@ -65,7 +65,7 @@ class SVL_API VirtualRadio
 		/** Get samples from samples_buf that are used by this virtual radio
 		 * @param samples_buf
 		 */
-		void demap_iq_samples(const samples_vec &samples_buf);
+		void demap_iq_samples(const gr_complex *samples_buf);
 
 		/** Copy rx samples in the buff to samples_buff
 		 * @param samples_buff
@@ -76,7 +76,7 @@ class SVL_API VirtualRadio
 		/**
 		 * @param samples_buf
 		 */
-		bool map_iq_samples(samples_vec &samples_buf);
+		bool map_iq_samples(gr_complex *samples_buf);
 
 		/**
 		 */

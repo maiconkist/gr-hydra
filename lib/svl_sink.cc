@@ -45,7 +45,7 @@ svl_sink::svl_sink(size_t _n_inputs,
       size_t _fft_m_len,
       const std::vector<int> _fft_n_len):gr::block("svl_sink",
    gr::io_signature::make(_n_inputs, _n_inputs, sizeof(gr_complex)),
-   gr::io_signature::make(1, 1, sizeof(gr_complex)*_fft_m_len))
+   gr::io_signature::make(1, 1, sizeof(gr_complex)))
 {
    g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len));
 
@@ -68,26 +68,17 @@ svl_sink::general_work(int noutput_items,
       gr_vector_void_star &output_items)
 {
    // forward to hypervisor
-   g_hypervisor->tx_add_samples(ninput_items, input_items);
+   g_hypervisor->tx_add_samples(noutput_items, ninput_items, input_items);
 
    // Consume the items in the input port i
    for (size_t i = 0; i < ninput_items.size(); ++i)
       consume(i, ninput_items[i]);
 
-   // Check if hypervisor is ready to transmit
-   if (g_hypervisor->tx_ready())
-   {
-      // Get buffer in TIME domain
-      // Return what GNURADIO expects
-      size_t t =  g_hypervisor->tx_outbuf(reinterpret_cast<gr_complex *>(output_items[0]), noutput_items);
+	// Gen output
+   int t =  g_hypervisor->tx_outbuf(reinterpret_cast<gr_complex *>(output_items[0]), noutput_items);
+	LOG(INFO) << "Gen outputs: " << t << "/" << noutput_items;
 
-		LOG(INFO) << "Gen outputs: " << t << "/" << noutput_items;
-      return t;
-   }
-
-   // No outputs generated.
-	LOG(INFO) << "No outputs generated";
-   return 0;
+	return t;
 }
 
 } /* namespace svl */

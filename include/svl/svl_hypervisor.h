@@ -64,7 +64,8 @@ class SVL_API Hypervisor
 
       /**
        */
-      void tx_add_samples(gr_vector_int &ninput_items,
+      void tx_add_samples(int noutput_items,
+				gr_vector_int &ninput_items,
             gr_vector_const_void_star &input_items);
 
       /**
