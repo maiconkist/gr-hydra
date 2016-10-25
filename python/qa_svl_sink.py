@@ -19,8 +19,10 @@
 # Boston, MA 02110-1301, USA.
 #
 from gnuradio import gr, gr_unittest
-from gnuradio import analog, blocks
-import numpy as np
+from gnuradio import analog, digital, blocks
+from grc_gnuradio import blks2 as grc_blks2
+import numpy
+
 import svl_swig as svl
 
 
@@ -48,6 +50,37 @@ class qa_svl_sink (gr_unittest.TestCase):
 
         # check if it is ok
         #print output
+
+    def test_002_t(self):
+        # set up fg
+        analog_random_source = blocks.vector_source_b(map(int, numpy.random.randint(0, 2, 1000)), True)
+
+        digital_ofdm = grc_blks2.packet_mod_b(digital.ofdm_mod(
+            options=grc_blks2.options(
+                modulation="bpsk",
+                fft_length=256,
+                occupied_tones=200,
+                cp_length=128,
+                pad_for_usrp=True,
+                log=None,
+                verbose=None,
+
+                ),
+            ),
+            payload_length=0,
+        )
+
+        head = blocks.head(gr.sizeof_gr_complex, 256)
+        DUT = svl.svl_sink(1, 256, (256,))
+        sink = blocks.vector_sink_c(1)
+        sink = blocks.vector_sink_c(1)
+
+        self.tb.connect(analog_random_source, digital_ofdm, head,  sink)
+        self.tb.start()
+        import time
+        time.sleep(1)
+        self.tb.stop()
+        print sink.data()[0:255]
 
 if __name__ == '__main__':
     gr_unittest.run(qa_svl_sink, "qa_svl_sink.xml")

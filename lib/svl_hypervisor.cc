@@ -3,7 +3,6 @@
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP;
 
-
 #include <volk/volk.h>
 
 namespace gr {
@@ -53,29 +52,26 @@ Hypervisor::forecast(int noutput_items, gr_vector_int &ninput_items_required)
    LOG_IF(ninput != g_vradios.size(), ERROR);
 
    for (size_t i = 0; i < ninput; ++i)
-      ninput_items_required[i] = get_vradio(i)->get_subcarriers();
+      ninput_items_required[i] = noutput_items;
 }
 
-/**
- */
 void
 Hypervisor::set_radio_mapping()
 {
    iq_map_vec sc_allocated(fft_m_len, 0);
 
-
 	// TODO:: subcarriers in the outerloop is faster
    size_t idx(0);
    for (vradio_vec::iterator it = g_vradios.begin();
          it != g_vradios.end();
-         ++it, ++idx)
+         ++it)
    {
       size_t sc_needed = std::min((*it)->get_subcarriers(),
                       fft_m_len);
 
       iq_map_vec the_map;
 
-      for (size_t idx = 0; idx < fft_m_len; ++idx)
+      for (; idx < fft_m_len; ++idx)
       {
          if (sc_allocated[idx] == 0)
          {
@@ -96,6 +92,9 @@ Hypervisor::tx_add_samples(int noutput_items,
 		gr_vector_int &ninput_items,
 		gr_vector_const_void_star &input_items)
 {
+
+   int factor = noutput_items / fft_m_len;
+
    for (size_t i = 0; i < ninput_items.size(); i++)
    {
       // For each input port
@@ -106,7 +105,9 @@ Hypervisor::tx_add_samples(int noutput_items,
       //         ........................... 2 .......................... 2
       //         ........................... N .......................... N
       get_vradio(i)->add_iq_sample((const gr_complex *) input_items[i],
-				noutput_items);
+				get_vradio(i)->get_subcarriers() * factor);
+
+		ninput_items[i] = get_vradio(i)->get_subcarriers() * factor;
    }
 }
 
@@ -125,16 +126,15 @@ Hypervisor::tx_ready()
 
 
 size_t
-Hypervisor::tx_outbuf(gr_complex *output_items, size_t max_noutput_items)
+Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_items)
 {
    // While we can generate samples to transmit
    size_t noutput_items = 0;
+	gr_complex *optr = (gr_complex *)output_items[0];
 
 	// For each VirtualRadio call the map_iq_samples
 	// func passing our buffer as parameter
-
    while (tx_ready() && noutput_items < max_noutput_items)
-   //while (tx_ready() && (noutput_items + fft_m_len) <= max_noutput_items)
    {
       for (vradio_vec::iterator it = g_vradios.begin();
 				it != g_vradios.end();
@@ -147,12 +147,18 @@ Hypervisor::tx_outbuf(gr_complex *output_items, size_t max_noutput_items)
       g_ifft_complex->execute();
 
 		// ::TRICKY:: change output_items pointer
-      std::copy(g_ifft_complex->get_outbuf(), g_ifft_complex->get_outbuf() + fft_m_len, output_items);
+      std::copy(g_ifft_complex->get_outbuf(),
+				g_ifft_complex->get_outbuf() + fft_m_len,
+			  	&optr[noutput_items]);
 
       noutput_items += fft_m_len;
-      output_items  += fft_m_len;
-
    }
+
+		std::cout << "----------" << std::endl;
+		for (int i = 0; i < noutput_items; i++)
+				  std::cout << optr[i] << ",";
+		std::cout << std::endl;
+
 
 	return noutput_items;
 }

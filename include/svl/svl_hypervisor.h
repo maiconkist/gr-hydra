@@ -41,7 +41,6 @@ class SVL_API Hypervisor
        */
       size_t const get_subcarriers() { return fft_m_len; }
 
-
       /**
        * @param noutput_items
        * @param ninput_items_required
@@ -53,7 +52,8 @@ class SVL_API Hypervisor
        * @param bandwidth
        * @return Always 1
        */
-      int set_vradio_subcarriers(size_t vradio_id, size_t bandwidth) {
+      int set_vradio_subcarriers(size_t vradio_id, size_t bandwidth)
+		{
             g_vradios[vradio_id]->set_subcarriers(bandwidth);
             return 1;
       }
@@ -79,8 +79,7 @@ class SVL_API Hypervisor
        * @param max_noutput_items
        * @return 
        */
-      size_t tx_outbuf(gr_complex *output_items,
-            size_t max_noutput_items);
+      size_t tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_items);
 
       /**
        * @param output_buff
