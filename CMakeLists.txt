@@ -110,7 +110,7 @@ endif(APPLE)
 ########################################################################
 find_package(CppUnit)
 find_package(Doxygen)
-find_package(FFTW)
+find_package(FFTW REQUIRED)
 
 # SearLibXML++ ch for GNU Radio and its components and versions. Add any
 
