@@ -51,8 +51,10 @@ Hypervisor::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 
    LOG_IF(ninput != g_vradios.size(), ERROR);
 
+	int factor = noutput_items / fft_m_len;
+
    for (size_t i = 0; i < ninput; ++i)
-      ninput_items_required[i] = noutput_items;
+      ninput_items_required[i] = g_vradios[i]->get_subcarriers() * factor;
 }
 
 void
@@ -71,7 +73,7 @@ Hypervisor::set_radio_mapping()
 
       iq_map_vec the_map;
 
-      for (; idx < fft_m_len; ++idx)
+      for (; idx < fft_m_len; idx++)
       {
          if (sc_allocated[idx] == 0)
          {
@@ -143,23 +145,22 @@ Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_item
       	(*it)->map_iq_samples(g_ifft_complex->get_inbuf());
       }
 
+		std::rotate(g_ifft_complex->get_inbuf(),
+				g_ifft_complex->get_inbuf() + fft_m_len/2,
+				g_ifft_complex->get_inbuf() + fft_m_len);
+
       // Transform buffer from FREQ domain to TIME domain using IFFT
       g_ifft_complex->execute();
 
-		// ::TRICKY:: change output_items pointer
-      std::copy(g_ifft_complex->get_outbuf(),
-				g_ifft_complex->get_outbuf() + fft_m_len,
-			  	&optr[noutput_items]);
 
+      std::copy(g_ifft_complex->get_outbuf(), g_ifft_complex->get_outbuf() + fft_m_len, optr);
+
+
+		optr += fft_m_len;
       noutput_items += fft_m_len;
    }
 
-		std::cout << "----------" << std::endl;
-		for (int i = 0; i < noutput_items; i++)
-				  std::cout << optr[i] << ",";
-		std::cout << std::endl;
-
-
+	LOG(INFO) << "noutput_items: " << noutput_items << "/" << max_noutput_items;
 	return noutput_items;
 }
 
@@ -207,6 +208,11 @@ Hypervisor::rx_ready()
 size_t
 Hypervisor::rx_outbuf(gr_complex *output_items, size_t max_noutput_items)
 {
+	/* THIS FUNCTIONS IS NOT BEING USED
+	 * THIS FUNCTIONS IS NOT BEING USED
+	 * THIS FUNCTIONS IS NOT BEING USED
+	 * THIS FUNCTIONS IS NOT BEING USED
+	 */
    size_t noutput_items = 0;
 
 	while (rx_ready() && noutput_items < max_noutput_items)

@@ -34,16 +34,6 @@ void
 VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
 {
 	g_tx_samples.insert(g_tx_samples.end(), &samples[0], &samples[len]);
-
-#if 0
-	if (g_idx == 0)
-	{
-		std::cout << "------------" << std::endl;
-		for (int i = 0; i < fft_n_len; i++)
-			std::cout << samples[i] << ",";
-		std::cout << std::endl;
-	}
-#endif
 }
 
 /**
@@ -117,21 +107,24 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
 			g_tx_samples.begin() + fft_n_len,
 			g_fft_complex->get_inbuf());
 
+	// Delete samples from our buffer
+	g_tx_samples.erase(g_tx_samples.begin(),
+			g_tx_samples.begin() + fft_n_len);
+
    g_fft_complex->execute();
 
 	gr_complex *outbuf = g_fft_complex->get_outbuf();
 
    // map samples in FREQ domain to samples_buff
+	// perfors fft shift 
    size_t idx = 0;
    for (iq_map_vec::iterator it = g_iq_map.begin();
 			it != g_iq_map.end();
-         ++it, ++idx)
+         it++, idx++)
    {
-		samples_buf[*it] = outbuf[idx] / float(fft_n_len); 
+		samples_buf[*it] = outbuf[(idx + (fft_n_len/2)) % fft_n_len] / float(fft_n_len); 
    }
 
-	g_tx_samples.erase(g_tx_samples.begin(),
-			g_tx_samples.begin() + fft_n_len);
 
    return true;
 }
