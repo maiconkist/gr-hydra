@@ -68,11 +68,6 @@ svl_sink::general_work(int noutput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
 {
-	LOG(INFO) << "general_work";
-   LOG(INFO) << "inputsize:" <<  input_signature()->sizeof_stream_item (0);
-   LOG(INFO) << "outputsize:" <<  output_signature()->sizeof_stream_item (0);
-
-
    // forward to hypervisor
    g_hypervisor->tx_add_samples(noutput_items, ninput_items, input_items);
 

@@ -160,7 +160,6 @@ Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_item
       noutput_items += fft_m_len;
    }
 
-	LOG(INFO) << "noutput_items: " << noutput_items << "/" << max_noutput_items;
 	return noutput_items;
 }
 
