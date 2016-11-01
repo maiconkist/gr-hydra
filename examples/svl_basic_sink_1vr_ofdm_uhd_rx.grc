@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Tue Nov  1 14:15:50 2016</timestamp>
+  <timestamp>Tue Nov  1 16:58:02 2016</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -110,29 +110,6 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>200000</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(476, 8)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>id</key>
       <value>fft_len_svl</value>
     </param>
     <param>
@@ -153,144 +130,22 @@
     </param>
   </block>
   <block>
-    <key>blocks_uchar_to_float</key>
+    <key>variable</key>
     <param>
       <key>id</key>
-      <value>blocks_uchar_to_float_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(561, 149)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>qtgui_histogram_sink_x</key>
-    <param>
-      <key>id</key>
-      <value>qtgui_histogram_sink_x_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>name</key>
-      <value>QT GUI Plot</value>
-    </param>
-    <param>
-      <key>size</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>bins</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>xmin</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>xmax</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>nconnections</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>update_time</key>
-      <value>0.10</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(766, 113)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>qtgui_waterfall_sink_x</key>
-    <param>
-      <key>id</key>
-      <value>qtgui_waterfall_sink_x_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>name</key>
-      <value>QT GUI Plot</value>
-    </param>
-    <param>
-      <key>fftsize</key>
-      <value>1024</value>
-    </param>
-    <param>
-      <key>wintype</key>
-      <value>firdes.WIN_BLACKMAN_hARRIS</value>
-    </param>
-    <param>
-      <key>fc</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>bw</key>
       <value>samp_rate</value>
     </param>
     <param>
-      <key>nconnections</key>
-      <value>1</value>
+      <key>_enabled</key>
+      <value>True</value>
     </param>
     <param>
-      <key>update_time</key>
-      <value>0.10</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
+      <key>value</key>
+      <value>1000000</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(270, 333)</value>
+      <value>(476, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -445,11 +300,11 @@
     </param>
     <param>
       <key>center_freq0</key>
-      <value>2.4*10**9</value>
+      <value>2.45*10**9</value>
     </param>
     <param>
       <key>gain0</key>
-      <value>10</value>
+      <value>1</value>
     </param>
     <param>
       <key>ant0</key>
@@ -457,7 +312,7 @@
     </param>
     <param>
       <key>bw0</key>
-      <value>samp_rate</value>
+      <value>200000</value>
     </param>
     <param>
       <key>center_freq1</key>
@@ -1048,7 +903,152 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(259, 106)</value>
+      <value>(272, 104)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_uchar_to_float</key>
+    <param>
+      <key>id</key>
+      <value>blocks_uchar_to_float_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(523, 148)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>qtgui_histogram_sink_x</key>
+    <param>
+      <key>id</key>
+      <value>qtgui_histogram_sink_x_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>name</key>
+      <value>QT GUI Plot</value>
+    </param>
+    <param>
+      <key>size</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>bins</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>xmin</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>xmax</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>nconnections</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>update_time</key>
+      <value>0.10</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(702, 112)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>qtgui_waterfall_sink_x</key>
+    <param>
+      <key>id</key>
+      <value>qtgui_waterfall_sink_x_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>name</key>
+      <value>QT GUI Plot</value>
+    </param>
+    <param>
+      <key>fftsize</key>
+      <value>1024</value>
+    </param>
+    <param>
+      <key>wintype</key>
+      <value>firdes.WIN_BLACKMAN_hARRIS</value>
+    </param>
+    <param>
+      <key>fc</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>bw</key>
+      <value>samp_rate</value>
+    </param>
+    <param>
+      <key>nconnections</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>update_time</key>
+      <value>0.10</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(270, 240)</value>
     </param>
     <param>
       <key>_rotation</key>
