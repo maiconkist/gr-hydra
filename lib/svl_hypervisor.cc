@@ -8,8 +8,12 @@ INITIALIZE_EASYLOGGINGPP;
 namespace gr {
    namespace svl {
 
-Hypervisor::Hypervisor(size_t _fft_m_len):
-        fft_m_len(_fft_m_len)
+Hypervisor::Hypervisor(size_t _fft_m_len,
+		double central_frequency,
+	  	double bandwidth):
+		  fft_m_len(_fft_m_len),
+		  g_cf(central_frequency),
+		  g_bw(bandwidth)
 {
    g_fft_complex  = sfft_complex(new gr::svl::fft_complex(fft_m_len));
    g_ifft_complex = sfft_complex(new gr::svl::fft_complex(fft_m_len, false));
@@ -20,19 +24,19 @@ Hypervisor::Hypervisor(size_t _fft_m_len):
  * @return New radio id
  */
 size_t
-Hypervisor::create_vradio(size_t _fft_n_len)
+Hypervisor::create_vradio(double cf, double bandwidth)
 {
-   vradio_ptr vradio(new VirtualRadio(g_vradios.size(), _fft_n_len));
+   size_t fft_n = bandwidth / (g_bw / fft_m_len);
+
+   vradio_ptr vradio(new VirtualRadio(g_vradios.size(), cf, bandwidth, fft_n));
    g_vradios.push_back(vradio);
+
+	LOG(INFO) << "VR " << g_vradios.size() - 1 << "- FFT N: " << vradio->get_id() << ", CF: " << vradio->get_central_frequency() << ", BW: " << vradio->get_bandwidth();
 
    // ID representing the radio;
    return g_vradios.size() - 1;
 };
 
-/**
- * @param idx
- * @return vradio_ptr to VR
- */
 vradio_ptr
 Hypervisor::get_vradio(size_t idx)
 {
@@ -40,12 +44,26 @@ Hypervisor::get_vradio(size_t idx)
    return g_vradios[idx];
 }
 
-/**
- * @param noutput_items
- * @param ninput_items_required
- */
+size_t const
+Hypervisor::get_allocated_subcarriers()
+{
+	// Check if we can fit the subcarriers requested
+	size_t total_subcarriers = 0;
+
+	for (vradio_vec::iterator it = g_vradios.begin();
+			it != g_vradios.end();
+	 		++it)
+	{
+		total_subcarriers += (*it)->get_subcarriers();
+	}
+
+	return total_subcarriers;
+}
+
+
 void
-Hypervisor::forecast(int noutput_items, gr_vector_int &ninput_items_required)
+Hypervisor::forecast(int noutput_items,
+		gr_vector_int &ninput_items_required)
 {
    size_t ninput = ninput_items_required.size();
 
@@ -57,36 +75,70 @@ Hypervisor::forecast(int noutput_items, gr_vector_int &ninput_items_required)
       ninput_items_required[i] = g_vradios[i]->get_subcarriers() * factor;
 }
 
+int
+Hypervisor::set_vradio_subcarriers(size_t vradio_id, size_t nsubcarriers)
+{
+	vradio_ptr the_radio = g_vradios[vradio_id];
+
+	// Check if we can fit the subcarriers requested
+	size_t total_subcarriers = 0;
+	for (vradio_vec::iterator it = g_vradios.begin();
+			it != g_vradios.end();
+	 		++it)
+	{
+		if (*it == the_radio) continue;
+		total_subcarriers += (*it)->get_subcarriers();
+	}
+
+	LOG_IF(total_subcarriers + nsubcarriers > fft_m_len, ERROR) << "Number of subcarriers exceeds FFT M";
+
+	if (total_subcarriers + nsubcarriers > fft_m_len)
+		return -1;
+
+	g_vradios[vradio_id]->set_subcarriers(nsubcarriers);
+}
+
 void
 Hypervisor::set_radio_mapping()
 {
-   iq_map_vec sc_allocated(fft_m_len, 0);
+   iq_map_vec subcarriers_map(fft_m_len, -1);
 
-	// TODO:: subcarriers in the outerloop is faster
+	LOG(INFO) << "Hypervisor: CF @" << g_cf << ", BW @" << g_bw;
+
    size_t idx(0);
    for (vradio_vec::iterator it = g_vradios.begin();
          it != g_vradios.end();
          ++it)
    {
-      size_t sc_needed = std::min((*it)->get_subcarriers(),
-                      fft_m_len);
+      size_t vr_bw = (*it)->get_bandwidth();
+		double vr_cf = (*it)->get_central_frequency();
+
+		double offset = (vr_cf - vr_bw/2.0) -  (g_cf - g_bw / 2.0) ;
+
+		LOG_IF(offset < 0, ERROR) << "VR " << (*it)->get_id() << ": Frequency outside range - too low [" << offset << "]";
+		LOG_IF(offset + vr_bw > g_cf + g_bw/2.0, ERROR) << "VR " << (*it)->get_id() << ": Frequency outside range - too high [" << offset << "]";
+
+		size_t sc = offset / (g_bw / fft_m_len);
 
       iq_map_vec the_map;
 
-      for (; idx < fft_m_len; idx++)
-      {
-         if (sc_allocated[idx] == 0)
-         {
-            the_map.push_back(idx);
-            sc_allocated[idx] = 1;
-         }
+		LOG(INFO) << "VR " << (*it)->get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + (*it)->get_subcarriers();
 
-         if (the_map.size() == sc_needed)
+      for (; sc < fft_m_len; sc++)
+      {
+         LOG_IF(subcarriers_map[sc] != -1, ERROR) << "Subcarrier already allocated";
+
+			the_map.push_back(sc);
+			subcarriers_map[sc] = (*it)->get_id();
+
+         if (the_map.size() == (*it)->get_subcarriers())
             break;
       }
 
       (*it)->set_iq_mapping(the_map);
    }
+
+	g_subcarriers_map = subcarriers_map;
 }
 
 void
@@ -142,7 +194,7 @@ Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_item
 				it != g_vradios.end();
 				++it)
       {
-      	(*it)->map_iq_samples(g_ifft_complex->get_inbuf());
+			(*it)->map_iq_samples(g_ifft_complex->get_inbuf());
       }
 
 		std::rotate(g_ifft_complex->get_inbuf(),
@@ -152,8 +204,9 @@ Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_item
       // Transform buffer from FREQ domain to TIME domain using IFFT
       g_ifft_complex->execute();
 
-
-      std::copy(g_ifft_complex->get_outbuf(), g_ifft_complex->get_outbuf() + fft_m_len, optr);
+      std::copy(g_ifft_complex->get_outbuf(),
+				g_ifft_complex->get_outbuf() + fft_m_len,
+				optr);
 
 
 		optr += fft_m_len;
@@ -216,7 +269,7 @@ Hypervisor::rx_outbuf(gr_complex *output_items, size_t max_noutput_items)
 
 	while (rx_ready() && noutput_items < max_noutput_items)
 	{
-	   const samples_vec &samp_time_vec = g_rx_samples.front();
+		const samples_vec &samp_time_vec = g_rx_samples.front();
 			g_rx_samples.pop();
 
 		// Transform buffer from TIME domain to FREQ domain using FFT

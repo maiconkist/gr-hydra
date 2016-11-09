@@ -35,17 +35,21 @@ class SVL_API svl_sink: public svl_block
       /**
        * @param _n_inputs
        * @param _fft_m_len
-       * @param _fft_n_len
+       * @param vradios_config
        */
       static svl_sink_ptr make(size_t _n_ports,
-            size_t _fft_m_len,
-            const std::vector<int> _fft_n_len);
+			size_t _fft_m_len,
+			double central_frequency,
+			double bandwidth,
+         const std::vector< std::vector<double> > vradios_config);
 
       /** CTOR
        */
       svl_sink(size_t _n_inputs,
             size_t _fft_m_len,
-            const std::vector<int> _fft_n_len);
+				double central_frequency,
+				double bandwidth,
+            const std::vector< std::vector<double> > vradio_conf);
 
       /** DTOR
        */

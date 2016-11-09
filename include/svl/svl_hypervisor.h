@@ -13,22 +13,31 @@ namespace gr {
 class SVL_API Hypervisor
 {
    private:
-      vradio_vec g_vradios;
 
-      size_t fft_m_len;
+      size_t fft_m_len; // FFT M length
+		double g_cf; // Hypervisor central frequency
+		double g_bw; // Hypervisor bandwidth
+
 		samples_vec_vec g_rx_samples;
 
       sfft_complex g_fft_complex;
       sfft_complex g_ifft_complex;
 
+      vradio_vec g_vradios;
+
+		iq_map_vec g_subcarriers_map; // mapping of subcarriers
+
    public:
-      Hypervisor(size_t _fft_m_len);
+      Hypervisor(size_t _fft_m_len,
+				double central_frequency,
+				double bandwidth);
 
       /**
-       * @param _fft_n_len
+       * @param cf VRadio central frequency
+		 * @param bandwidth VRadio bandwidth
        * @return New radio id
        */
-      size_t create_vradio(size_t _fft_n_len);
+      size_t create_vradio(double cf, double bandwidth);
 
       /**
        * @param idx
@@ -36,12 +45,17 @@ class SVL_API Hypervisor
        */
       vradio_ptr get_vradio(size_t idx);
 
-      /**
+      /** Get total number of subcarriers, i.e., FFT M
        * @return fft_m_len
        */
-      size_t const get_subcarriers() { return fft_m_len; }
+      size_t const get_total_subcarriers() { return fft_m_len; }
 
-      /**
+		/** Get total of subcarriers allocated
+		 * @return Total of subcarriers allocated
+		 */
+      size_t const get_allocated_subcarriers();
+
+      /** Overrida GNURadio virtual method.
        * @param noutput_items
        * @param ninput_items_required
        */
@@ -49,14 +63,26 @@ class SVL_API Hypervisor
 
       /**
        * @param vradio_id
-       * @param bandwidth
-       * @return Always 1
+       * @param nsubcarriers
+       * @return 
        */
-      int set_vradio_subcarriers(size_t vradio_id, size_t bandwidth)
-		{
-            g_vradios[vradio_id]->set_subcarriers(bandwidth);
-            return 1;
-      }
+      int set_vradio_subcarriers(size_t vradio_id, size_t nsubcarriers);
+
+		/**
+		 * @param vradio_id
+		 * @param cf
+		 */
+		int set_vradio_central_frequency(size_t vradio_id, double cf);
+
+		/**
+		 * @param cf central frequency
+		 */
+		void set_central_frequency(double cf){ g_cf = cf; }
+
+		/**
+		 * @param bw The hypervisor bandwidth
+		 */
+		void set_bandwidth(double bw){ g_bw = bw; }
 
       /**
        */
@@ -88,7 +114,6 @@ class SVL_API Hypervisor
        */
       size_t rx_outbuf(gr_complex *output_items,
             size_t max_noutput_items);
-
 
       /**
        * @return true if can generate output

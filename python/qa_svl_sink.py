@@ -40,9 +40,9 @@ class qa_svl_sink (gr_unittest.TestCase):
         dst = blocks.vector_sink_c(1)
         op1 = blocks.head(gr.sizeof_gr_complex, 64)
 
-        sink = svl.svl_sink(1, 64, (64,))
+        DUT = svl.svl_sink(1, 64, 100e3, 200e3, ((100e3, 200e3),))
 
-        self.tb.connect(src1, op1, sink, dst)
+        self.tb.connect(src1, op1, DUT, dst)
         self.tb.run()
 
         # get data
@@ -71,7 +71,7 @@ class qa_svl_sink (gr_unittest.TestCase):
         )
 
         head = blocks.head(gr.sizeof_gr_complex, 256)
-        DUT = svl.svl_sink(1, 256, (256,))
+        DUT = svl.svl_sink(1, 256, 100e3, 200e3, ((100e3, 200e3),))
         sink = blocks.vector_sink_c(1)
         sink = blocks.vector_sink_c(1)
 

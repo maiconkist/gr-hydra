@@ -33,23 +33,30 @@ namespace gr {
 svl_source::svl_source_ptr
 svl_source::make(size_t _n_ports,
 		size_t _fft_m_len,
-      const std::vector<int> _fft_n_len)
+		double central_frequency,
+		double bandwidth,
+      const std::vector< std::vector<double> > vradio_conf)
 {
    return gnuradio::get_initial_sptr(new svl_source(_n_ports,
          _fft_m_len,
-         _fft_n_len));
+			central_frequency,
+			bandwidth,
+         vradio_conf));
 }
 
 svl_source::svl_source(size_t _n_outputs,
 		size_t _fft_m_len,
-      const std::vector<int> _fft_n_len):gr::block("svl_source",
-	gr::io_signature::make(1, 1, sizeof(gr_complex)),
-   gr::io_signature::make(_n_outputs, _n_outputs, sizeof(gr_complex) * _fft_m_len))
+		double central_frequency,
+		double bandwidth,
+      const std::vector< std::vector<double> > vradio_conf):
+			gr::block("svl_source",
+				gr::io_signature::make(1, 1, sizeof(gr_complex)),
+   			gr::io_signature::make(_n_outputs,
+			  		_n_outputs, sizeof(gr_complex) * _fft_m_len)),
+			svl_block(_n_outputs, _fft_m_len, central_frequency, bandwidth)
 {
-   g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len));
-
    for (size_t i = 0; i < _n_outputs; ++i)
-      create_vradio(_fft_n_len[i]);
+		create_vradio(vradio_conf[i][0], vradio_conf[i][1]);
 
    g_hypervisor->set_radio_mapping();
 }

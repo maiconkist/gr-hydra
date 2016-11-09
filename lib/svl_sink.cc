@@ -34,29 +34,35 @@ namespace gr {
 svl_sink::svl_sink_ptr
 svl_sink::make(size_t _n_ports,
       size_t _fft_m_len,
-      const std::vector<int> _fft_n_len)
+		double central_frequency,
+		double bandwidth,
+      const std::vector<std::vector<double> > vradio_conf)
 {
    return gnuradio::get_initial_sptr(new svl_sink(_n_ports,
          _fft_m_len,
-         _fft_n_len));
+			central_frequency,
+			bandwidth,
+         vradio_conf));
 }
 
 svl_sink::svl_sink(size_t _n_inputs,
       size_t _fft_m_len,
-      const std::vector<int> _fft_n_len):gr::block("svl_sink",
-   gr::io_signature::make(_n_inputs, _n_inputs, sizeof(gr_complex)),
-   gr::io_signature::make(1, 1, sizeof(gr_complex)))
+		double central_frequency,
+		double bandwidth,
+      const std::vector< std::vector<double> > vradio_conf):
+			gr::block("svl_sink",
+   				gr::io_signature::make(_n_inputs,
+							  _n_inputs, sizeof(gr_complex)),
+   				gr::io_signature::make(1, 1, sizeof(gr_complex))),
+			svl_block(_n_inputs, _fft_m_len, central_frequency, bandwidth)
 {
 	set_output_multiple(_fft_m_len);
 
-   g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len));
+	for (size_t i = 0; i < _n_inputs; ++i)
+		create_vradio(vradio_conf[i][0], vradio_conf[i][1]);
 
-   for (size_t i = 0; i < _n_inputs; ++i)
-   	create_vradio(_fft_n_len[i]);
-
-   g_hypervisor->set_radio_mapping();
+	g_hypervisor->set_radio_mapping();
 }
-
 
 svl_sink::~svl_sink()
 {

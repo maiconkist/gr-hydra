@@ -10,13 +10,13 @@
 namespace gr {
 	namespace svl {
 
-/**
- */
 class SVL_API VirtualRadio
 {
 	private:
-		size_t fft_n_len;
-		size_t g_idx;
+		size_t fft_n_len; // Subcarriers used by this VRadio
+		size_t g_idx; // Radio unique ID
+		double g_cf; // Central frequency
+		double g_bw; // Bandwidth 
 
 		samples_vec g_tx_samples;
 		samples_vec_vec g_rx_samples;
@@ -29,9 +29,19 @@ class SVL_API VirtualRadio
 	public:
 		/** CTOR
 		 * @param _idx
+		 * @param central_frequency
+		 * @param bandwidth
 		 * @param _fft_n_len
 		 */
-		VirtualRadio(size_t _idx, size_t _fft_n_len);
+		VirtualRadio(size_t _idx,
+				double central_frequency,
+				double bandwidth,
+				size_t _fft_n_len);
+
+		/** Return VRadio unique ID
+		 * @return VRadio ID
+		 */
+		size_t const get_id(){ return g_idx; }
 
 		/**
 		 * @return fft_n_len
@@ -39,16 +49,34 @@ class SVL_API VirtualRadio
 		size_t const get_subcarriers() { return fft_n_len; }
 
 		/**
+		 * @return Allocated subcarriers
+		 */
+		size_t const get_allocated_subcarriers();
+
+		/**
+		 * @return g_cf The central frequency
+		 */
+		double const get_central_frequency() { return g_cf; }
+
+		/**
+		 * @return Bandwidth
+		 */
+		double const get_bandwidth() { return g_bw; }
+
+		/**
 		 * @param _fft_n_len
 		 */
 		void set_subcarriers(size_t _fft_n_len) { fft_n_len = _fft_n_len; }
 
-		/** The number of IQ samples required to produced noutput_items output
-		 * One output is a buffer with fft_n_items
-		 * @param noutput_items Total of noutput_items required
-		 * @return Total of IQ samples require to produce nouput_items
+		/**
+		 * @param cf Central frequency
 		 */
-		int forecast(int noutput_items);
+		void set_central_frequency(double cf) { g_cf = cf;	}
+
+		/**
+		 * @param bw
+		 */
+		void set_bandwidth(double bw) { g_bw = bw; };
 
 		/** Added the buff samples to the VR tx queue.
 		 *
@@ -86,7 +114,6 @@ class SVL_API VirtualRadio
 /* TYPEDEFS for this class */
 typedef boost::shared_ptr<VirtualRadio> vradio_ptr;
 typedef std::vector<vradio_ptr> vradio_vec;
-
 
 } /* namespace svl */
 } /* namespace gr */

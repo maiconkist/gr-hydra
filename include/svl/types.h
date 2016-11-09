@@ -16,6 +16,7 @@ namespace gr {
 
       typedef std::vector<size_t> iq_map_vec;
 
+
 } /* namespace svl */
 
 } /* namespace gr */

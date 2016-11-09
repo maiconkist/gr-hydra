@@ -38,14 +38,18 @@ class SVL_API svl_source: public svl_block
        * @param _fft_n_len
        */
       static svl_source_ptr make(size_t _n_ports,
-                      size_t _fft_m_len,
-                      const std::vector<int> _fft_n_len);
+			size_t _fft_m_len,
+			double central_frequency,
+			double bandwidth,
+			const std::vector< std::vector<double> > vradios_config);
 
       /** CTOR
        */
       svl_source(size_t _n_inputs,
             size_t _fft_m_len,
-            const std::vector<int> _fft_n_len);
+				double central_frequency,
+				double bandwidth,
+            const std::vector< std::vector<double> > vradio_conf);
 
       /** DTOR
        */

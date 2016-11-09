@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Wed Nov  2 11:50:38 2016</timestamp>
+  <timestamp>Wed Nov  9 17:41:37 2016</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -321,108 +321,6 @@
     </param>
   </block>
   <block>
-    <key>qtgui_waterfall_sink_x</key>
-    <param>
-      <key>id</key>
-      <value>qtgui_waterfall_sink_x_0_0_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>name</key>
-      <value>QT GUI Plot</value>
-    </param>
-    <param>
-      <key>fftsize</key>
-      <value>1024</value>
-    </param>
-    <param>
-      <key>wintype</key>
-      <value>firdes.WIN_BLACKMAN_hARRIS</value>
-    </param>
-    <param>
-      <key>fc</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>bw</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>nconnections</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>update_time</key>
-      <value>0.10</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(595, 474)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_multiply_const_vxx</key>
-    <param>
-      <key>id</key>
-      <value>blocks_multiply_const_vxx_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>const</key>
-      <value>amplitude</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(593, 365)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>digital_ofdm_tx</key>
     <param>
       <key>id</key>
@@ -726,26 +624,34 @@
     </param>
   </block>
   <block>
-    <key>svl_svl_sink</key>
+    <key>analog_random_source_x</key>
     <param>
       <key>id</key>
-      <value>svl_svl_sink_0</value>
+      <value>analog_random_source_x_0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>num_inputs</key>
-      <value>2</value>
+      <key>type</key>
+      <value>byte</value>
     </param>
     <param>
-      <key>fft_m_size</key>
-      <value>fft_len_svl</value>
+      <key>min</key>
+      <value>0</value>
     </param>
     <param>
-      <key>fft_n_size</key>
-      <value>(256, 256)</value>
+      <key>max</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>num_samps</key>
+      <value>1000</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>True</value>
     </param>
     <param>
       <key>affinity</key>
@@ -761,7 +667,105 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(378, 352)</value>
+      <value>(11, 106)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_range</key>
+    <param>
+      <key>id</key>
+      <value>central_freq</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Central Frequency</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>2.45*10**9</value>
+    </param>
+    <param>
+      <key>start</key>
+      <value>2.4*10**9</value>
+    </param>
+    <param>
+      <key>stop</key>
+      <value>2.6*10**9</value>
+    </param>
+    <param>
+      <key>step</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>counter</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.Horizontal</value>
+    </param>
+    <param>
+      <key>min_len</key>
+      <value>200</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(230, 505)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_multiply_const_vxx</key>
+    <param>
+      <key>id</key>
+      <value>blocks_multiply_const_vxx_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>const</key>
+      <value>amplitude</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(627, 365)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -916,7 +920,7 @@
     </param>
     <param>
       <key>center_freq0</key>
-      <value>2.45*10**9</value>
+      <value>central_freq</value>
     </param>
     <param>
       <key>gain0</key>
@@ -1432,7 +1436,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(775, 349)</value>
+      <value>(819, 349)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1440,10 +1444,10 @@
     </param>
   </block>
   <block>
-    <key>analog_random_source_x</key>
+    <key>qtgui_waterfall_sink_x</key>
     <param>
       <key>id</key>
-      <value>analog_random_source_x_0</value>
+      <value>qtgui_waterfall_sink_x_0_0_0</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -1451,23 +1455,82 @@
     </param>
     <param>
       <key>type</key>
-      <value>byte</value>
+      <value>complex</value>
     </param>
     <param>
-      <key>min</key>
+      <key>name</key>
+      <value>QT GUI Plot</value>
+    </param>
+    <param>
+      <key>fftsize</key>
+      <value>1024</value>
+    </param>
+    <param>
+      <key>wintype</key>
+      <value>firdes.WIN_BLACKMAN_hARRIS</value>
+    </param>
+    <param>
+      <key>fc</key>
       <value>0</value>
     </param>
     <param>
-      <key>max</key>
-      <value>10</value>
+      <key>bw</key>
+      <value>samp_rate</value>
     </param>
     <param>
-      <key>num_samps</key>
-      <value>1000</value>
+      <key>nconnections</key>
+      <value>1</value>
     </param>
     <param>
-      <key>repeat</key>
+      <key>update_time</key>
+      <value>0.10</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(629, 465)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>svl_svl_sink</key>
+    <param>
+      <key>id</key>
+      <value>svl_svl_sink_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
       <value>True</value>
+    </param>
+    <param>
+      <key>num_inputs</key>
+      <value>2</value>
+    </param>
+    <param>
+      <key>fft_m_size</key>
+      <value>fft_len_svl</value>
+    </param>
+    <param>
+      <key>central_frequency</key>
+      <value>central_freq</value>
+    </param>
+    <param>
+      <key>bandwidth</key>
+      <value>samp_rate</value>
+    </param>
+    <param>
+      <key>vradio_config</key>
+      <value>((central_freq-samp_rate/2, samp_rate/2),(central_freq+samp_rate/2, samp_rate/2) )</value>
     </param>
     <param>
       <key>affinity</key>
@@ -1483,7 +1546,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(11, 106)</value>
+      <value>(377, 341)</value>
     </param>
     <param>
       <key>_rotation</key>

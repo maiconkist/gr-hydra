@@ -4,7 +4,7 @@
   <key>svl_svl_sink</key>
   <category>svl</category>
   <import>import svl</import>
-  <make>svl.svl_sink($num_inputs, $fft_m_size, $fft_n_size)</make>
+  <make>svl.svl_sink($num_inputs, $fft_m_size, $central_frequency, $bandwidth, $vradio_config)</make>
 
   <param>
     <name>Num VRadios</name>
@@ -19,13 +19,26 @@
     <type>int</type>
   </param>
   <param>
-    <name>FFT N Size</name>
-    <key>fft_n_size</key>
+    <name>Central Frequency</name>
+    <key>central_frequency</key>
+    <value>0</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Bandwidth</name>
+    <key>bandwidth</key>
+    <value>200e3</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>VRadio Config</name>
+    <key>vradio_config</key>
     <value>()</value>
     <type>raw</type>
   </param>
 
   <check>$num_inputs &gt; 0</check>
+  <check>$bandwidth &gt; 0</check>
  
   <!-- Make one 'sink' node per input. Sub-nodes:
        * name (an identifier for the GUI)

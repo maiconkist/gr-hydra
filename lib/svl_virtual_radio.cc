@@ -6,39 +6,27 @@
 namespace gr {
    namespace svl {
 
-VirtualRadio::VirtualRadio(size_t _idx, size_t _fft_n_len):
-        fft_n_len(_fft_n_len), g_idx(_idx)
+VirtualRadio::VirtualRadio(size_t _idx,
+	 double central_frequency,
+	 double bandwidth,
+	 size_t _fft_n_len):
+		  g_idx(_idx),
+		  g_cf(central_frequency),
+		  g_bw(bandwidth),
+        fft_n_len(_fft_n_len)
 {
    g_fft_complex = sfft_complex(new gr::svl::fft_complex(fft_n_len)) ;
    g_ifft_complex = sfft_complex(new gr::svl::fft_complex(fft_n_len, false));
 }
 
-/**
- * The number of IQ samples required to produced noutput_items output
- * One output is a buffer with fft_n_items
- *
- * @param noutput_items Total of noutput_items required
- * @return Total of IQ samples require to produce nouput_items
- */
-int
-VirtualRadio::forecast(int noutput_items)
-{
-   return fft_n_len;
-}
-
-/** Added the buff samples to the VR tx queue.
- * \param samples The samples  that must be added to the VR tx queue.
- * \param len samples lenght.
- */
 void
 VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
 {
 	g_tx_samples.insert(g_tx_samples.end(), &samples[0], &samples[len]);
+
+	LOG_IF(g_tx_samples.size() > 5000, INFO) << "VR " << g_idx << ": g_tx_samples too big";
 }
 
-/**
- * @param iq_map
- */
 void
 VirtualRadio::set_iq_mapping(const iq_map_vec &iq_map)
 {
@@ -46,9 +34,6 @@ VirtualRadio::set_iq_mapping(const iq_map_vec &iq_map)
    g_iq_map = iq_map;
 }
 
-/**
- * @param samples_buf FREQ domain samples
- */
 void
 VirtualRadio::demap_iq_samples(const gr_complex *samples_buf)
 {
@@ -73,8 +58,6 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf)
 	);
 }
 
-/**
- */
 void
 VirtualRadio::get_rx_samples(gr_complex *samples_buff, size_t len)
 {
@@ -84,16 +67,6 @@ VirtualRadio::get_rx_samples(gr_complex *samples_buff, size_t len)
 			samples_buff);
 
 	g_rx_samples.pop();
-}
-
-/**
-*/
-bool const
-VirtualRadio::ready_to_map_iq_samples()
-{
-   if (g_tx_samples.size() < fft_n_len)
-   	return false;
-   return true;
 }
 
 bool
@@ -126,6 +99,15 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
    }
 
 
+   return true;
+}
+
+
+bool const
+VirtualRadio::ready_to_map_iq_samples()
+{
+   if (g_tx_samples.size() < fft_n_len)
+   	return false;
    return true;
 }
 
