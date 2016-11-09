@@ -110,15 +110,15 @@ Hypervisor::set_radio_mapping()
          it != g_vradios.end();
          ++it)
    {
-      size_t vr_bw = (*it)->get_bandwidth();
+      double vr_bw = (*it)->get_bandwidth();
 		double vr_cf = (*it)->get_central_frequency();
 
-		double offset = (vr_cf - vr_bw/2.0) -  (g_cf - g_bw / 2.0) ;
+		double offset = (vr_cf - vr_bw/2.0) - (g_cf - g_bw / 2.0) ;
 
 		LOG_IF(offset < 0, ERROR) << "VR " << (*it)->get_id() << ": Frequency outside range - too low [" << offset << "]";
 		LOG_IF(offset + vr_bw > g_cf + g_bw/2.0, ERROR) << "VR " << (*it)->get_id() << ": Frequency outside range - too high [" << offset << "]";
 
-		size_t sc = offset / (g_bw / fft_m_len);
+		unsigned long sc = offset / (g_bw / fft_m_len);
 
       iq_map_vec the_map;
 
