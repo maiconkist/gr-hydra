@@ -10,11 +10,13 @@
 namespace gr {
 	namespace svl {
 
+class Hypervisor;
+
 class SVL_API VirtualRadio
 {
 	private:
 		size_t fft_n_len; // Subcarriers used by this VRadio
-		size_t g_idx; // Radio unique ID
+		int g_idx; // Radio unique ID
 		double g_cf; // Central frequency
 		double g_bw; // Bandwidth 
 
@@ -26,14 +28,19 @@ class SVL_API VirtualRadio
 
 		iq_map_vec g_iq_map;
 
+		// pointer to this VR hypervisor
+		Hypervisor &g_hypervisor;
+
 	public:
 		/** CTOR
+		 * @param hypervisor
 		 * @param _idx
 		 * @param central_frequency
 		 * @param bandwidth
 		 * @param _fft_n_len
 		 */
-		VirtualRadio(size_t _idx,
+		VirtualRadio(Hypervisor &hypervisor,
+				size_t _idx,
 				double central_frequency,
 				double bandwidth,
 				size_t _fft_n_len);
@@ -41,42 +48,38 @@ class SVL_API VirtualRadio
 		/** Return VRadio unique ID
 		 * @return VRadio ID
 		 */
-		size_t const get_id(){ return g_idx; }
+		int const get_id(){ return g_idx; }
 
 		/**
 		 * @return fft_n_len
 		 */
-		size_t const get_subcarriers() { return fft_n_len; }
-
-		/**
-		 * @return Allocated subcarriers
-		 */
-		size_t const get_allocated_subcarriers();
+		size_t const get_subcarriers() {
+				  return fft_n_len;
+		}
 
 		/**
 		 * @return g_cf The central frequency
 		 */
-		double const get_central_frequency() { return g_cf; }
+		double const get_central_frequency() {
+				  return g_cf;
+		}
 
 		/**
 		 * @return Bandwidth
 		 */
-		double const get_bandwidth() { return g_bw; }
-
-		/**
-		 * @param _fft_n_len
-		 */
-		void set_subcarriers(size_t _fft_n_len) { fft_n_len = _fft_n_len; }
+		double const get_bandwidth() {
+				  return g_bw;
+		}
 
 		/**
 		 * @param cf Central frequency
 		 */
-		void set_central_frequency(double cf) { g_cf = cf;	}
+		void set_central_frequency(double cf);
 
 		/**
 		 * @param bw
 		 */
-		void set_bandwidth(double bw) { g_bw = bw; };
+		void set_bandwidth(double bw);
 
 		/** Added the buff samples to the VR tx queue.
 		 *

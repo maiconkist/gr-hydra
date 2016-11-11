@@ -8,11 +8,17 @@
 %include "svl_swig_doc.i"
 
 %{
+#include "svl/types.h"
+#include "svl/svl_virtual_radio.h"
+#include "svl/svl_hypervisor.h"
 #include "svl/svl_block.h"
 #include "svl/svl_sink.h"
 #include "svl/svl_source.h"
 %}
 
+%include "svl/types.h"
+%include "svl/svl_virtual_radio.h"
+%include "svl/svl_hypervisor.h"
 %include "svl/svl_block.h"
 %include "svl/svl_sink.h"
 GR_SWIG_BLOCK_MAGIC2(svl, svl_sink);

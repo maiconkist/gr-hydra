@@ -1,15 +1,17 @@
 #include <svl/svl_virtual_radio.h>
+#include <svl/svl_hypervisor.h>
 
 #include "easylogging++.h"
-#include <volk/volk.h>
 
 namespace gr {
    namespace svl {
 
-VirtualRadio::VirtualRadio(size_t _idx,
+VirtualRadio::VirtualRadio(Hypervisor &hypervisor,
+	 size_t _idx,
 	 double central_frequency,
 	 double bandwidth,
 	 size_t _fft_n_len):
+		  g_hypervisor(hypervisor),
 		  g_idx(_idx),
 		  g_cf(central_frequency),
 		  g_bw(bandwidth),
@@ -17,6 +19,28 @@ VirtualRadio::VirtualRadio(size_t _idx,
 {
    g_fft_complex = sfft_complex(new gr::svl::fft_complex(fft_n_len)) ;
    g_ifft_complex = sfft_complex(new gr::svl::fft_complex(fft_n_len, false));
+}
+
+void
+VirtualRadio::set_central_frequency(double cf)
+{
+	double old_cf = cf;
+	g_cf = cf;
+
+	int err = g_hypervisor.notify(*this);
+	if (err < 0)
+		g_cf = old_cf;
+}
+
+void
+VirtualRadio::set_bandwidth(double bw)
+{
+	double old_bw = g_bw;
+	g_bw = bw;
+
+	int err = g_hypervisor.notify(*this);
+	if (err < 0)
+		g_bw = old_bw;
 }
 
 void

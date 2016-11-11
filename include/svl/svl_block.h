@@ -23,6 +23,7 @@
 #include <gnuradio/block.h>
 
 #include <svl/api.h>
+#include <svl/types.h>
 #include <svl/svl_hypervisor.h>
 
 namespace gr {
@@ -31,7 +32,6 @@ namespace gr {
 class SVL_API svl_block: virtual public gr::block
 {
    protected:
-      typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
       hypervisor_ptr g_hypervisor;
 
 		size_t fft_m_len;
@@ -53,15 +53,13 @@ class SVL_API svl_block: virtual public gr::block
          return  g_hypervisor->create_vradio(cf, bandwidth);  
       }
 
-      /**
-       * @param _vradio_id
-       * @param _fft_n_len
-       */
-      int set_vradio_subcarriers(size_t _vradio_id,
-            size_t _fft_n_len)
-      {
-			return g_hypervisor->set_vradio_subcarriers(_vradio_id, _fft_n_len);
-      }
+
+		/** Return pointer to Hypervisor
+		 * ::NOTE:: I tried to return a hypervisor_ptr, but it did not worked when called from python using SWIG
+		 */
+		Hypervisor * get_hypervisor(){
+				  return g_hypervisor.get();
+		}
 
 		/**
 		 * @param noutput_items

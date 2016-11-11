@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Wed Nov  9 17:09:48 2016</timestamp>
+  <timestamp>Thu Nov 10 10:59:08 2016</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -64,7 +64,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>packet_len</value>
+      <value>samp_rate</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -72,34 +72,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>96</value>
+      <value>1000000</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(192, 10)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>id</key>
-      <value>packet_length_tag_key</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>"packet_len"</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(299, 10)</value>
+      <value>(476, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -133,7 +110,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>samp_rate</value>
+      <value>packet_length_tag_key</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -141,11 +118,34 @@
     </param>
     <param>
       <key>value</key>
-      <value>1000000</value>
+      <value>"packet_len"</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(476, 8)</value>
+      <value>(299, 10)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>id</key>
+      <value>packet_len</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>96</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(192, 10)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -487,50 +487,113 @@
     </param>
   </block>
   <block>
-    <key>svl_svl_sink</key>
+    <key>qtgui_waterfall_sink_x</key>
     <param>
       <key>id</key>
-      <value>svl_svl_sink_0</value>
+      <value>qtgui_waterfall_sink_x_0_0_0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>num_inputs</key>
-      <value>1</value>
+      <key>type</key>
+      <value>complex</value>
     </param>
     <param>
-      <key>fft_m_size</key>
-      <value>fft_len_svl</value>
+      <key>name</key>
+      <value>QT GUI Plot</value>
     </param>
     <param>
-      <key>central_frequency</key>
-      <value>center_freq</value>
+      <key>fftsize</key>
+      <value>1024</value>
     </param>
     <param>
-      <key>bandwidth</key>
+      <key>wintype</key>
+      <value>firdes.WIN_BLACKMAN_hARRIS</value>
+    </param>
+    <param>
+      <key>fc</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>bw</key>
       <value>samp_rate</value>
     </param>
     <param>
-      <key>vradio_config</key>
-      <value>((center_freq, samp_rate),)</value>
+      <key>nconnections</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>update_time</key>
+      <value>0.10</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
     </param>
     <param>
       <key>affinity</key>
       <value></value>
     </param>
     <param>
-      <key>minoutbuf</key>
-      <value>0</value>
+      <key>_coordinate</key>
+      <value>(778, 360)</value>
     </param>
     <param>
-      <key>maxoutbuf</key>
+      <key>_rotation</key>
       <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_range</key>
+    <param>
+      <key>id</key>
+      <value>center_freq</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>center_freq</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>2.45*10**9</value>
+    </param>
+    <param>
+      <key>start</key>
+      <value>2.4*10**9</value>
+    </param>
+    <param>
+      <key>stop</key>
+      <value>2.6*10**9</value>
+    </param>
+    <param>
+      <key>step</key>
+      <value>1*10**6</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>slider</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.Horizontal</value>
+    </param>
+    <param>
+      <key>min_len</key>
+      <value>200</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(519, 271)</value>
+      <value>(235, 428)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -545,7 +608,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>type</key>
@@ -1209,113 +1272,50 @@
     </param>
   </block>
   <block>
-    <key>qtgui_waterfall_sink_x</key>
+    <key>svl_svl_sink</key>
     <param>
       <key>id</key>
-      <value>qtgui_waterfall_sink_x_0_0_0</value>
+      <value>svl_svl_sink_0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>name</key>
-      <value>QT GUI Plot</value>
-    </param>
-    <param>
-      <key>fftsize</key>
-      <value>1024</value>
-    </param>
-    <param>
-      <key>wintype</key>
-      <value>firdes.WIN_BLACKMAN_hARRIS</value>
-    </param>
-    <param>
-      <key>fc</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>bw</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>nconnections</key>
+      <key>num_inputs</key>
       <value>1</value>
     </param>
     <param>
-      <key>update_time</key>
-      <value>0.10</value>
+      <key>fft_m_size</key>
+      <value>fft_len_svl</value>
     </param>
     <param>
-      <key>gui_hint</key>
-      <value></value>
+      <key>central_frequency</key>
+      <value>center_freq</value>
+    </param>
+    <param>
+      <key>bandwidth</key>
+      <value>samp_rate</value>
+    </param>
+    <param>
+      <key>vradio_config</key>
+      <value>((center_freq+samp_rate/4, samp_rate/4),)</value>
     </param>
     <param>
       <key>affinity</key>
       <value></value>
     </param>
     <param>
-      <key>_coordinate</key>
-      <value>(778, 360)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
+      <key>minoutbuf</key>
       <value>0</value>
     </param>
-  </block>
-  <block>
-    <key>variable_qtgui_range</key>
     <param>
-      <key>id</key>
-      <value>center_freq</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>center_freq</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>2.45*10**9</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>2.4*10**9</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>2.6*10**9</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>1*10**6</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>slider</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value></value>
+      <key>maxoutbuf</key>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(235, 428)</value>
+      <value>(519, 271)</value>
     </param>
     <param>
       <key>_rotation</key>

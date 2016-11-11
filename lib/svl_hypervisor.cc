@@ -3,7 +3,7 @@
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP;
 
-#include <volk/volk.h>
+#include <algorithm>
 
 namespace gr {
    namespace svl {
@@ -28,7 +28,7 @@ Hypervisor::create_vradio(double cf, double bandwidth)
 {
    size_t fft_n = bandwidth / (g_bw / fft_m_len);
 
-   vradio_ptr vradio(new VirtualRadio(g_vradios.size(), cf, bandwidth, fft_n));
+   vradio_ptr vradio(new VirtualRadio(*this, g_vradios.size(), cf, bandwidth, fft_n));
    g_vradios.push_back(vradio);
 
 	LOG(INFO) << "VR " << g_vradios.size() - 1 << "- FFT N: " << vradio->get_id() << ", CF: " << vradio->get_central_frequency() << ", BW: " << vradio->get_bandwidth();
@@ -37,11 +37,33 @@ Hypervisor::create_vradio(double cf, double bandwidth)
    return g_vradios.size() - 1;
 };
 
-vradio_ptr
+int
+Hypervisor::notify(VirtualRadio &vr)
+{
+	LOG(INFO) << "notify";
+   iq_map_vec subcarriers_map = g_subcarriers_map;
+	std::replace(subcarriers_map.begin(),
+						 subcarriers_map.end(),
+						 vr.get_id(),
+						 -1);
+
+	// enter 'if' in case of success
+	if (set_radio_mapping(vr, subcarriers_map ) > 0)
+	{
+		LOG(INFO) << "success";
+		g_subcarriers_map = subcarriers_map;
+		return 1;
+	}
+	LOG(INFO) << "fail";
+
+	return -1;
+}
+
+VirtualRadio * const
 Hypervisor::get_vradio(size_t idx)
 {
    LOG_IF(idx > g_vradios.size(), WARNING) << "ERROR";
-   return g_vradios[idx];
+   return g_vradios[idx].get();
 }
 
 size_t const
@@ -75,6 +97,7 @@ Hypervisor::forecast(int noutput_items,
       ninput_items_required[i] = g_vradios[i]->get_subcarriers() * factor;
 }
 
+#if 0
 int
 Hypervisor::set_vradio_subcarriers(size_t vradio_id, size_t nsubcarriers)
 {
@@ -97,48 +120,61 @@ Hypervisor::set_vradio_subcarriers(size_t vradio_id, size_t nsubcarriers)
 
 	g_vradios[vradio_id]->set_subcarriers(nsubcarriers);
 }
+#endif
 
 void
 Hypervisor::set_radio_mapping()
 {
    iq_map_vec subcarriers_map(fft_m_len, -1);
 
-	LOG(INFO) << "Hypervisor: CF @" << g_cf << ", BW @" << g_bw;
-
-   size_t idx(0);
+	// for each virtual radio, to its mapping to subcarriers
+	// ::TRICKY:: we dont stop if a virtual radio cannot be allocated
    for (vradio_vec::iterator it = g_vradios.begin();
          it != g_vradios.end();
          ++it)
    {
-      double vr_bw = (*it)->get_bandwidth();
-		double vr_cf = (*it)->get_central_frequency();
-
-		double offset = (vr_cf - vr_bw/2.0) - (g_cf - g_bw / 2.0) ;
-
-		LOG_IF(offset < 0, ERROR) << "VR " << (*it)->get_id() << ": Frequency outside range - too low [" << offset << "]";
-		LOG_IF(offset + vr_bw > g_cf + g_bw/2.0, ERROR) << "VR " << (*it)->get_id() << ": Frequency outside range - too high [" << offset << "]";
-
-		unsigned long sc = offset / (g_bw / fft_m_len);
-
-      iq_map_vec the_map;
-
-		LOG(INFO) << "VR " << (*it)->get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + (*it)->get_subcarriers();
-
-      for (; sc < fft_m_len; sc++)
-      {
-         LOG_IF(subcarriers_map[sc] != -1, ERROR) << "Subcarrier already allocated";
-
-			the_map.push_back(sc);
-			subcarriers_map[sc] = (*it)->get_id();
-
-         if (the_map.size() == (*it)->get_subcarriers())
-            break;
-      }
-
-      (*it)->set_iq_mapping(the_map);
+			// *((*it).get()) == get pointer to vr, derefence pointer
+			set_radio_mapping(*((*it).get()), subcarriers_map);
    }
 
 	g_subcarriers_map = subcarriers_map;
+}
+
+int
+Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
+{
+   iq_map_vec the_map;
+   double vr_bw = vr.get_bandwidth();
+	double vr_cf = vr.get_central_frequency();
+	double offset = (vr_cf - vr_bw/2.0) - (g_cf - g_bw / 2.0) ;
+
+	// First VR subcarrier
+	int sc = offset / (g_bw / fft_m_len);
+
+	LOG_IF(sc < 0, ERROR) << "VR " << vr.get_id() << ": SC outside range - too low [" << offset << "]";
+	LOG_IF(sc > fft_m_len, ERROR) << "VR " << vr.get_id() << ": SC outside range - too high [" << offset << "]";
+
+	if (sc < 0 || sc > fft_m_len) return -1;
+
+	LOG(INFO) << "VR " << vr.get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + vr.get_subcarriers();
+
+	// Allocate subcarriers sequentially from sc
+   for (; sc < fft_m_len; sc++)
+   {
+      LOG_IF(subcarriers_map[sc] != -1, ERROR) << "Subcarrier @" <<  sc << " already allocated";
+		if (subcarriers_map[sc] != -1) return -1;
+
+		the_map.push_back(sc);
+		subcarriers_map[sc] = vr.get_id();
+
+		// break when we allocated enough subcarriers
+      if (the_map.size() == vr.get_subcarriers())
+         break;
+   }
+
+   vr.set_iq_mapping(the_map);
+
+	return 1;
 }
 
 void
@@ -207,7 +243,6 @@ Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_item
       std::copy(g_ifft_complex->get_outbuf(),
 				g_ifft_complex->get_outbuf() + fft_m_len,
 				optr);
-
 
 		optr += fft_m_len;
       noutput_items += fft_m_len;

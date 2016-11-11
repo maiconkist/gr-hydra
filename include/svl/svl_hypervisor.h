@@ -2,10 +2,12 @@
 #define INCLUDED_SVL_SVL_HYPERVISOR_H
 
 #include <svl/api.h>
+#include <svl/types.h>
 #include <svl/svl_fft.h>
 #include <svl/svl_virtual_radio.h>
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 namespace gr {
    namespace svl {
@@ -24,7 +26,6 @@ class SVL_API Hypervisor
       sfft_complex g_ifft_complex;
 
       vradio_vec g_vradios;
-
 		iq_map_vec g_subcarriers_map; // mapping of subcarriers
 
    public:
@@ -43,7 +44,7 @@ class SVL_API Hypervisor
        * @param idx
        * @return vradio_ptr to VR
        */
-      vradio_ptr get_vradio(size_t idx);
+      VirtualRadio * const get_vradio(size_t idx);
 
       /** Get total number of subcarriers, i.e., FFT M
        * @return fft_m_len
@@ -61,18 +62,11 @@ class SVL_API Hypervisor
        */
       void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
-      /**
-       * @param vradio_id
-       * @param nsubcarriers
-       * @return 
-       */
-      int set_vradio_subcarriers(size_t vradio_id, size_t nsubcarriers);
-
-		/**
-		 * @param vradio_id
-		 * @param cf
+		/** Called by Virtual Radio instances to notify changes
+		 * @param vr
+		 * @return -1 if error, 0 otherwise
 		 */
-		int set_vradio_central_frequency(size_t vradio_id, double cf);
+		int notify(VirtualRadio &vr);
 
 		/**
 		 * @param cf central frequency
@@ -84,15 +78,41 @@ class SVL_API Hypervisor
 		 */
 		void set_bandwidth(double bw){ g_bw = bw; }
 
-      /**
+      /** Map all virtual radios to subcarriers. Reset all mapping.
        */
       void set_radio_mapping();
+
+		/** Allocate subcarriers for Virtual Radio vr only
+		 * @return -1 if error, 0 otherwise
+		 */
+		int set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map);
 
       /**
        */
       void tx_add_samples(int noutput_items,
 				gr_vector_int &ninput_items,
             gr_vector_const_void_star &input_items);
+
+      /**
+       * @param output_buff
+       * @param max_noutput_items
+       * @return 
+       */
+      size_t tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_items);
+
+      /**
+       * @return true if can generate output
+       */
+      bool const tx_ready();
+
+
+		/*
+		 *
+		 * 
+		 * RX FUNCTIONS.
+		 *
+		 *
+		 */
 
       /**
 		 * @param samples
@@ -105,26 +125,15 @@ class SVL_API Hypervisor
        * @param max_noutput_items
        * @return 
        */
-      size_t tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_items);
-
-      /**
-       * @param output_buff
-       * @param max_noutput_items
-       * @return 
-       */
       size_t rx_outbuf(gr_complex *output_items,
             size_t max_noutput_items);
 
       /**
-       * @return true if can generate output
-       */
-      bool const tx_ready();
-
-      /**
        */
       bool const rx_ready();
-      
 };
+
+typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
 
 } /* namespace svl */
 } /* namespace gr */
