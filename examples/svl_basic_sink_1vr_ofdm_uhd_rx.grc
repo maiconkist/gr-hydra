@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Fri Dec  2 17:01:24 2016</timestamp>
+  <timestamp>Fri Dec  2 17:57:07 2016</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -64,7 +64,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>pilot_carriers</value>
+      <value>fft_len_ofdm</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -72,11 +72,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>([y for y in range(-127,128,3) if y != 0], )</value>
+      <value>512</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(546, 550)</value>
+      <value>(768, 5)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -87,7 +87,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>pilot_simbols</value>
+      <value>occupied_carriers</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -95,34 +95,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>([[-1, 1j, 1,]*1000][0][0:85])</value>
+      <value>([y for y in range(-127,128) if y not in range(-127,128,3) and y != 0], )</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(546, 619)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>id</key>
-      <value>packet_length_tag_key</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>"packet_len"</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(299, 10)</value>
+      <value>(545, 481)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -156,7 +133,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>fft_len_ofdm</value>
+      <value>packet_length_tag_key</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -164,11 +141,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>256</value>
+      <value>"packet_len"</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(768, 5)</value>
+      <value>(299, 10)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -179,7 +156,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>occupied_carriers</value>
+      <value>pilot_carriers</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -187,11 +164,227 @@
     </param>
     <param>
       <key>value</key>
-      <value>([y for y in range(-127,128) if y not in range(-127,128,3) and y != 0], )</value>
+      <value>(([y for y in range(-127,128,3) if y != 0], ))</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(545, 481)</value>
+      <value>(546, 550)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>id</key>
+      <value>pilot_simbols</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>([[-1, 1j, 1, -1j]*1000][0][0:85], )</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(546, 619)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_range</key>
+    <param>
+      <key>id</key>
+      <value>central_freq</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Central Frequency</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>2.45*10**9</value>
+    </param>
+    <param>
+      <key>start</key>
+      <value>2.4*10**9</value>
+    </param>
+    <param>
+      <key>stop</key>
+      <value>2.6*10**9</value>
+    </param>
+    <param>
+      <key>step</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>counter</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.Horizontal</value>
+    </param>
+    <param>
+      <key>min_len</key>
+      <value>200</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(153, 446)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>qtgui_waterfall_sink_x</key>
+    <param>
+      <key>id</key>
+      <value>qtgui_waterfall_sink_x_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>name</key>
+      <value>QT GUI Plot</value>
+    </param>
+    <param>
+      <key>fftsize</key>
+      <value>1024</value>
+    </param>
+    <param>
+      <key>wintype</key>
+      <value>firdes.WIN_BLACKMAN_hARRIS</value>
+    </param>
+    <param>
+      <key>fc</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>bw</key>
+      <value>samp_rate</value>
+    </param>
+    <param>
+      <key>nconnections</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>update_time</key>
+      <value>0.10</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(281, 286)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>digital_ofdm_rx</key>
+    <param>
+      <key>id</key>
+      <value>digital_ofdm_rx_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>fft_len</key>
+      <value>fft_len_ofdm</value>
+    </param>
+    <param>
+      <key>cp_len</key>
+      <value>32</value>
+    </param>
+    <param>
+      <key>packet_len_key</key>
+      <value>len_tag_key</value>
+    </param>
+    <param>
+      <key>occupied_carriers</key>
+      <value>occupied_carriers</value>
+    </param>
+    <param>
+      <key>pilot_carriers</key>
+      <value>pilot_carriers</value>
+    </param>
+    <param>
+      <key>pilot_symbols</key>
+      <value>pilot_simbols</value>
+    </param>
+    <param>
+      <key>sync_word1</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>sync_word2</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>header_mod</key>
+      <value>"BPSK"</value>
+    </param>
+    <param>
+      <key>payload_mod</key>
+      <value>"QPSK"</value>
+    </param>
+    <param>
+      <key>scramble_bits</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>log</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(284, 96)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -870,7 +1063,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(7, 120)</value>
+      <value>(7, 144)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -878,54 +1071,30 @@
     </param>
   </block>
   <block>
-    <key>variable_qtgui_range</key>
+    <key>blocks_uchar_to_float</key>
     <param>
       <key>id</key>
-      <value>central_freq</value>
+      <value>blocks_uchar_to_float_0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>label</key>
-      <value>Central Frequency</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>2.45*10**9</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>2.4*10**9</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>2.6*10**9</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>counter</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
+      <key>affinity</key>
       <value></value>
     </param>
     <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
       <key>_coordinate</key>
-      <value>(153, 446)</value>
+      <value>(546, 164)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -980,93 +1149,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(735, 104)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_uchar_to_float</key>
-    <param>
-      <key>id</key>
-      <value>blocks_uchar_to_float_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(546, 140)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_range</key>
-    <param>
-      <key>id</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Samp Rate</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>500e3</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>200e3</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>5e6</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>counter_slider</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(25, 445)</value>
+      <value>(726, 128)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1113,7 +1196,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(545, 323)</value>
+      <value>(549, 270)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1121,137 +1204,54 @@
     </param>
   </block>
   <block>
-    <key>digital_ofdm_rx</key>
+    <key>variable_qtgui_range</key>
     <param>
       <key>id</key>
-      <value>digital_ofdm_rx_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>fft_len</key>
-      <value>fft_len_ofdm</value>
-    </param>
-    <param>
-      <key>cp_len</key>
-      <value>32</value>
-    </param>
-    <param>
-      <key>packet_len_key</key>
-      <value>len_tag_key</value>
-    </param>
-    <param>
-      <key>occupied_carriers</key>
-      <value>occupied_carriers</value>
-    </param>
-    <param>
-      <key>pilot_carriers</key>
-      <value>pilot_carriers</value>
-    </param>
-    <param>
-      <key>pilot_symbols</key>
-      <value>pilot_simbols</value>
-    </param>
-    <param>
-      <key>sync_word1</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>sync_word2</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>header_mod</key>
-      <value>"BPSK"</value>
-    </param>
-    <param>
-      <key>payload_mod</key>
-      <value>"QPSK"</value>
-    </param>
-    <param>
-      <key>scramble_bits</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>log</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(284, 96)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>qtgui_waterfall_sink_x</key>
-    <param>
-      <key>id</key>
-      <value>qtgui_waterfall_sink_x_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>name</key>
-      <value>QT GUI Plot</value>
-    </param>
-    <param>
-      <key>fftsize</key>
-      <value>1024</value>
-    </param>
-    <param>
-      <key>wintype</key>
-      <value>firdes.WIN_BLACKMAN_hARRIS</value>
-    </param>
-    <param>
-      <key>fc</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>bw</key>
       <value>samp_rate</value>
     </param>
     <param>
-      <key>nconnections</key>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Samp Rate</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>1e6</value>
+    </param>
+    <param>
+      <key>start</key>
+      <value>200e3</value>
+    </param>
+    <param>
+      <key>stop</key>
+      <value>5e6</value>
+    </param>
+    <param>
+      <key>step</key>
       <value>1</value>
     </param>
     <param>
-      <key>update_time</key>
-      <value>0.10</value>
+      <key>widget</key>
+      <value>counter_slider</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.Horizontal</value>
+    </param>
+    <param>
+      <key>min_len</key>
+      <value>200</value>
     </param>
     <param>
       <key>gui_hint</key>
       <value></value>
     </param>
     <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
       <key>_coordinate</key>
-      <value>(281, 286)</value>
+      <value>(26, 445)</value>
     </param>
     <param>
       <key>_rotation</key>
