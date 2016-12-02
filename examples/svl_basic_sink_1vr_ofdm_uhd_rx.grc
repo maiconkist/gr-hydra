@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Wed Nov 30 10:37:10 2016</timestamp>
+  <timestamp>Fri Dec  2 17:01:24 2016</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -64,6 +64,52 @@
     <key>variable</key>
     <param>
       <key>id</key>
+      <value>pilot_carriers</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>([y for y in range(-127,128,3) if y != 0], )</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(546, 550)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>id</key>
+      <value>pilot_simbols</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>([[-1, 1j, 1,]*1000][0][0:85])</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(546, 619)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>id</key>
       <value>packet_length_tag_key</value>
     </param>
     <param>
@@ -110,29 +156,6 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>fft_len_svl</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>512</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(679, 4)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>id</key>
       <value>fft_len_ofdm</value>
     </param>
     <param>
@@ -153,30 +176,22 @@
     </param>
   </block>
   <block>
-    <key>blocks_uchar_to_float</key>
+    <key>variable</key>
     <param>
       <key>id</key>
-      <value>blocks_uchar_to_float_0</value>
+      <value>occupied_carriers</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
+      <key>value</key>
+      <value>([y for y in range(-127,128) if y not in range(-127,128,3) and y != 0], )</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(532, 140)</value>
+      <value>(545, 481)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -863,6 +878,61 @@
     </param>
   </block>
   <block>
+    <key>variable_qtgui_range</key>
+    <param>
+      <key>id</key>
+      <value>central_freq</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Central Frequency</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>2.45*10**9</value>
+    </param>
+    <param>
+      <key>start</key>
+      <value>2.4*10**9</value>
+    </param>
+    <param>
+      <key>stop</key>
+      <value>2.6*10**9</value>
+    </param>
+    <param>
+      <key>step</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>counter</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.Horizontal</value>
+    </param>
+    <param>
+      <key>min_len</key>
+      <value>200</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(153, 446)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>qtgui_histogram_sink_x</key>
     <param>
       <key>id</key>
@@ -910,7 +980,38 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(729, 104)</value>
+      <value>(735, 104)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_uchar_to_float</key>
+    <param>
+      <key>id</key>
+      <value>blocks_uchar_to_float_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(546, 140)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -941,7 +1042,7 @@
     </param>
     <param>
       <key>stop</key>
-      <value>1e6</value>
+      <value>5e6</value>
     </param>
     <param>
       <key>step</key>
@@ -966,6 +1067,132 @@
     <param>
       <key>_coordinate</key>
       <value>(25, 445)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_udp_sink</key>
+    <param>
+      <key>id</key>
+      <value>blocks_udp_sink_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>ipaddr</key>
+      <value>127.0.0.1</value>
+    </param>
+    <param>
+      <key>port</key>
+      <value>12345</value>
+    </param>
+    <param>
+      <key>psize</key>
+      <value>1472</value>
+    </param>
+    <param>
+      <key>eof</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(545, 323)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>digital_ofdm_rx</key>
+    <param>
+      <key>id</key>
+      <value>digital_ofdm_rx_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>fft_len</key>
+      <value>fft_len_ofdm</value>
+    </param>
+    <param>
+      <key>cp_len</key>
+      <value>32</value>
+    </param>
+    <param>
+      <key>packet_len_key</key>
+      <value>len_tag_key</value>
+    </param>
+    <param>
+      <key>occupied_carriers</key>
+      <value>occupied_carriers</value>
+    </param>
+    <param>
+      <key>pilot_carriers</key>
+      <value>pilot_carriers</value>
+    </param>
+    <param>
+      <key>pilot_symbols</key>
+      <value>pilot_simbols</value>
+    </param>
+    <param>
+      <key>sync_word1</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>sync_word2</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>header_mod</key>
+      <value>"BPSK"</value>
+    </param>
+    <param>
+      <key>payload_mod</key>
+      <value>"QPSK"</value>
+    </param>
+    <param>
+      <key>scramble_bits</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>log</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(284, 96)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1024,164 +1251,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(281, 241)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>virtual_sink</key>
-    <param>
-      <key>id</key>
-      <value>virtual_sink_0_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>stream_id</key>
-      <value>svl_time_samples</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(282, 343)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_range</key>
-    <param>
-      <key>id</key>
-      <value>central_freq</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Central Frequency</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>2.45*10**9</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>2.4*10**9</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>2.6*10**9</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>counter</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(153, 446)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>digital_ofdm_rx</key>
-    <param>
-      <key>id</key>
-      <value>digital_ofdm_rx_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>fft_len</key>
-      <value>fft_len_ofdm</value>
-    </param>
-    <param>
-      <key>cp_len</key>
-      <value>32</value>
-    </param>
-    <param>
-      <key>packet_len_key</key>
-      <value>len_tag_key</value>
-    </param>
-    <param>
-      <key>occupied_carriers</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>pilot_carriers</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>pilot_symbols</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>sync_word1</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>sync_word2</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>header_mod</key>
-      <value>"BPSK"</value>
-    </param>
-    <param>
-      <key>payload_mod</key>
-      <value>"QPSK"</value>
-    </param>
-    <param>
-      <key>scramble_bits</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>log</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(284, 96)</value>
+      <value>(281, 286)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1213,8 +1283,8 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>uhd_usrp_source_0</source_block_id>
-    <sink_block_id>virtual_sink_0_0</sink_block_id>
+    <source_block_id>digital_ofdm_rx_0</source_block_id>
+    <sink_block_id>blocks_udp_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
