@@ -136,9 +136,6 @@ class uhd_transmitter(uhd_interface, gr.hier_block2):
                           help="Subdevice of UHD device where appropriate")
         parser.add_option("-A", "--antenna", type="string", default=None,
                           help="select Rx Antenna where appropriate")
-        parser.add_option("", "--tx-freq", type="eng_float", default=None,
-                          help="set transmit frequency to FREQ [default=%default]",
-                          metavar="FREQ")
         parser.add_option("", "--lo-offset", type="eng_float", default=0,
                           help="set local oscillator offset in Hz (default is 0)")
         parser.add_option("", "--tx-gain", type="eng_float", default=None,

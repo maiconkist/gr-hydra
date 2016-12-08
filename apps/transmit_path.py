@@ -30,7 +30,7 @@ from gnuradio.digital import ofdm_mod
 # /////////////////////////////////////////////////////////////////////////////
 
 class transmit_path(gr.hier_block2):
-    def __init__(self, options, tx_amplitude):
+    def __init__(self, options):
         '''
         See below for what options should hold
         '''

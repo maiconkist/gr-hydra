@@ -39,23 +39,16 @@ from uhd_interface import uhd_transmitter
 
 # For a nested dict, you need to recursively update __dict__
 def dict2obj(d):
-    """Convert a dict to an object
-
-    >>> d = {'a': 1, 'b': {'c': 2}, 'd': ["hi", {'foo': "bar"}]}
-    >>> obj = dict2obj(d)
-    >>> obj.b.c
-    2
-    >>> obj.d
-    ["hi", {'foo': "bar"}]
-    """
-    try:
-        d = dict(d)
-    except (TypeError, ValueError):
-        return d
-    obj = Object()
-    for k, v in d.iteritems():
-        obj.__dict__[k] = dict2obj(v)
-    return obj
+        if isinstance(d, list):
+            d = [dict2obj(x) for x in d]
+        if not isinstance(d, dict):
+            return d
+        class C(object):
+            pass
+        o = C()
+        for k in d:
+            o.__dict__[k] = dict2obj(d[k])
+        return o
 
 class my_top_block(gr.top_block):
     def __init__(self, options, options_vr1, options_vr2):
@@ -77,15 +70,16 @@ class my_top_block(gr.top_block):
         self.txpath1 = transmit_path(options_vr1)
         self.txpath2 = transmit_path(options_vr2)
 
-
-        svl_sink = svl.svk_sink(1,
+	print options
+        svl_sink = svl.svl_sink(1,
                                 options.fft_length,
-                                options.tx_freq,
-                                options.bandwidth,
+                                int(options.tx_freq),
+                                int(options.bandwidth),
                                 ((options_vr1.freq, options_vr1.bandwidth), )
                     )
 
         self.connect(self.txpath1, svl_sink, self.sink)
+        #self.connect(self.txpath1, self.sink)
 
 # /////////////////////////////////////////////////////////////////////////////
 #                                   main
@@ -94,7 +88,7 @@ class my_top_block(gr.top_block):
 def main():
 
     def send_pkt(payload='', eof=False):
-        return tb.txpath.send_pkt(payload, eof)
+        return tb.txpath1.send_pkt(payload, eof)
 
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
 
@@ -102,18 +96,22 @@ def main():
     svl_options = parser.add_option_group("HyDRA Options")
     svl_options.add_option("", "--fft-length", type="intx", default=1024,
                       help="HyDRA FFT M size [default=%default]")
+    parser.add_option("", "--tx-freq", type="eng_float", default=svl_centerfrequency,
+		    help="Hydra transmit frequency [default=%default]", metavar="FREQ")
+    parser.add_option("-W", "--bandwidth", type="eng_float", default=1e6,
+		    help="Hydra sample_rate [default=%default]")
 
     vr1_options = parser.add_option_group("VR 1 Options")
     vr1_options.add_option("", "--vr1-bandwidth", type="eng_float", default=1e6,
                       help="set bandwidth for VR 1 [default=%default]")
-    vr1_options.add_option("", "--vr1-centerfrequency", type="eng_float", default=svl_centerfrequency-750e3,
+    vr1_options.add_option("", "--vr1-freq", type="eng_float", default=svl_centerfrequency,
                       help="set central frequency for VR 1 [default=%default]")
+    vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.1, metavar="AMPL",
+                          help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
     vr1_options.add_option("", "--vr1-port", type="intx", default=12345,
                       help="set UDP socket port number for VR1 [default=%default]")
     vr1_options.add_option("", "--vr1-bufferbytes", type="intx", default=20480,
                       help="set UDP socket receiver buffer size for VR1 [default=%default]")
-    vr1_options.add_option("", "--vr1-amplitude", type="eng_float", default=0.1, metavar="AMPL",
-                          help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
     vr1_options.add_option("-m", "--vr1-modulation", type="string", default="bpsk",
                       help="set modulation type (bpsk, qpsk, 8psk, qam{16,64}) [default=%default]")
     vr1_options.add_option("", "--vr1-fft-length", type="intx", default=512,
@@ -126,14 +124,14 @@ def main():
     vr2_options = parser.add_option_group("VR 2 Options")
     vr2_options.add_option("", "--vr2-bandwidth", type="eng_float", default=200e3,
                       help="set bandwidth for VR 2 [default=%default]")  
-    vr2_options.add_option("", "--vr2-centerfrequency", type="eng_float", default=svl_centerfrequency+350e3,
+    vr2_options.add_option("", "--vr2-freq", type="eng_float", default=svl_centerfrequency+350e3,
                       help="set central frequency for VR 2 [default=%default]")  
+    vr2_options.add_option("", "--vr2-tx-amplitude", type="eng_float", default=0.1, metavar="AMPL",
+                          help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
     vr2_options.add_option("", "--vr2-port", type="intx", default=12345,
                       help="set UDP socket port number for VR 2 [default=%default]")
     vr2_options.add_option("", "--vr2-bufferbytes", type="intx", default=20480,
                       help="set UDP socket receiver buffer size for VR 2 [default=%default]")  
-    vr2_options.add_option("", "--vr2-amplitude", type="eng_float", default=0.1, metavar="AMPL",
-                          help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
     vr2_options.add_option("-m", "--vr2-modulation", type="string", default="bpsk",
                       help="set modulation type (bpsk, qpsk, 8psk, qam{16,64}) [default=%default]")
     vr2_options.add_option("", "--vr2-fft-length", type="intx", default=512,
@@ -150,24 +148,31 @@ def main():
                       help="set megabytes to transmit [default=%default]")
     expert_grp.add_option("","--to-file", default=None,
                       help="Output file for modulated samples")
-
     uhd_transmitter.add_options(parser)
 
     (options, args) = parser.parse_args()
 
     # build the graph
     options_vr1 = dict2obj({'tx_amplitude': options.vr1_tx_amplitude,
+			   'freq': options.vr1_freq,
+			   'bandwidth': options.vr1_bandwidth,
                            'modulation': options.vr1_modulation,
                            'fft_length': options.vr1_fft_length,
                            'occupied_tones': options.vr1_occupied_tones,
                            'cp_length': options.vr1_cp_length,
-                           'modulation': options.vr1_modulation})
+                           'modulation': options.vr1_modulation,
+			   'verbose': False,
+			   'log': False})
     options_vr2 = dict2obj({'tx_amplitude': options.vr2_tx_amplitude,
+			   'freq': options.vr2_freq,
+			   'bandwidth': options.vr1_bandwidth,
                            'modulation': options.vr2_modulation,
                            'fft_length': options.vr2_fft_length,
                            'occupied_tones': options.vr2_occupied_tones,
                            'cp_length': options.vr2_cp_length,
-                           'modulation': options.vr2_modulation})
+                           'modulation': options.vr2_modulation,
+			   'verbose': False,
+			   'log': False})
 
     tb = my_top_block(options, options_vr1, options_vr2)
 
@@ -188,10 +193,8 @@ def main():
     # create a socket
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     host = '' # can leave this blank on the server side
-    # print options.port
-    # print options.bufferbytes
     try:
-        s.bind((host, options.port))
+        s.bind((host, options.vr1_port))
     except socket.error, err:
         print "Could not set up a UDP server on port %d: %s" % (options.port, err)
         raise SystemExit
@@ -202,7 +205,11 @@ def main():
         # pdb.set_trace()
         # try:
         #data = s.recv(options.bufferbytes)
+
 	data = f.read(max_pkt_size)
+	#data = ''.join(['1' for x in range(2048)])
+
+
 	# add error handling here 021609
         # except (KeyboardInterrupt, SystemExit):
         #    raise
@@ -225,7 +232,8 @@ def main():
             data = data[max_pkt_size:]  # update "data"
 
         data = struct.pack('!H', 0xaaaa) + data
-        payload = struct.pack('!H', pktno & 0xffff) + data
+        #payload = struct.pack('!H', pktno & 0xffff) + data
+        payload = data
         send_pkt(payload)
         n += len(payload)
         sys.stderr.write('.')
