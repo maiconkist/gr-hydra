@@ -94,11 +94,11 @@ def main():
 
     svl_centerfrequency = 5.5e9
     svl_options = parser.add_option_group("HyDRA Options")
-    svl_options.add_option("", "--fft-length", type="intx", default=1024,
+    svl_options.add_option("", "--fft-length", type="intx", default=2048,
                       help="HyDRA FFT M size [default=%default]")
     parser.add_option("", "--tx-freq", type="eng_float", default=svl_centerfrequency,
 		    help="Hydra transmit frequency [default=%default]", metavar="FREQ")
-    parser.add_option("-W", "--bandwidth", type="eng_float", default=1e6,
+    parser.add_option("-W", "--bandwidth", type="eng_float", default=2e6,
 		    help="Hydra sample_rate [default=%default]")
 
     vr1_options = parser.add_option_group("VR 1 Options")
