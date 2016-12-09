@@ -21,24 +21,69 @@
 # 
 
 from gnuradio import gr
-from gnuradio import eng_notation
 from gnuradio import blocks
 from gnuradio.digital import ofdm_mod
+
+import sys
+import threading
+import struct
+import logging
+
+
+class ReadThread(threading.Thread):
+    def __init__(self, filename, tx_path):
+        self._filename = filename
+        self._tx_path = tx_path
+
+    def run(self):
+        f = open(self._filename, "rb")
+
+        pktno = 0
+        n = 0
+
+        while True:
+            # pdb.set_trace()
+            # try:
+            """
+            data = s.recv(options.bufferbytes)
+            """
+
+            data = f.read(3072)
+
+            # add error handling here 021609
+            # except (KeyboardInterrupt, SystemExit):
+            #    raise
+            if not data:
+                logging.warning("no data in buffer")
+                break
+
+            data = struct.pack('!H', 0xaaaa) + data
+            payload = data
+            self._tx_path.send_pkt(payload)
+            n += len(payload)
+            sys.stderr.write('.')
+
+            pktno += 1
+
+        logging.info("tx_bytes = %d,\t tx_pkts = %d" % (n, pktno))
+        self._tx_path.send_pkt(eof=True)
+        f.close()
+
 
 # /////////////////////////////////////////////////////////////////////////////
 #                              transmit path
 # /////////////////////////////////////////////////////////////////////////////
-
-class transmit_path(gr.hier_block2):
+class TransmitPath(gr.hier_block2):
     def __init__(self, options):
         '''
         See below for what options should hold
         '''
-	gr.hier_block2.__init__(self, "transmit_path",
-				gr.io_signature(0, 0, 0),
-				gr.io_signature(1, 1, gr.sizeof_gr_complex))
+        gr.hier_block2.__init__(self, "transmit_path",
+                                gr.io_signature(0, 0, 0),
+                                gr.io_signature(1, 1, gr.sizeof_gr_complex))
 
-        self._tx_amplitude = options.tx_amplitude # digital amp sent to radio
+        # digital amp inside gnuradio radio
+        self._tx_amplitude = options.tx_amplitude
 
         self.ofdm_tx = ofdm_mod(options,
                                 msgq_limit=4,
@@ -49,6 +94,10 @@ class transmit_path(gr.hier_block2):
 
         # Create and setup transmit path flow graph
         self.connect(self.ofdm_tx, self.amp, self)
+
+        if options.file is None:
+            logging.error("Filename is empty")
+            sys.exit(0)
 
     def set_tx_amplitude(self, ampl):
         """
@@ -65,7 +114,6 @@ class transmit_path(gr.hier_block2):
         Calls the transmitter method to send a packet
         """
         return self.ofdm_tx.send_pkt(payload, eof)
-
 
     def _print_verbage(self):
         """
