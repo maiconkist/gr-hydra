@@ -31,8 +31,11 @@ import logging
 
 
 class ReadThread(threading.Thread):
-    def __init__(self, filename, tx_path):
+    def __init__(self, filename, buffersize, tx_path):
+        threading.Thread.__init__(self)
+
         self._filename = filename
+        self._buffersize = buffersize
         self._tx_path = tx_path
 
     def run(self):
@@ -47,8 +50,7 @@ class ReadThread(threading.Thread):
             """
             data = s.recv(options.bufferbytes)
             """
-
-            data = f.read(3072)
+            data = f.read(self._buffersize)
 
             # add error handling here 021609
             # except (KeyboardInterrupt, SystemExit):
