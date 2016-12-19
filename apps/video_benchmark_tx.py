@@ -65,13 +65,13 @@ class my_top_block(gr.top_block):
         # do this after for any adjustments to the options that may
         # occur in the sinks (specifically the UHD sink)
         self.txpath1 = TransmitPath(options_vr1)
-        self.txpath2 = TransmitPath(options_vr2)
 
         vr_configs = []
         vr_configs.append([options_vr1.freq, options_vr1.bandwidth])
         vr_configs.append([options_vr2.freq, options_vr2.bandwidth])
 
         if not options.two_virtual_radios:
+	    print("Creating 1 VR")
             svl_sink = svl.svl_sink(1,
                                     options.fft_length,
                                     int(options.tx_freq),
@@ -80,6 +80,8 @@ class my_top_block(gr.top_block):
             self.connect(self.txpath1, svl_sink, self.sink)
             self.svl = svl_sink
         else:
+	    print("Creating 2 VRs")
+	    self.txpath2 = TransmitPath(options_vr2)
             svl_sink = svl.svl_sink(2,
                                     options.fft_length,
                                     int(options.tx_freq),
@@ -106,11 +108,11 @@ def main():
             action="store_true", default=False, help="Run with TWO virtual radios [default=%default]")
     svl_options.add_option("", "--file-sink",
             action="store_true", default=False, help="Do not use USRP as sink. Use file instead [default=%default]")
-    svl_options.add_option("", "--fft-length", type="intx", default=2048,
+    svl_options.add_option("", "--fft-length", type="intx", default=5120,
             help="HyDRA FFT M size [default=%default]")
     parser.add_option("", "--tx-freq", type="eng_float", default=svl_centerfrequency,
             help="Hydra transmit frequency [default=%default]", metavar="FREQ")
-    parser.add_option("-W", "--bandwidth", type="eng_float", default=2e6,
+    parser.add_option("-W", "--bandwidth", type="eng_float", default=4e6,
             help="Hydra sample_rate [default=%default]")
 
     vr1_options = parser.add_option_group("VR 1 Options")
@@ -118,13 +120,13 @@ def main():
             help="set bandwidth for VR 1 [default=%default]")
     vr1_options.add_option("", "--vr1-freq", type="eng_float", default=svl_centerfrequency-500e3,
             help="set central frequency for VR 1 [default=%default]")
-    vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.1, metavar="AMPL",
+    vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
             help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
     vr1_options.add_option("", "--vr1-file", type="string", default=None,
             help="set the file to obtain data [default=%default]")
     vr1_options.add_option("", "--vr1-buffersize", type="intx", default=3072,
             help="set number of bytes to read from buffer size for VR1 [default=%default]")
-    vr1_options.add_option("-m", "--vr1-modulation", type="string", default="bpsk",
+    vr1_options.add_option("-m", "--vr1-modulation", type="string", default="qpsk",
             help="set modulation type (bpsk, qpsk, 8psk, qam{16,64}) [default=%default]")
     vr1_options.add_option("", "--vr1-fft-length", type="intx", default=512,
             help="set the number of FFT bins [default=%default]")
@@ -133,12 +135,13 @@ def main():
     vr1_options.add_option("", "--vr1-cp-length", type="intx", default=4,
             help="set the number of bits in the cyclic prefix [default=%default]")
 
+	
     vr2_options = parser.add_option_group("VR 2 Options")
     vr2_options.add_option("", "--vr2-bandwidth", type="eng_float", default=200e3,
                            help="set bandwidth for VR 2 [default=%default]")  
-    vr2_options.add_option("", "--vr2-freq", type="eng_float", default=svl_centerfrequency+350e3,
+    vr2_options.add_option("", "--vr2-freq", type="eng_float", default=svl_centerfrequency+200e3,
                            help="set central frequency for VR 2 [default=%default]")  
-    vr2_options.add_option("", "--vr2-tx-amplitude", type="eng_float", default=0.1, metavar="AMPL",
+    vr2_options.add_option("", "--vr2-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
                            help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
     vr2_options.add_option("", "--vr2-file", type="string", default=None,
                       help="set the file to obtain data [default=%default]")
@@ -146,11 +149,11 @@ def main():
                            help="set number of bytes to read from buffer size for VR2 [default=%default]")
     vr2_options.add_option("-m", "--vr2-modulation", type="string", default="bpsk",
                            help="set modulation type (bpsk, qpsk, 8psk, qam{16,64}) [default=%default]")
-    vr2_options.add_option("", "--vr2-fft-length", type="intx", default=128,
+    vr2_options.add_option("", "--vr2-fft-length", type="intx", default=64,
                            help="set the number of FFT bins [default=%default]")
-    vr2_options.add_option("", "--vr2-occupied-tones", type="intx", default=100,
+    vr2_options.add_option("", "--vr2-occupied-tones", type="intx", default=48,
                            help="set the number of occupied FFT bins [default=%default]")
-    vr2_options.add_option("", "--vr2-cp-length", type="intx", default=16,
+    vr2_options.add_option("", "--vr2-cp-length", type="intx", default=2,
                            help="set the number of bits in the cyclic prefix [default=%default]")
 
     expert_grp = parser.add_option_group("Expert")
@@ -195,14 +198,19 @@ def main():
         print "Warning: failed to enable realtime scheduling"
 
     tb = my_top_block(options, options_vr1, options_vr2)
+    tb.start()                       # start flow graph
+
+
 
     t1 = ReadThread(options_vr1.file, options_vr1.buffersize, tb.txpath1)
-    t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2)
-
-    tb.start()                       # start flow graph
     t1.start()
-    t2.start()
 
+
+    if options.two_virtual_radios:
+    	t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2)
+	t2.start()
+
+    
     tb.wait()                       # wait for it to finish
 
 if __name__ == '__main__':
