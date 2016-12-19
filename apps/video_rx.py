@@ -36,14 +36,29 @@ from uhd_interface import uhd_receiver
 
 import struct, sys
 
+# For a nested dict, you need to recursively update __dict__
+def dict2obj(d):
+        if isinstance(d, list):
+            d = [dict2obj(x) for x in d]
+        if not isinstance(d, dict):
+            return d
+
+        class C(object):
+            pass
+
+        o = C()
+        for k in d:
+            o.__dict__[k] = dict2obj(d[k])
+        return o
+
 class my_top_block(gr.top_block):
     def __init__(self, callback, options):
         gr.top_block.__init__(self)
 
-        if(options.rx_freq is not None):
+        if(options.freq is not None):
             self.source = uhd_receiver(options.args,
-                                       options.bandwidth, options.rx_freq, 
-                                       options.lo_offset, options.rx_gain,
+                                       options.bandwidth, options.freq, 
+                                       options.lo_offset, options.gain,
                                        options.spec, options.antenna,
                                        options.clock_source, options.verbose)
         elif(options.from_file is not None):
@@ -71,56 +86,66 @@ def main():
     n_right = 0
 
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
-    parser.add_option("", "--vr-configuration", default=1,
+    parser.add_option("", "--vr-configuration", type="int", default=None,
                       help="Default configuration for VR RX (matches the configuration of TX) [default=%default]")  
 
     expert_grp = parser.add_option_group("Expert")
     
-    expert.add_option("-p", "--port", type="intx", default=12346,
+    expert_grp.add_option("-p", "--port", type="intx", default=12346,
                       help="set UDP socket port number [default=%default]")
-    expert.add_option("", "--host", default="127.0.0.1",
+    expert_grp.add_option("", "--host", default="127.0.0.1",
                       help="set host IP address [default=%default]")  
 
     receive_path.add_options(expert_grp, expert_grp)
     uhd_receiver.add_options(expert_grp)
     digital.ofdm_demod.add_options(expert_grp, expert_grp)
-
     (options, args) = parser.parse_args ()
-
 
     options_vr1 = dict2obj({'tx_amplitude': 0.125,
                             'freq': 5.5e9 - 500e3,
                             'bandwidth': 1e6,
+			    'gain': 15,
                             'file': None,
                             'buffersize': 4072,
                             'modulation': 'qpsk',
                             'fft_length': 512,
                             'occupied_tones': 200,
                             'cp_length': 4,
+			    'args' : options.args,
+			    'lo_offset' : options.lo_offset,
+			    'spec' : options.spec,
+			    'antenna' : options.antenna,
+			    'clock_source' : options.clock_source,
                             'verbose': False,
                             'log': False})
     options_vr2 = dict2obj({'tx_amplitude': 0.125,
                             'freq': 5.5e9 + 200e3,
                             'bandwidth': 200e3,
+			    'gain': 15,
                             'file': None,
                             'buffersize': 4072,
                             'modulation': 'bpsk',
                             'fft_length': 64,
                             'occupied_tones': 48,
                             'cp_length': 2,
+			    'args' : options.args,
+			    'lo_offset' : options.lo_offset,
+			    'spec' : options.spec,
+			    'antenna' : options.antenna,
+			    'clock_source' : options.clock_source,
                             'verbose': False,
                             'log': False})
 
-
-
-
-    if options.rx_freq is None:
+    vr_configuration = [options_vr1, options_vr2]
+    if options.vr_configuration is not None:
+        options = vr_configuration[options.vr_configuration - 1]
+		
+    if options.freq is None:
         sys.stderr.write("You must specify -f FREQ or --freq FREQ\n")
         parser.print_help(sys.stderr)
         sys.exit(1)
 
     cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    
     def rx_callback(ok, payload):
         global n_rcvd, n_right
         n_rcvd += 1
