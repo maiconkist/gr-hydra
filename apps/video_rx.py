@@ -71,32 +71,56 @@ def main():
     n_right = 0
 
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
+    parser.add_option("", "--vr-configuration", default=1,
+                      help="Default configuration for VR RX (matches the configuration of TX) [default=%default]")  
+
     expert_grp = parser.add_option_group("Expert")
     
-    parser.add_option("","--discontinuous", action="store_true", default=False,
-                      help="enable discontinuous")
-    parser.add_option("","--from-file", default=None,
-                      help="input file of samples to demod")
-    parser.add_option("-p", "--port", type="intx", default=12346,
+    expert.add_option("-p", "--port", type="intx", default=12346,
                       help="set UDP socket port number [default=%default]")
-    parser.add_option("", "--host", default="127.0.0.1",
+    expert.add_option("", "--host", default="127.0.0.1",
                       help="set host IP address [default=%default]")  
 
-    receive_path.add_options(parser, expert_grp)
-    uhd_receiver.add_options(parser)
-    digital.ofdm_demod.add_options(parser, expert_grp)
+    receive_path.add_options(expert_grp, expert_grp)
+    uhd_receiver.add_options(expert_grp)
+    digital.ofdm_demod.add_options(expert_grp, expert_grp)
 
     (options, args) = parser.parse_args ()
 
-    if options.from_file is None:
-        if options.rx_freq is None:
-            sys.stderr.write("You must specify -f FREQ or --freq FREQ\n")
-            parser.print_help(sys.stderr)
-            sys.exit(1)
+
+    options_vr1 = dict2obj({'tx_amplitude': 0.125,
+                            'freq': 5.5e9 - 500e3,
+                            'bandwidth': 1e6,
+                            'file': None,
+                            'buffersize': 4072,
+                            'modulation': 'qpsk',
+                            'fft_length': 512,
+                            'occupied_tones': 200,
+                            'cp_length': 4,
+                            'verbose': False,
+                            'log': False})
+    options_vr2 = dict2obj({'tx_amplitude': 0.125,
+                            'freq': 5.5e9 + 200e3,
+                            'bandwidth': 200e3,
+                            'file': None,
+                            'buffersize': 4072,
+                            'modulation': 'bpsk',
+                            'fft_length': 64,
+                            'occupied_tones': 48,
+                            'cp_length': 2,
+                            'verbose': False,
+                            'log': False})
+
+
+
+
+    if options.rx_freq is None:
+        sys.stderr.write("You must specify -f FREQ or --freq FREQ\n")
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
-    f = open('/home/nodeuser/maicon/video_gnuradio/video_out.raw', "wb")
     def rx_callback(ok, payload):
         global n_rcvd, n_right
         n_rcvd += 1
@@ -106,9 +130,7 @@ def main():
         print "ok: %r \t pktno: %d \t n_rcvd: %d \t n_right: %d" % (ok, pktno, n_rcvd, n_right)
         print "Sent packet length = %4d" % (len(payload[2:])) 
 
-        f.write(payload[2:])
 	cs.sendto(payload[2:], (options.host, options.port))
-
 
     # build the graph
     tb = my_top_block(rx_callback, options)
