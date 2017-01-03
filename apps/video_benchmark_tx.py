@@ -71,7 +71,7 @@ class my_top_block(gr.top_block):
         vr_configs.append([options_vr2.freq, options_vr2.bandwidth])
 
         if not options.two_virtual_radios:
-	    print("Creating 1 VR")
+            print("Creating 1 VR")
             svl_sink = svl.svl_sink(1,
                                     options.fft_length,
                                     int(options.tx_freq),
@@ -80,8 +80,8 @@ class my_top_block(gr.top_block):
             self.connect(self.txpath1, svl_sink, self.sink)
             self.svl = svl_sink
         else:
-	    print("Creating 2 VRs")
-	    self.txpath2 = TransmitPath(options_vr2)
+            print("Creating 2 VRs")
+            self.txpath2 = TransmitPath(options_vr2)
             svl_sink = svl.svl_sink(2,
                                     options.fft_length,
                                     int(options.tx_freq),
@@ -107,7 +107,7 @@ def main():
     svl_options.add_option("-2", "--two-virtual-radios",
             action="store_true", default=False, help="Run with TWO virtual radios [default=%default]")
     svl_options.add_option("", "--file-sink",
-            action="store_true", default=False, help="Do not use USRP as sink. Use file instead [default=%default]")
+            action="store_true", default=True, help="Do not use USRP as sink. Use file instead [default=%default]")
     svl_options.add_option("", "--fft-length", type="intx", default=5120,
             help="HyDRA FFT M size [default=%default]")
     parser.add_option("", "--tx-freq", type="eng_float", default=svl_centerfrequency,
@@ -122,7 +122,7 @@ def main():
             help="set central frequency for VR 1 [default=%default]")
     vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
             help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
-    vr1_options.add_option("", "--vr1-file", type="string", default=None,
+    vr1_options.add_option("", "--vr1-file", type="string", default='vr1fifo',
             help="set the file to obtain data [default=%default]")
     vr1_options.add_option("", "--vr1-buffersize", type="intx", default=3072,
             help="set number of bytes to read from buffer size for VR1 [default=%default]")
@@ -135,15 +135,15 @@ def main():
     vr1_options.add_option("", "--vr1-cp-length", type="intx", default=4,
             help="set the number of bits in the cyclic prefix [default=%default]")
 
-	
+
     vr2_options = parser.add_option_group("VR 2 Options")
     vr2_options.add_option("", "--vr2-bandwidth", type="eng_float", default=200e3,
-                           help="set bandwidth for VR 2 [default=%default]")  
+                           help="set bandwidth for VR 2 [default=%default]")
     vr2_options.add_option("", "--vr2-freq", type="eng_float", default=svl_centerfrequency+200e3,
-                           help="set central frequency for VR 2 [default=%default]")  
+                           help="set central frequency for VR 2 [default=%default]")
     vr2_options.add_option("", "--vr2-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
                            help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
-    vr2_options.add_option("", "--vr2-file", type="string", default=None,
+    vr2_options.add_option("", "--vr2-file", type="string", default='vr2fifo',
                       help="set the file to obtain data [default=%default]")
     vr2_options.add_option("", "--vr2-buffersize", type="intx", default=16,
                            help="set number of bytes to read from buffer size for VR2 [default=%default]")
@@ -200,17 +200,14 @@ def main():
     tb = my_top_block(options, options_vr1, options_vr2)
     tb.start()                       # start flow graph
 
-
-
     t1 = ReadThread(options_vr1.file, options_vr1.buffersize, tb.txpath1)
     t1.start()
 
-
     if options.two_virtual_radios:
-    	t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2)
-	t2.start()
+        t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2)
+        t2.start()
 
-    
+
     tb.wait()                       # wait for it to finish
 
 if __name__ == '__main__':
