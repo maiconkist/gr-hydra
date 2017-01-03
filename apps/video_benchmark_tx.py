@@ -21,12 +21,19 @@
 # Boston, MA 02110-1301, USA.
 # 
 
+
+# GNURadio blocks
 from gnuradio import gr
 from gnuradio.eng_option import eng_option
-from optparse import OptionParser
+from gnuradio import blocks
 import svl
 
-from gnuradio import blocks
+# parse options
+from optparse import OptionParser
+
+# Server for remote commands
+import SimpleXMLRPCServer
+import threading
 
 # from current dir
 from transmit_path import TransmitPath, ReadThread
@@ -52,6 +59,11 @@ def dict2obj(d):
 class my_top_block(gr.top_block):
     def __init__(self, options, options_vr1, options_vr2):
         gr.top_block.__init__(self)
+
+        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", 12345), allow_none=True)
+        self.xmlrpc_server.register_instance(self)
+        threading.Thread(target=self.xmlrpc_server.serve_forever).start()
+
 
         if(options.file_sink is False):
             self.sink = uhd_transmitter(options.args,
@@ -90,6 +102,22 @@ class my_top_block(gr.top_block):
             self.connect(self.txpath1, (svl_sink, 0), self.sink)
             self.connect(self.txpath2, (svl_sink, 1))
             self.svl = svl_sink
+
+
+
+    def set_svl_center_freq(self, center_freq):
+        print("called: set_svl_center_freq")
+
+    def set_svl_bandwidth(self, bandwidth):
+        print("called: set_svl_bandwidth")
+
+    def get_svl_center_freq(self):
+        print("called: get_svl_center_freq")
+        return 111
+
+    def get_svl_bandwidth(self):
+        print("called: get_svl_bandwidth")
+        return 112
 
 
 # /////////////////////////////////////////////////////////////////////////////
