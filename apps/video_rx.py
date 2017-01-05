@@ -101,8 +101,9 @@ def main():
     digital.ofdm_demod.add_options(expert_grp, expert_grp)
     (options, args) = parser.parse_args ()
 
+    svl_center_freq = 3.0e9
     options_vr1 = dict2obj({'tx_amplitude': 0.125,
-                            'freq': 5.5e9 - 500e3,
+                            'freq': svl_center_freq - 500e3,
                             'bandwidth': 1e6,
 			    'gain': 15,
 			    'snr' : options.snr,
@@ -122,7 +123,7 @@ def main():
                             'verbose': False,
                             'log': False})
     options_vr2 = dict2obj({'tx_amplitude': 0.125,
-                            'freq': 5.5e9 + 200e3,
+                            'freq': svl_center_freq + 200e3,
                             'bandwidth': 200e3,
 			    'gain': 15,
 			    'snr' : options.snr,
