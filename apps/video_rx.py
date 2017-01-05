@@ -130,7 +130,7 @@ def main():
     
     expert_grp.add_option("-p", "--port", type="intx", default=12346,
                       help="set UDP socket port number [default=%default]")
-    expert_grp.add_option("-p", "--rpc-port", type="intx", default=12370,
+    expert_grp.add_option("-p", "--rpc-port", type="intx", default=12345,
                       help="set UDP socket port number [default=%default]")
     expert_grp.add_option("", "--host", default="127.0.0.1",
                       help="set host IP address [default=%default]")  
