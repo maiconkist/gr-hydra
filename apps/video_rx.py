@@ -24,17 +24,25 @@
 from gnuradio import gr
 from gnuradio import eng_notation
 from gnuradio.eng_option import eng_option
+from gnuradio import blocks
+from gnuradio import digital
+
 from optparse import OptionParser
 import socket
 
-from gnuradio import blocks
-from gnuradio import digital
+# Server for remote commands
+import SimpleXMLRPCServer
+import threading
 
 # from current dir
 from receive_path import receive_path
 from uhd_interface import uhd_receiver
 
 import struct, sys
+
+
+n_rcvd = 0
+n_right = 0
 
 # For a nested dict, you need to recursively update __dict__
 def dict2obj(d):
@@ -55,6 +63,12 @@ class my_top_block(gr.top_block):
     def __init__(self, callback, options):
         gr.top_block.__init__(self)
 
+        # rpc server to receive remote commands
+        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", options.rpc_port), allow_none=True)
+        self.xmlrpc_server.register_instance(self)
+        threading.Thread(target=self.xmlrpc_server.serve_forever).start()
+
+
         if(options.freq is not None):
             self.source = uhd_receiver(options.args,
                                        options.bandwidth, options.freq, 
@@ -72,8 +86,31 @@ class my_top_block(gr.top_block):
         self.rxpath = receive_path(callback, options)
 
         self.connect(self.source, self.rxpath)
-        
 
+
+    def get_center_freq(self):
+        return self.source.get_sample_rate()
+
+    def get_bandwidth(self):
+        return self.source.get_sample_rate()
+
+    def get_pkt_rcvd(self):
+        global n_rcvd
+        return n_rcvd
+
+    def get_pkt_right(self):
+        global n_right
+        return n_right
+
+    def set_center_freq(self, freq):
+        self.source.set_freq(freq)
+        return self.get_center_freq()
+
+    def set_bandwidth(self, samp_rate):
+        self.source.set_sample_rate(samp_rate)
+        return self.get_bandwidth()
+
+        
 # /////////////////////////////////////////////////////////////////////////////
 #                                   main
 # /////////////////////////////////////////////////////////////////////////////
@@ -93,6 +130,8 @@ def main():
     
     expert_grp.add_option("-p", "--port", type="intx", default=12346,
                       help="set UDP socket port number [default=%default]")
+    expert_grp.add_option("-p", "--rpc-port", type="intx", default=12370,
+                      help="set UDP socket port number [default=%default]")
     expert_grp.add_option("", "--host", default="127.0.0.1",
                       help="set host IP address [default=%default]")  
 
@@ -103,45 +142,47 @@ def main():
 
     svl_center_freq = 3.0e9
     options_vr1 = dict2obj({'tx_amplitude': 0.125,
-                            'freq': svl_center_freq - 500e3,
-                            'bandwidth': 1e6,
-			    'gain': 15,
-			    'snr' : options.snr,
-                            'file': None,
-                            'buffersize': 4072,
-                            'modulation': 'qpsk',
-                            'fft_length': 512,
-                            'occupied_tones': 200,
-                            'cp_length': 4,
-			    'host' : options.host,
-			    'port' : options.port,
-			    'args' : options.args,
-			    'lo_offset' : options.lo_offset,
-			    'spec' : options.spec,
-			    'antenna' : options.antenna,
-			    'clock_source' : options.clock_source,
-                            'verbose': False,
-                            'log': False})
+                    'freq': svl_center_freq - 500e3,
+                    'bandwidth': 1e6,
+                    'gain': 15,
+                    'snr' : options.snr,
+                    'file': None,
+                    'buffersize': 4072,
+                    'modulation': 'qpsk',
+                    'fft_length': 512,
+                    'occupied_tones': 200,
+                    'cp_length': 4,
+                    'host' : options.host,
+                    'rpc_port' : options.rpc_port,
+                    'port' : options.port,
+                    'args' : options.args,
+                    'lo_offset' : options.lo_offset,
+                    'spec' : options.spec,
+                    'antenna' : options.antenna,
+                    'clock_source' : options.clock_source,
+                    'verbose': False,
+                    'log': False})
     options_vr2 = dict2obj({'tx_amplitude': 0.125,
-                            'freq': svl_center_freq + 200e3,
-                            'bandwidth': 200e3,
-			    'gain': 15,
-			    'snr' : options.snr,
-                            'file': None,
-                            'buffersize': 4072,
-                            'modulation': 'bpsk',
-                            'fft_length': 64,
-                            'occupied_tones': 48,
-                            'cp_length': 2,
-			    'host' : options.host,
-			    'port' : options.port,
-			    'args' : options.args,
-			    'lo_offset' : options.lo_offset,
-			    'spec' : options.spec,
-			    'antenna' : options.antenna,
-			    'clock_source' : options.clock_source,
-                            'verbose': False,
-                            'log': False})
+                    'freq': svl_center_freq + 200e3,
+                    'bandwidth': 200e3,
+                    'gain': 15,
+                    'snr' : options.snr,
+                    'file': None,
+                    'buffersize': 4072,
+                    'modulation': 'bpsk',
+                    'fft_length': 64,
+                    'occupied_tones': 48,
+                    'cp_length': 2,
+                    'host' : options.host,
+                    'rpc_port' : options.rpc_port,
+                    'port' : options.port,
+                    'args' : options.args,
+                    'lo_offset' : options.lo_offset,
+                    'spec' : options.spec,
+                    'antenna' : options.antenna,
+                    'clock_source' : options.clock_source,
+                    'verbose': False,
+                    'log': False})
 
     vr_configuration = [options_vr1, options_vr2]
     if options.vr_configuration is not None:
@@ -152,6 +193,7 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
 
+
     cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     def rx_callback(ok, payload):
         global n_rcvd, n_right
@@ -161,8 +203,7 @@ def main():
             n_right += 1
         print "ok: %r \t pktno: %d \t n_rcvd: %d \t n_right: %d" % (ok, pktno, n_rcvd, n_right)
         print "Sent packet length = %4d" % (len(payload[2:])) 
-
-	cs.sendto(payload[2:], (options.host, options.port))
+        cs.sendto(payload[2:], (options.host, options.port))
 
     # build the graph
     tb = my_top_block(rx_callback, options)

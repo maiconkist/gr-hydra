@@ -152,7 +152,7 @@ def main():
             help="set central frequency for VR 1 [default=%default]")
     vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
             help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
-    vr1_options.add_option("", "--vr1-file", type="string", default='vr1fifo',
+    vr1_options.add_option("", "--vr1-file", type="string", default='/home/nodeuser/gr-hydra/apps/vr1fifo',
             help="set the file to obtain data [default=%default]")
     vr1_options.add_option("", "--vr1-buffersize", type="intx", default=3072,
             help="set number of bytes to read from buffer size for VR1 [default=%default]")
@@ -173,7 +173,7 @@ def main():
                            help="set central frequency for VR 2 [default=%default]")
     vr2_options.add_option("", "--vr2-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
                            help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
-    vr2_options.add_option("", "--vr2-file", type="string", default='vr2fifo',
+    vr2_options.add_option("", "--vr2-file", type="string", default='/home/nodeuser/gr-hydra/apps/vr2fifo',
                       help="set the file to obtain data [default=%default]")
     vr2_options.add_option("", "--vr2-buffersize", type="intx", default=16,
                            help="set number of bytes to read from buffer size for VR2 [default=%default]")
