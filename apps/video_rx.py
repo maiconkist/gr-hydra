@@ -63,12 +63,6 @@ class my_top_block(gr.top_block):
     def __init__(self, callback, options):
         gr.top_block.__init__(self)
 
-        # rpc server to receive remote commands
-        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", options.rpc_port), allow_none=True)
-        self.xmlrpc_server.register_instance(self)
-        threading.Thread(target=self.xmlrpc_server.serve_forever).start()
-
-
         if(options.freq is not None):
             self.source = uhd_receiver(options.args,
                                        options.bandwidth, options.freq, 
@@ -87,9 +81,14 @@ class my_top_block(gr.top_block):
 
         self.connect(self.source, self.rxpath)
 
+        # rpc server to receive remote commands
+        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", options.rpc_port), allow_none=True)
+        self.xmlrpc_server.register_instance(self)
+        threading.Thread(target=self.xmlrpc_server.serve_forever).start()
+
 
     def get_center_freq(self):
-        return self.source.get_center_freq()
+        return self.source.get_freq()
 
     def get_bandwidth(self):
         return self.source.get_sample_rate()
