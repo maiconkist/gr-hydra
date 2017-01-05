@@ -86,7 +86,7 @@ def main():
     n_right = 0
 
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
-    parser.add_option("", "--vr-configuration", type="int", default=None,
+    parser.add_option("", "--vr-configuration", type="int", default=1,
                       help="Default configuration for VR RX (matches the configuration of TX) [default=%default]")  
 
     expert_grp = parser.add_option_group("Expert")
