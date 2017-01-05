@@ -132,7 +132,7 @@ def main():
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
 
     #svl_centerfrequency = 5.5e9
-    svl_centerfrequency = 3.0e9
+    svl_centerfrequency = 3.5e9
     svl_options = parser.add_option_group("HyDRA Options")
     svl_options.add_option("-2", "--one-virtual-radio",
             action="store_true", default=False, help="Run with ONE virtual radio instead [default=%default]")
@@ -150,7 +150,7 @@ def main():
             help="set bandwidth for VR 1 [default=%default]")
     vr1_options.add_option("", "--vr1-freq", type="eng_float", default=svl_centerfrequency-500e3,
             help="set central frequency for VR 1 [default=%default]")
-    vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
+    vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.8, metavar="AMPL",
             help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
     vr1_options.add_option("", "--vr1-file", type="string", default='/home/nodeuser/gr-hydra/apps/vr1fifo',
             help="set the file to obtain data [default=%default]")

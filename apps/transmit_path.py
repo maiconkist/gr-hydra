@@ -63,7 +63,6 @@ class ReadThread(threading.Thread):
             payload = data
             self._tx_path.send_pkt(payload)
             n += len(payload)
-            print('.')
 
             pktno += 1
 
