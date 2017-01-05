@@ -66,6 +66,7 @@ class my_top_block(gr.top_block):
 
 
         if(options.file_sink is False):
+            print("Using USRP")
             self.sink = uhd_transmitter(options.args,
                                         options.bandwidth, options.tx_freq,
                                         options.lo_offset, options.tx_gain,
@@ -82,7 +83,7 @@ class my_top_block(gr.top_block):
         vr_configs.append([options_vr1.freq, options_vr1.bandwidth])
         vr_configs.append([options_vr2.freq, options_vr2.bandwidth])
 
-        if not options.two_virtual_radios:
+        if options.one_virtual_radio is True:
             print("Creating 1 VR")
             svl_sink = svl.svl_sink(1,
                                     options.fft_length,
@@ -130,12 +131,13 @@ def main():
 
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
 
-    svl_centerfrequency = 5.5e9
+    #svl_centerfrequency = 5.5e9
+    svl_centerfrequency = 3.0e9
     svl_options = parser.add_option_group("HyDRA Options")
-    svl_options.add_option("-2", "--two-virtual-radios",
-            action="store_true", default=False, help="Run with TWO virtual radios [default=%default]")
+    svl_options.add_option("-2", "--one-virtual-radio",
+            action="store_true", default=False, help="Run with ONE virtual radio instead [default=%default]")
     svl_options.add_option("", "--file-sink",
-            action="store_true", default=True, help="Do not use USRP as sink. Use file instead [default=%default]")
+            action="store_true", default=False, help="Do not use USRP as sink. Use file instead [default=%default]")
     svl_options.add_option("", "--fft-length", type="intx", default=5120,
             help="HyDRA FFT M size [default=%default]")
     parser.add_option("", "--tx-freq", type="eng_float", default=svl_centerfrequency,
@@ -231,7 +233,7 @@ def main():
     t1 = ReadThread(options_vr1.file, options_vr1.buffersize, tb.txpath1)
     t1.start()
 
-    if options.two_virtual_radios:
+    if options.one_virtual_radio == False:
         t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2)
         t2.start()
 
