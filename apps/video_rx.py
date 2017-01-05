@@ -110,6 +110,9 @@ class my_top_block(gr.top_block):
         self.source.set_sample_rate(samp_rate)
         return self.get_bandwidth()
 
+    def set_gain(self, gain):
+        return self.source.set_gain(gain)
+
         
 # /////////////////////////////////////////////////////////////////////////////
 #                                   main

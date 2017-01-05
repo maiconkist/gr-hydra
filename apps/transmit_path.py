@@ -56,14 +56,14 @@ class ReadThread(threading.Thread):
             # except (KeyboardInterrupt, SystemExit):
             #    raise
             if not data:
-                logging.warning("no data in buffer")
+                print("no data in buffer")
                 break
 
             data = struct.pack('!H', 0xaaaa) + data
             payload = data
             self._tx_path.send_pkt(payload)
             n += len(payload)
-            sys.stderr.write('.')
+            print('.')
 
             pktno += 1
 
