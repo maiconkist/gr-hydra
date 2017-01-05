@@ -89,7 +89,7 @@ class my_top_block(gr.top_block):
 
 
     def get_center_freq(self):
-        return self.source.get_sample_rate()
+        return self.source.get_center_freq()
 
     def get_bandwidth(self):
         return self.source.get_sample_rate()
@@ -143,7 +143,7 @@ def main():
     digital.ofdm_demod.add_options(expert_grp, expert_grp)
     (options, args) = parser.parse_args ()
 
-    svl_center_freq = 3.0e9
+    svl_center_freq = 3.5e9
     options_vr1 = dict2obj({'tx_amplitude': 0.125,
                     'freq': svl_center_freq - 500e3,
                     'bandwidth': 1e6,
