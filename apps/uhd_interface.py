@@ -80,6 +80,9 @@ class uhd_interface:
 
     def get_sample_rate(self):
         return self.u.get_samp_rate()
+
+    def get_freq(self):
+        return self._freq
     
     def set_gain(self, gain=None):
         if gain is None:
@@ -101,6 +104,7 @@ class uhd_interface:
         r = self.u.set_center_freq(uhd.tune_request(freq, lo_offset))
 
         if r:
+            self._freq = freq
             return freq
         else:
             frange = self.u.get_freq_range()

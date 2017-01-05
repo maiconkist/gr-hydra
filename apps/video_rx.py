@@ -217,6 +217,7 @@ def main():
 
     tb.start()                      # start flow graph
     tb.wait()                       # wait for it to finish
+    tb.xmlrpc_server.shutdown()
 
 if __name__ == '__main__':
     try:
