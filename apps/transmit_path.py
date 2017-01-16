@@ -31,12 +31,13 @@ import logging
 
 
 class ReadThread(threading.Thread):
-    def __init__(self, filename, buffersize, tx_path):
+    def __init__(self, filename, buffersize, tx_path, read_from_beginning = False):
         threading.Thread.__init__(self)
 
         self._filename = filename
         self._buffersize = buffersize
         self._tx_path = tx_path
+        self._read = read_from_beginning
 
     def run(self):
         f = open(self._filename, "rb")
@@ -50,6 +51,9 @@ class ReadThread(threading.Thread):
             """
             data = s.recv(options.bufferbytes)
             """
+            if self._read:
+                f.seek(0)
+
             data = f.read(self._buffersize)
 
             # add error handling here 021609

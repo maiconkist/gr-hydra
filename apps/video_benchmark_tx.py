@@ -238,9 +238,8 @@ def main():
     t1.start()
 
     if options.one_virtual_radio == False:
-        t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2)
+        t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2, True)
         t2.start()
-
 
     tb.wait()                       # wait for it to finish
 

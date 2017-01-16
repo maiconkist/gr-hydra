@@ -40,7 +40,6 @@ from uhd_interface import uhd_receiver
 
 import struct, sys
 
-
 n_rcvd = 0
 n_right = 0
 
@@ -131,7 +130,7 @@ def main():
     expert_grp = parser.add_option_group("Expert")
     
     expert_grp.add_option("-p", "--port", type="intx", default=23451,
-                      help="set UDP socket port number [default=%default]")
+                      help="set UDP socket port number to ouput the received data  [default=%default]")
     expert_grp.add_option("-p", "--rpc-port", type="intx", default=12345,
                       help="set UDP socket port number [default=%default]")
     expert_grp.add_option("", "--host", default="127.0.0.1",
@@ -177,7 +176,7 @@ def main():
                     'cp_length': 2,
                     'host' : options.host,
                     'rpc_port' : options.rpc_port,
-                    'port' : options.port,
+                    'port' : options.port + 1,
                     'args' : options.args,
                     'lo_offset' : options.lo_offset,
                     'spec' : options.spec,
