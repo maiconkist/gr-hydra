@@ -60,11 +60,6 @@ class my_top_block(gr.top_block):
     def __init__(self, options, options_vr1, options_vr2):
         gr.top_block.__init__(self)
 
-        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", 12345), allow_none=True)
-        self.xmlrpc_server.register_instance(self)
-        threading.Thread(target=self.xmlrpc_server.serve_forever).start()
-
-
         if(options.file_sink is False):
             print("Using USRP")
             self.sink = uhd_transmitter(options.args,
@@ -104,30 +99,39 @@ class my_top_block(gr.top_block):
             self.connect(self.txpath2, (svl_sink, 1))
             self.svl = svl_sink
 
+        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", 12345), allow_none=True)
+        self.xmlrpc_server.register_instance(self)
+        threading.Thread(target=self.xmlrpc_server.serve_forever).start()
+
+
+
+    def set_vr1_gain(self, gain):
+        print("called: set_vr1_gain")
+        return self.txpath1.set_tx_amplitude(gain)
+
+    def set_vr2_gain(self, gain):
+        print("called: set_vr2_gain")
+        return self.txpath2.set_tx_amplitude(gain)
+
     def set_svl_center_freq(self, center_freq):
         print("called: set_svl_center_freq")
-        return self.sink.set_freq(center_freq)
 
     def set_svl_bandwidth(self, bandwidth):
         print("called: set_svl_center_freq")
-        return self.sink.set_samp_rate(bandwidth)
 
     def get_svl_center_freq(self):
         print("called: get_svl_center_freq")
-        return self.sink.get_center_freq()
+        return self.sink.get_freq()
 
     def get_svl_bandwidth(self):
         print("called: get_svl_bandwidth")
-        return self.sink.get_samp_rate()
+        return self.sink.get_sample_rate()
 
 
 # /////////////////////////////////////////////////////////////////////////////
 #                                   main
 # /////////////////////////////////////////////////////////////////////////////
 def main():
-
-    def send_pkt(payload='', eof=False):
-        return tb.txpath1.send_pkt(payload, eof)
 
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
 
@@ -150,9 +154,9 @@ def main():
             help="set bandwidth for VR 1 [default=%default]")
     vr1_options.add_option("", "--vr1-freq", type="eng_float", default=svl_centerfrequency-500e3,
             help="set central frequency for VR 1 [default=%default]")
-    vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.8, metavar="AMPL",
+    vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.1, metavar="AMPL",
             help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
-    vr1_options.add_option("", "--vr1-file", type="string", default='./vr1fifo',
+    vr1_options.add_option("", "--vr1-file", type="string", default='/home/ctvr/.wishful/radio/vr1fifo',
             help="set the file to obtain data [default=%default]")
     vr1_options.add_option("", "--vr1-buffersize", type="intx", default=3072,
             help="set number of bytes to read from buffer size for VR1 [default=%default]")
@@ -173,7 +177,7 @@ def main():
                            help="set central frequency for VR 2 [default=%default]")
     vr2_options.add_option("", "--vr2-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
                            help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
-    vr2_options.add_option("", "--vr2-file", type="string", default='./vr2fifo',
+    vr2_options.add_option("", "--vr2-file", type="string", default='/home/ctvr/.wishful/radio/vr2fifo',
                       help="set the file to obtain data [default=%default]")
     vr2_options.add_option("", "--vr2-buffersize", type="intx", default=16,
                            help="set number of bytes to read from buffer size for VR2 [default=%default]")

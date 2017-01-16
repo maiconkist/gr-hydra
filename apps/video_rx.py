@@ -130,7 +130,7 @@ def main():
 
     expert_grp = parser.add_option_group("Expert")
     
-    expert_grp.add_option("-p", "--port", type="intx", default=12346,
+    expert_grp.add_option("-p", "--port", type="intx", default=23451,
                       help="set UDP socket port number [default=%default]")
     expert_grp.add_option("-p", "--rpc-port", type="intx", default=12345,
                       help="set UDP socket port number [default=%default]")
