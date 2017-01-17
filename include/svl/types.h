@@ -13,7 +13,7 @@ namespace gr {
 		typedef std::vector<gr_complex> samples_vec;
 		typedef std::queue<samples_vec> samples_vec_vec;
 
-		typedef std::vector<size_t> iq_map_vec;
+		typedef std::vector<int> iq_map_vec;
 } /* namespace svl */
 
 } /* namespace gr */

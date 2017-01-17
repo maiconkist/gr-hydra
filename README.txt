@@ -1,6 +1,7 @@
+== REQUIRED LIBS ==
 
-
-
+swig
+libffw3-dev
 
 == TROUBLESHOOTING ==
 
