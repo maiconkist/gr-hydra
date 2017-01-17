@@ -11,7 +11,7 @@ s.bind(("localhost", 23452))
 
 class AppGui():
     def __init__(self, root):
-        self.the_label = tk.Label(root, text="", font=("Helvetica", 256))
+        self.the_label = tk.Label(root, text="", font=("Helvetica", 128))
         self.the_label.pack()
 
 def update():
