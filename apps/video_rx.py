@@ -29,6 +29,7 @@ from gnuradio import digital
 
 from optparse import OptionParser
 import socket
+import time
 
 # Server for remote commands
 import SimpleXMLRPCServer
@@ -40,8 +41,17 @@ from uhd_interface import uhd_receiver
 
 import struct, sys
 
+from video_benchmark_tx import svl_center_frequency, vr1_initial_shift, vr2_initial_shift
+
 n_rcvd = 0
 n_right = 0
+
+g_pkt_history = []
+
+class PktHistory:
+   def __init__(self, pkt_size, timestamp):
+      self.pkt_size = pkt_size * 8
+      self.timestamp = timestamp
 
 # For a nested dict, you need to recursively update __dict__
 def dict2obj(d):
@@ -96,12 +106,33 @@ class my_top_block(gr.top_block):
         global n_rcvd
         return n_rcvd
 
+    @staticmethod
+    def get_throughput():
+        global g_pkt_history
+
+        last_sec = time.time() - 1
+
+        def calculate_throughput():
+            total_bits = 0
+            marked_for_del = []
+            for i in g_pkt_history:
+               if i.timestamp > last_sec:
+                  total_bits += i.pkt_size
+               else:
+                  marked_for_del.append(i)
+            for i in marked_for_del:
+               g_pkt_history.remove(i)
+
+            return total_bits
+        return calculate_throughput()
+
     def get_pkt_right(self):
         global n_right
         return n_right
 
     def set_center_freq(self, freq):
-        self.source.set_freq(freq)
+        print("rx:set_center_qreq")
+        self.source.set_freq(svl_center_frequency + freq)
         return self.get_center_freq()
 
     def set_bandwidth(self, samp_rate):
@@ -141,9 +172,8 @@ def main():
     digital.ofdm_demod.add_options(expert_grp, expert_grp)
     (options, args) = parser.parse_args ()
 
-    svl_center_freq = 5.5e9
     options_vr1 = dict2obj({'tx_amplitude': 0.125,
-                    'freq': svl_center_freq - 500e3,
+                    'freq': svl_center_frequency + vr1_initial_shift,
                     'bandwidth': 1e6,
                     'gain': 15,
                     'snr' : options.snr,
@@ -164,7 +194,7 @@ def main():
                     'verbose': False,
                     'log': False})
     options_vr2 = dict2obj({'tx_amplitude': 0.125,
-                    'freq': svl_center_freq + 200e3,
+                    'freq': svl_center_frequency + vr2_initial_shift,
                     'bandwidth': 200e3,
                     'gain': 15,
                     'snr' : options.snr,
@@ -197,7 +227,7 @@ def main():
 
     cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     def rx_callback(ok, payload):
-        global n_rcvd, n_right
+        global n_rcvd, n_right, g_pkt_history
         n_rcvd += 1
         (pktno,) = struct.unpack('!H', payload[0:2])
         if ok:
@@ -205,6 +235,9 @@ def main():
         print "ok: %r \t pktno: %d \t n_rcvd: %d \t n_right: %d" % (ok, pktno, n_rcvd, n_right)
         print "Sent packet length = %4d" % (len(payload[2:])) 
         cs.sendto(payload[2:], (options.host, options.port))
+
+        g_pkt_history.append( PktHistory(len(payload[2:]), time.time()))
+
 
     # build the graph
     tb = my_top_block(rx_callback, options)

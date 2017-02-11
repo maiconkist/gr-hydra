@@ -96,12 +96,12 @@ class uhd_interface:
         self.u.set_gain(gain, 0)
         return gain
 
-    def set_freq(self, freq=None, lo_offset=None):
+    def set_freq(self, freq=None, lo_offset=0.0):
         if(freq is None):
             sys.stderr.write("You must specify -f FREQ or --freq FREQ\n")
             sys.exit(1)
         
-        r = self.u.set_center_freq(uhd.tune_request(freq, lo_offset))
+        r = self.u.set_center_freq(uhd.tune_request(freq))
 
         if r:
             self._freq = freq

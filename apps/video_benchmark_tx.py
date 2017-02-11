@@ -40,6 +40,11 @@ from transmit_path import TransmitPath, ReadThread
 from uhd_interface import uhd_transmitter
 
 
+svl_center_frequency = 5.5e9
+vr1_initial_shift = -500e3
+vr2_initial_shift =  400e3
+
+
 # For a nested dict, you need to recursively update __dict__
 def dict2obj(d):
         if isinstance(d, list):
@@ -104,10 +109,17 @@ class my_top_block(gr.top_block):
         threading.Thread(target=self.xmlrpc_server.serve_forever).start()
 
 
-
     def set_vr1_gain(self, gain):
         print("called: set_vr1_gain")
         return self.txpath1.set_tx_amplitude(gain)
+
+    def set_vr1_center_freq(self, cf):
+        print("called: set_vr1_cf")
+        return self.svl.get_hypervisor().get_vradio(0).set_central_frequency(svl_center_frequency+cf)
+
+    def set_vr2_center_freq(self, cf):
+        print("called: set_vr2_cf")
+        return self.svl.get_hypervisor().get_vradio(1).set_central_frequency(svl_center_frequency+cf)
 
     def set_vr2_gain(self, gain):
         print("called: set_vr2_gain")
@@ -135,8 +147,6 @@ def main():
 
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
 
-    #svl_centerfrequency = 3.5e9
-    svl_centerfrequency = 5.5e9
     svl_options = parser.add_option_group("HyDRA Options")
     svl_options.add_option("-2", "--one-virtual-radio",
             action="store_true", default=False, help="Run with ONE virtual radio instead [default=%default]")
@@ -144,7 +154,7 @@ def main():
             action="store_true", default=False, help="Do not use USRP as sink. Use file instead [default=%default]")
     svl_options.add_option("", "--fft-length", type="intx", default=5120,
             help="HyDRA FFT M size [default=%default]")
-    parser.add_option("", "--tx-freq", type="eng_float", default=svl_centerfrequency,
+    parser.add_option("", "--tx-freq", type="eng_float", default=svl_center_frequency,
             help="Hydra transmit frequency [default=%default]", metavar="FREQ")
     parser.add_option("-W", "--bandwidth", type="eng_float", default=4e6,
             help="Hydra sample_rate [default=%default]")
@@ -152,7 +162,7 @@ def main():
     vr1_options = parser.add_option_group("VR 1 Options")
     vr1_options.add_option("", "--vr1-bandwidth", type="eng_float", default=1e6,
             help="set bandwidth for VR 1 [default=%default]")
-    vr1_options.add_option("", "--vr1-freq", type="eng_float", default=svl_centerfrequency-500e3,
+    vr1_options.add_option("", "--vr1-freq", type="eng_float", default=svl_center_frequency+vr1_initial_shift,
             help="set central frequency for VR 1 [default=%default]")
     vr1_options.add_option("", "--vr1-tx-amplitude", type="eng_float", default=0.1, metavar="AMPL",
             help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
@@ -173,7 +183,7 @@ def main():
     vr2_options = parser.add_option_group("VR 2 Options")
     vr2_options.add_option("", "--vr2-bandwidth", type="eng_float", default=200e3,
                            help="set bandwidth for VR 2 [default=%default]")
-    vr2_options.add_option("", "--vr2-freq", type="eng_float", default=svl_centerfrequency+200e3,
+    vr2_options.add_option("", "--vr2-freq", type="eng_float", default=svl_center_frequency + vr2_initial_shift,
                            help="set central frequency for VR 2 [default=%default]")
     vr2_options.add_option("", "--vr2-tx-amplitude", type="eng_float", default=0.125, metavar="AMPL",
                            help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
@@ -247,4 +257,6 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
+	tb.xmlrpc_server.stop()
+	tb.stop()
         pass
