@@ -36,9 +36,8 @@ import SimpleXMLRPCServer
 import threading
 
 # from current dir
-from transmit_path import TransmitPath, ReadThread
+from transmit_path import TransmitPath, ReadThread, XMLRPCThread
 from uhd_interface import uhd_transmitter
-
 
 svl_center_frequency = 5.5e9
 vr1_initial_shift = -500e3
@@ -125,11 +124,13 @@ class my_top_block(gr.top_block):
         print("called: set_vr2_gain")
         return self.txpath2.set_tx_amplitude(gain)
 
-    def set_svl_center_freq(self, center_freq):
-        print("called: set_svl_center_freq")
+    def set_vr1_bandwidth(self, bandwidth):
+        print("called: set_vr1_bandwidth")
+        return self.svl.get_hypervisor().get_vradio(0).set_bandwidth(bandwidth)
 
-    def set_svl_bandwidth(self, bandwidth):
-        print("called: set_svl_center_freq")
+    def set_vr2_bandwidth(self, bandwidth):
+        print("called: set_vr2_bandwidth")
+        return self.svl.get_hypervisor().get_vradio(1).set_bandwidth(bandwidth)
 
     def get_svl_center_freq(self):
         print("called: get_svl_center_freq")
@@ -138,6 +139,10 @@ class my_top_block(gr.top_block):
     def get_svl_bandwidth(self):
         print("called: get_svl_bandwidth")
         return self.sink.get_sample_rate()
+
+
+t1 = None
+t2 = None
 
 
 # /////////////////////////////////////////////////////////////////////////////
@@ -189,7 +194,7 @@ def main():
                            help="set transmitter digital amplitude: 0 <= AMPL < 1.0 [default=%default]")
     vr2_options.add_option("", "--vr2-file", type="string", default='/home/ctvr/.wishful/radio/vr2fifo',
                       help="set the file to obtain data [default=%default]")
-    vr2_options.add_option("", "--vr2-buffersize", type="intx", default=16,
+    vr2_options.add_option("", "--vr2-buffersize", type="intx", default=3072,
                            help="set number of bytes to read from buffer size for VR2 [default=%default]")
     vr2_options.add_option("-m", "--vr2-modulation", type="string", default="bpsk",
                            help="set modulation type (bpsk, qpsk, 8psk, qam{16,64}) [default=%default]")
@@ -248,15 +253,17 @@ def main():
     t1.start()
 
     if options.one_virtual_radio == False:
-        t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2, True)
+        #t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2, True)
+        t2 = XMLRPCThread(options_vr2.buffersize, tb.txpath2)
         t2.start()
 
     tb.wait()                       # wait for it to finish
 
 if __name__ == '__main__':
     try:
-        main()
+       main()
     except KeyboardInterrupt:
-	tb.xmlrpc_server.stop()
-	tb.stop()
-        pass
+       t1._run = False
+       t2._run = False
+       tb.xmlrpc_server.stop()
+       tb.stop()

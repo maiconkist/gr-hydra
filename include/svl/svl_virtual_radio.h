@@ -55,7 +55,14 @@ class SVL_API VirtualRadio
 		 */
 		size_t const get_subcarriers() {
 				  return fft_n_len;
+
 		}
+
+      void set_subcarriers(size_t n) {
+         fft_n_len = n;
+         g_fft_complex = sfft_complex(new gr::svl::fft_complex(fft_n_len)) ;
+         g_ifft_complex = sfft_complex(new gr::svl::fft_complex(fft_n_len, false));
+      }
 
 		/**
 		 * @return g_cf The central frequency

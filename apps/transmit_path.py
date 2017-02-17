@@ -29,11 +29,52 @@ import threading
 import struct
 import logging
 
+import SimpleXMLRPCServer
+
+
+class XMLRPCThread(threading.Thread):
+    def __init__(self, buffersize, tx_path):
+        threading.Thread.__init__(self)
+
+        self._value = 70
+        self._buffersize = buffersize
+        self._tx_path = tx_path
+        self._run = True
+        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("192.168.5.56", 22345), allow_none=True)
+
+        self.xmlrpc_server.register_instance(self)
+        threading.Thread(target=self.xmlrpc_server.serve_forever).start()
+
+    def set_value(self, value):
+        self._value = value
+
+    def run(self):
+        pktno = 0
+        n = 0
+
+        while self._run:
+            # pdb.set_trace()
+            # try:
+            """
+            data = s.recv(options.bufferbytes)
+            """
+            data = struct.pack('!H', 0xaaaa) + str(self._value) + " ".join(["" for x in range(400)])
+            payload = data
+            self._tx_path.send_pkt(payload)
+            n += len(payload)
+
+            pktno += 1
+
+        logging.info("tx_bytes = %d,\t tx_pkts = %d" % (n, pktno))
+        self._tx_path.send_pkt(eof=True)
+        self.xmlrpc_server.stop()
+
 
 class ReadThread(threading.Thread):
     def __init__(self, filename, buffersize, tx_path, read_from_beginning = False):
         threading.Thread.__init__(self)
 
+        self._run = True
         self._filename = filename
         self._buffersize = buffersize
         self._tx_path = tx_path
@@ -45,23 +86,21 @@ class ReadThread(threading.Thread):
         pktno = 0
         n = 0
 
-        while True:
+        while self._run:
             # pdb.set_trace()
             # try:
             """
             data = s.recv(options.bufferbytes)
             """
             if self._read:
-                f.seek(0)
+                  f = open(self._filename, "rb")
 
             data = f.read(self._buffersize)
 
-            # add error handling here 021609
-            # except (KeyboardInterrupt, SystemExit):
-            #    raise
             if not data:
-                print("no data in buffer")
-                break
+                print("starting from beginning")
+                f.seek(0)
+                data = f.read(self._buffersize)
 
             data = struct.pack('!H', 0xaaaa) + data
             payload = data

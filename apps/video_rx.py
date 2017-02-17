@@ -172,7 +172,9 @@ def main():
     digital.ofdm_demod.add_options(expert_grp, expert_grp)
     (options, args) = parser.parse_args ()
 
-    options_vr1 = dict2obj({'tx_amplitude': 0.125,
+    options_vr1 = dict2obj({
+                    'id': 0,
+                    'tx_amplitude': 0.125,
                     'freq': svl_center_frequency + vr1_initial_shift,
                     'bandwidth': 1e6,
                     'gain': 15,
@@ -193,7 +195,9 @@ def main():
                     'clock_source' : options.clock_source,
                     'verbose': False,
                     'log': False})
-    options_vr2 = dict2obj({'tx_amplitude': 0.125,
+    options_vr2 = dict2obj({
+                    'id': 1,
+                    'tx_amplitude': 0.125,
                     'freq': svl_center_frequency + vr2_initial_shift,
                     'bandwidth': 200e3,
                     'gain': 15,
@@ -234,9 +238,13 @@ def main():
             n_right += 1
         print "ok: %r \t pktno: %d \t n_rcvd: %d \t n_right: %d" % (ok, pktno, n_rcvd, n_right)
         print "Sent packet length = %4d" % (len(payload[2:])) 
-        cs.sendto(payload[2:], (options.host, options.port))
 
-        g_pkt_history.append( PktHistory(len(payload[2:]), time.time()))
+        if options.id == 0:
+            cs.sendto(payload[2:], (options.host, options.port))
+            g_pkt_history.append( PktHistory(len(payload[2:]), time.time()))
+        else:
+            cs.sendto(payload[2:10], (options.host, options.port))
+            g_pkt_history.append( PktHistory(len(payload[2:10]), time.time()))
 
 
     # build the graph
