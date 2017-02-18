@@ -44,9 +44,11 @@ import struct, sys
 from video_benchmark_tx import svl_center_frequency, vr1_initial_shift, vr2_initial_shift
 
 n_rcvd = 0
+n_fec = 0
 n_right = 0
 
 g_pkt_history = []
+pkt_buffer = []
 
 class PktHistory:
    def __init__(self, pkt_size, timestamp):
@@ -182,8 +184,8 @@ def main():
                     'file': None,
                     'buffersize': 4072,
                     'modulation': 'qpsk',
-                    'fft_length': 512,
-                    'occupied_tones': 200,
+                    'fft_length': 1024,
+                    'occupied_tones': 800,
                     'cp_length': 4,
                     'host' : options.host,
                     'rpc_port' : options.rpc_port,
@@ -230,25 +232,47 @@ def main():
 
 
     cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    def rx_callback(ok, payload):
+
+    def rx_callback_vr2(ok, payload):
         global n_rcvd, n_right, g_pkt_history
-        n_rcvd += 1
         (pktno,) = struct.unpack('!H', payload[0:2])
+
+        n_rcvd += 1
         if ok:
             n_right += 1
         print "ok: %r \t pktno: %d \t n_rcvd: %d \t n_right: %d" % (ok, pktno, n_rcvd, n_right)
-        print "Sent packet length = %4d" % (len(payload[2:])) 
 
-        if options.id == 0:
-            cs.sendto(payload[2:], (options.host, options.port))
-            g_pkt_history.append( PktHistory(len(payload[2:]), time.time()))
+        data = payload[2:10]
+        cs.sendto(data, (options.host, options.port))
+        g_pkt_history.append( PktHistory(len(data), time.time()))
+
+    def rx_callback_vr1(ok, payload):
+        global n_rcvd, n_right, g_pkt_history, pkt_buffer, n_fec
+        MAX_RET = 2
+        (pktno,) = struct.unpack('!H', payload[0:2])
+
+        n_rcvd += 1
+        if ok:
+            n_right += 1
+
+        if (pktno == 1):
+            if len(pkt_buffer) > 0 or ok:
+                if not ok and  len(pkt_buffer) > 0:
+                    n_fec += 1
+                
+                data = payload[2:] if ok else pkt_buffer[0]
+
+                cs.sendto(data, (options.host, options.port))
+                g_pkt_history.append( PktHistory(len(data), time.time()))
+                pkt_buffer = []
         else:
-            cs.sendto(payload[2:10], (options.host, options.port))
-            g_pkt_history.append( PktHistory(len(payload[2:10]), time.time()))
+            if ok:
+                pkt_buffer.append( payload[2:] )
 
+        print "ok: %r \t pktno: %d \t n_rcvd: %d \t n_right: %d \t n_fec: %d" % (ok, pktno, n_rcvd, n_right, n_fec)
 
     # build the graph
-    tb = my_top_block(rx_callback, options)
+    tb = my_top_block(rx_callback_vr2 if options.id== 1 else rx_callback_vr1, options)
 
     r = gr.enable_realtime_scheduling()
     if r != gr.RT_OK:

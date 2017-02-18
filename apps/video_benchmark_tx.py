@@ -177,9 +177,9 @@ def main():
             help="set number of bytes to read from buffer size for VR1 [default=%default]")
     vr1_options.add_option("-m", "--vr1-modulation", type="string", default="qpsk",
             help="set modulation type (bpsk, qpsk, 8psk, qam{16,64}) [default=%default]")
-    vr1_options.add_option("", "--vr1-fft-length", type="intx", default=512,
+    vr1_options.add_option("", "--vr1-fft-length", type="intx", default=1024,
             help="set the number of FFT bins [default=%default]")
-    vr1_options.add_option("", "--vr1-occupied-tones", type="intx", default=200,
+    vr1_options.add_option("", "--vr1-occupied-tones", type="intx", default=800,
             help="set the number of occupied FFT bins [default=%default]")
     vr1_options.add_option("", "--vr1-cp-length", type="intx", default=4,
             help="set the number of bits in the cyclic prefix [default=%default]")
@@ -244,7 +244,7 @@ def main():
 
     r = gr.enable_realtime_scheduling()
     if r != gr.RT_OK:
-        print "Warning: failed to enable realtime scheduling"
+        print("Warning: failed to enable realtime scheduling")
 
     tb = my_top_block(options, options_vr1, options_vr2)
     tb.start()                       # start flow graph

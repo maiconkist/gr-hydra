@@ -72,6 +72,7 @@ class XMLRPCThread(threading.Thread):
 
 class ReadThread(threading.Thread):
     def __init__(self, filename, buffersize, tx_path, read_from_beginning = False):
+
         threading.Thread.__init__(self)
 
         self._run = True
@@ -79,6 +80,7 @@ class ReadThread(threading.Thread):
         self._buffersize = buffersize
         self._tx_path = tx_path
         self._read = read_from_beginning
+
 
     def run(self):
         f = open(self._filename, "rb")
@@ -102,12 +104,17 @@ class ReadThread(threading.Thread):
                 f.seek(0)
                 data = f.read(self._buffersize)
 
-            data = struct.pack('!H', 0xaaaa) + data
-            payload = data
+            # transmit the same pkt 2 times. Receiver can throw away one in case of errors
+            payload = struct.pack('!H', 0xffff & 0) + data
             self._tx_path.send_pkt(payload)
+
+            payload = struct.pack('!H', 0xffff & 1) + data
+            self._tx_path.send_pkt(payload)
+
             n += len(payload)
 
             pktno += 1
+            pktno %= 2
 
         logging.info("tx_bytes = %d,\t tx_pkts = %d" % (n, pktno))
         self._tx_path.send_pkt(eof=True)
@@ -163,4 +170,4 @@ class TransmitPath(gr.hier_block2):
         """
         Prints information about the transmit path
         """
-        print "Tx amplitude     %s" % (self._tx_amplitude)
+        print("Tx amplitude     %s" % (self._tx_amplitude))
