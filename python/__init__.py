@@ -23,11 +23,11 @@ This is the GNU Radio SVL module. Place your Python package
 description here (python/__init__.py).
 '''
 
-# import swig generated symbols into the svl namespace
+# import swig generated symbols into the hydra namespace
 import os
 try:
-    from svl_swig import *
+    from hydra_swig import *
 except ImportError:
     dirname, filename = os.path.split(os.path.abspath(__file__))
     __path__.append(os.path.join(dirname, "..", "..", "swig"))
-    from svl_swig import *
+    from hydra_swig import *

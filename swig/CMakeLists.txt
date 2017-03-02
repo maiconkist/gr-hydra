@@ -20,10 +20,10 @@
 ########################################################################
 # Check if there is C++ code at all
 ########################################################################
-if(NOT svl_sources)
+if(NOT hydra_sources)
 	MESSAGE(STATUS "No C++ sources... skipping swig/")
 	return()
-endif(NOT svl_sources)
+endif(NOT hydra_sources)
 
 ########################################################################
 # Include swig generation macros
@@ -43,23 +43,23 @@ foreach(incdir ${GNURADIO_RUNTIME_INCLUDE_DIRS})
     list(APPEND GR_SWIG_INCLUDE_DIRS ${incdir}/gnuradio/swig)
 endforeach(incdir)
 
-set(GR_SWIG_LIBRARIES gnuradio-svl)
-set(GR_SWIG_DOC_FILE ${CMAKE_CURRENT_BINARY_DIR}/svl_swig_doc.i)
+set(GR_SWIG_LIBRARIES gnuradio-hydra)
+set(GR_SWIG_DOC_FILE ${CMAKE_CURRENT_BINARY_DIR}/hydra_swig_doc.i)
 set(GR_SWIG_DOC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
-GR_SWIG_MAKE(svl_swig svl_swig.i)
+GR_SWIG_MAKE(hydra_swig hydra_swig.i)
 
 ########################################################################
 # Install the build swig module
 ########################################################################
-GR_SWIG_INSTALL(TARGETS svl_swig DESTINATION ${GR_PYTHON_DIR}/svl)
+GR_SWIG_INSTALL(TARGETS hydra_swig DESTINATION ${GR_PYTHON_DIR}/hydra)
 
 ########################################################################
 # Install swig .i files for development
 ########################################################################
 install(
     FILES
-    svl_swig.i
-    ${CMAKE_CURRENT_BINARY_DIR}/svl_swig_doc.i
-    DESTINATION ${GR_INCLUDE_DIR}/svl/swig
+    hydra_swig.i
+    ${CMAKE_CURRENT_BINARY_DIR}/hydra_swig_doc.i
+    DESTINATION ${GR_INCLUDE_DIR}/hydra/swig
 )

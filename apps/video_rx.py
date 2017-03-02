@@ -41,7 +41,7 @@ from uhd_interface import uhd_receiver
 
 import struct, sys
 
-from video_benchmark_tx import svl_center_frequency, vr1_initial_shift, vr2_initial_shift
+from video_benchmark_tx import hydra_center_frequency, vr1_initial_shift, vr2_initial_shift
 
 n_rcvd = 0
 n_fec = 0
@@ -134,7 +134,7 @@ class my_top_block(gr.top_block):
 
     def set_center_freq(self, freq):
         print("rx:set_center_qreq")
-        self.source.set_freq(svl_center_frequency + freq)
+        self.source.set_freq(hydra_center_frequency + freq)
         return self.get_center_freq()
 
     def set_bandwidth(self, samp_rate):
@@ -177,7 +177,7 @@ def main():
     options_vr1 = dict2obj({
                     'id': 0,
                     'tx_amplitude': 0.125,
-                    'freq': svl_center_frequency + vr1_initial_shift,
+                    'freq': hydra_center_frequency + vr1_initial_shift,
                     'bandwidth': 1e6,
                     'gain': 15,
                     'snr' : options.snr,
@@ -200,7 +200,7 @@ def main():
     options_vr2 = dict2obj({
                     'id': 1,
                     'tx_amplitude': 0.125,
-                    'freq': svl_center_frequency + vr2_initial_shift,
+                    'freq': hydra_center_frequency + vr2_initial_shift,
                     'bandwidth': 200e3,
                     'gain': 15,
                     'snr' : options.snr,
