@@ -17,6 +17,6 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 install(FILES
-    svl_svl_sink.xml
-    svl_svl_source.xml DESTINATION share/gnuradio/grc/blocks
+    hydra_hydra_sink.xml
+    hydra_hydra_source.xml DESTINATION share/gnuradio/grc/blocks
 )

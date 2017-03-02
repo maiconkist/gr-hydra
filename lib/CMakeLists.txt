@@ -24,31 +24,31 @@ include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
-list(APPEND svl_sources
-    svl_fft.cc
-    svl_virtual_radio.cc
-	 svl_hypervisor.cc
-    svl_sink.cc
-	 svl_source.cc)
+list(APPEND hydra_sources
+    hydra_fft.cc
+    hydra_virtual_radio.cc
+	 hydra_hypervisor.cc
+    hydra_sink.cc
+	 hydra_source.cc)
 
-set(svl_sources "${svl_sources}" PARENT_SCOPE)
-if(NOT svl_sources)
+set(hydra_sources "${hydra_sources}" PARENT_SCOPE)
+if(NOT hydra_sources)
 	MESSAGE(STATUS "No C++ sources... skipping lib/")
 	return()
-endif(NOT svl_sources)
+endif(NOT hydra_sources)
 
-add_library(gnuradio-svl SHARED ${svl_sources})
-target_link_libraries(gnuradio-svl
+add_library(gnuradio-hydra SHARED ${hydra_sources})
+target_link_libraries(gnuradio-hydra
 	${Boost_LIBRARIES}
 	${GNURADIO_ALL_LIBRARIES}
 	${FFTW_LIBRARIES}
 	fftw3f
 	fftw3l
 )
-set_target_properties(gnuradio-svl PROPERTIES DEFINE_SYMBOL "gnuradio_svl_EXPORTS")
+set_target_properties(gnuradio-hydra PROPERTIES DEFINE_SYMBOL "gnuradio_hydra_EXPORTS")
 
 if(APPLE)
-    set_target_properties(gnuradio-svl PROPERTIES
+    set_target_properties(gnuradio-hydra PROPERTIES
         INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
     )
 endif(APPLE)
@@ -56,7 +56,7 @@ endif(APPLE)
 ########################################################################
 # Install built library files
 ########################################################################
-install(TARGETS gnuradio-svl
+install(TARGETS gnuradio-hydra
     LIBRARY DESTINATION lib${LIB_SUFFIX} # .so/.dylib file
     ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
     RUNTIME DESTINATION bin              # .dll file
@@ -69,23 +69,23 @@ include(GrTest)
 
 include_directories(${CPPUNIT_INCLUDE_DIRS})
 
-list(APPEND test_svl_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_svl.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_svl.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_svl_sink.cc
+list(APPEND test_hydra_sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_hydra.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/qa_hydra.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/qa_hydra_sink.cc
 )
 
-add_executable(test-svl ${test_svl_sources})
+add_executable(test-hydra ${test_hydra_sources})
 
 target_link_libraries(
-  test-svl
+  test-hydra
   ${GNURADIO_RUNTIME_LIBRARIES}
   ${Boost_LIBRARIES}
   ${CPPUNIT_LIBRARIES}
   ${FFTW_LIBRARIES}
   fftw3f
   fftw3l
-  gnuradio-svl
+  gnuradio-hydra
 )
 
-GR_ADD_TEST(test_svl test-svl)
+GR_ADD_TEST(test_hydra test-hydra)
