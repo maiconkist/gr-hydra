@@ -205,6 +205,7 @@ def main():
     vr2_options.add_option("", "--vr2-cp-length", type="intx", default=2,
                            help="set the number of bits in the cyclic prefix [default=%default]")
 
+
     expert_grp = parser.add_option_group("Expert")
     expert_grp.add_option("-s", "--size", type="eng_float", default=400,
                           help="set packet size [default=%default]")
@@ -252,9 +253,10 @@ def main():
     t1 = ReadThread(options_vr1.file, options_vr1.buffersize, tb.txpath1)
     t1.start()
 
+    ipaddr =  "192.168.5.241"
     if options.one_virtual_radio == False:
         #t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2, True)
-        t2 = XMLRPCThread(options_vr2.buffersize, tb.txpath2)
+        t2 = XMLRPCThread(ipaddr, options_vr2.buffersize, tb.txpath2)
         t2.start()
 
     tb.wait()                       # wait for it to finish

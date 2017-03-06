@@ -33,14 +33,14 @@ import SimpleXMLRPCServer
 
 
 class XMLRPCThread(threading.Thread):
-    def __init__(self, buffersize, tx_path):
+    def __init__(self, ipaddr, buffersize, tx_path):
         threading.Thread.__init__(self)
 
         self._value = 70
         self._buffersize = buffersize
         self._tx_path = tx_path
         self._run = True
-        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("192.168.5.56", 22345), allow_none=True)
+        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer((ipaddr, 22345), allow_none=True)
 
         self.xmlrpc_server.register_instance(self)
         threading.Thread(target=self.xmlrpc_server.serve_forever).start()
@@ -58,6 +58,7 @@ class XMLRPCThread(threading.Thread):
             """
             data = s.recv(options.bufferbytes)
             """
+            print "-"
             data = struct.pack('!H', 0xaaaa) + str(self._value) + " ".join(["" for x in range(400)])
             payload = data
             self._tx_path.send_pkt(payload)
@@ -94,6 +95,7 @@ class ReadThread(threading.Thread):
             """
             data = s.recv(options.bufferbytes)
             """
+            print "."
             if self._read:
                   f = open(self._filename, "rb")
 
