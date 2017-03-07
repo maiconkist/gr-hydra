@@ -152,6 +152,10 @@ def main():
 
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
 
+    global_options = parser.add_option_group("Host Options")
+    global_options.add_option("", "--host-ip", type="string", default="localhost",
+            help="This host command interface IP address [default=%default]")
+
     hydra_options = parser.add_option_group("HyDRA Options")
     hydra_options.add_option("-2", "--one-virtual-radio",
             action="store_true", default=False, help="Run with ONE virtual radio instead [default=%default]")
@@ -184,7 +188,6 @@ def main():
     vr1_options.add_option("", "--vr1-cp-length", type="intx", default=4,
             help="set the number of bits in the cyclic prefix [default=%default]")
 
-
     vr2_options = parser.add_option_group("VR 2 Options")
     vr2_options.add_option("", "--vr2-bandwidth", type="eng_float", default=200e3,
                            help="set bandwidth for VR 2 [default=%default]")
@@ -204,7 +207,6 @@ def main():
                            help="set the number of occupied FFT bins [default=%default]")
     vr2_options.add_option("", "--vr2-cp-length", type="intx", default=2,
                            help="set the number of bits in the cyclic prefix [default=%default]")
-
 
     expert_grp = parser.add_option_group("Expert")
     expert_grp.add_option("-s", "--size", type="eng_float", default=400,
@@ -253,10 +255,9 @@ def main():
     t1 = ReadThread(options_vr1.file, options_vr1.buffersize, tb.txpath1)
     t1.start()
 
-    ipaddr =  "192.168.5.241"
     if options.one_virtual_radio == False:
         #t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2, True)
-        t2 = XMLRPCThread(ipaddr, options_vr2.buffersize, tb.txpath2)
+        t2 = XMLRPCThread(options.host_ip, options_vr2.buffersize, tb.txpath2)
         t2.start()
 
     tb.wait()                       # wait for it to finish
