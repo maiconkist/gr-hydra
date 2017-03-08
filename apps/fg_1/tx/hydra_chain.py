@@ -21,7 +21,6 @@
 # Boston, MA 02110-1301, USA.
 # 
 
-
 # GNURadio blocks
 from gnuradio import gr
 from gnuradio.eng_option import eng_option
@@ -83,7 +82,7 @@ class my_top_block(gr.top_block):
                 int(options.bandwidth),
                 vr_configs)
 
-        self.vr1_source = zeromq.pull_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:4000', 1000, False, -1)
+        self.vr1_source = zeromq.pull_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:4000', 100, False, -1)
         self.vr2_source = zeromq.pull_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:4001', 100, False, -1)
 
         self.connect(self.vr1_source, (hydra_sink, 0), self.sink)
