@@ -68,6 +68,7 @@ class my_top_block(gr.top_block):
         # do this after for any adjustments to the options that may
         # occur in the sinks (specifically the UHD sink)
         self.txpath = TransmitPath(options)
+
         self.sink   = zeromq.push_sink(gr.sizeof_gr_complex, 1, options.next_container_ip, 100, False, -1)
 
         self.connect(self.txpath, self.sink)
