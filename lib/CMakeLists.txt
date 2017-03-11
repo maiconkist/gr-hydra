@@ -29,6 +29,7 @@ list(APPEND hydra_sources
     hydra_virtual_radio.cc
 	 hydra_hypervisor.cc
     hydra_sink.cc
+    hydra_async_sink.cc
 	 hydra_source.cc)
 
 set(hydra_sources "${hydra_sources}" PARENT_SCOPE)

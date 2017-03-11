@@ -15,8 +15,8 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
         g_cf(central_frequency),
         g_bw(bandwidth)
 {
-   g_fft_complex  = sfft_complex(new gr::hydra::fft_complex(fft_m_len));
-   g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(fft_m_len, false));
+		  g_fft_complex  = sfft_complex(new gr::hydra::fft_complex(fft_m_len));
+		  g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(fft_m_len, false));
 };
 
 /**
@@ -26,37 +26,37 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
 size_t
 Hypervisor::create_vradio(double cf, double bandwidth)
 {
-   size_t fft_n = bandwidth / (g_bw / fft_m_len);
+		  size_t fft_n = bandwidth / (g_bw / fft_m_len);
 
-   vradio_ptr vradio(new VirtualRadio(*this, g_vradios.size(), cf, bandwidth, fft_n));
-   g_vradios.push_back(vradio);
+		  vradio_ptr vradio(new VirtualRadio(*this, g_vradios.size(), cf, bandwidth, fft_n));
+		  g_vradios.push_back(vradio);
 
-   LOG(INFO) << "VR " << g_vradios.size() - 1 << "- FFT N: " << vradio->get_id() << ", CF: " << vradio->get_central_frequency() << ", BW: " << vradio->get_bandwidth();
+		  LOG(INFO) << "VR " << g_vradios.size() - 1 << "- FFT N: " << vradio->get_id() << ", CF: " << vradio->get_central_frequency() << ", BW: " << vradio->get_bandwidth();
 
-   // ID representing the radio;
-   return g_vradios.size() - 1;
+		  // ID representing the radio;
+		  return g_vradios.size() - 1;
 };
 
 int
 Hypervisor::notify(VirtualRadio &vr)
 {
-   LOG(INFO) << "notify";
-   iq_map_vec subcarriers_map = g_subcarriers_map;
-   std::replace(subcarriers_map.begin(),
-                   subcarriers_map.end(),
-                   vr.get_id(),
-                   -1);
+		  LOG(INFO) << "notify";
+		  iq_map_vec subcarriers_map = g_subcarriers_map;
+		  std::replace(subcarriers_map.begin(),
+								subcarriers_map.end(),
+								vr.get_id(),
+								-1);
 
-   // enter 'if' in case of success
-   if (set_radio_mapping(vr, subcarriers_map ) > 0)
-   {
-      LOG(INFO) << "success";
-      g_subcarriers_map = subcarriers_map;
-      return 1;
-   }
-   LOG(INFO) << "fail";
+		  // enter 'if' in case of success
+		  if (set_radio_mapping(vr, subcarriers_map ) > 0)
+		  {
+					 LOG(INFO) << "success";
+					 g_subcarriers_map = subcarriers_map;
+					 return 1;
+		  }
+		  LOG(INFO) << "fail";
 
-   return -1;
+		  return -1;
 }
 
 VirtualRadio * const
@@ -94,7 +94,11 @@ Hypervisor::forecast(int noutput_items,
    int factor = noutput_items / fft_m_len;
 
    for (size_t i = 0; i < ninput; ++i)
+	{
       ninput_items_required[i] = g_vradios[i]->get_subcarriers() * factor;
+	   std::cout << ninput_items_required[i] << std::endl;
+	}
+
 }
 
 #if 0
@@ -184,7 +188,6 @@ Hypervisor::tx_add_samples(int noutput_items,
       gr_vector_int &ninput_items,
       gr_vector_const_void_star &input_items)
 {
-
    int factor = noutput_items / fft_m_len;
 
    for (size_t i = 0; i < ninput_items.size(); i++)
@@ -206,6 +209,7 @@ Hypervisor::tx_add_samples(int noutput_items,
 bool const
 Hypervisor::tx_ready()
 {
+#if 0
    for (vradio_vec::iterator it = g_vradios.begin();
          it != g_vradios.end();
          ++it)
@@ -214,6 +218,16 @@ Hypervisor::tx_ready()
          return false;
    }
    return true;
+#endif
+
+   for (vradio_vec::iterator it = g_vradios.begin();
+         it != g_vradios.end();
+         ++it)
+   {
+      if ((*it)->ready_to_map_iq_samples())
+         return true;
+   }
+   return false;
 }
 
 
@@ -238,7 +252,8 @@ Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_item
 
       for (size_t i = 0; i < g_subcarriers_map.size(); ++i)
       {
-         if (g_subcarriers_map[i] == -1) {
+         if (g_subcarriers_map[i] == -1)
+			{
             g_ifft_complex->get_inbuf()[i] = gr_complex(0, 0);
          }
       }

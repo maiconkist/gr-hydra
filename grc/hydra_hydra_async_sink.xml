@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<block>
+  <name>hydra_async_sink</name>
+  <key>hydra_hydra_async_sink</key>
+  <category>hydra</category>
+  <import>import hydra</import>
+  <make>hydra.hydra_async_sink($num_inputs, $fft_m_size, $central_frequency, $bandwidth, $vradio_config)</make>
+
+  <param>
+    <name>Num VRadios</name>
+    <key>num_inputs</key>
+    <value>2</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>FFT M Size</name>
+    <key>fft_m_size</key>
+    <value>1024</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Central Frequency</name>
+    <key>central_frequency</key>
+    <value>0</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Bandwidth</name>
+    <key>bandwidth</key>
+    <value>200e3</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>VRadio Config</name>
+    <key>vradio_config</key>
+    <value>()</value>
+    <type>raw</type>
+  </param>
+
+  <check>$num_inputs &gt; 0</check>
+  <check>$bandwidth &gt; 0</check>
+
+  <sink>
+    <name>vr</name>
+    <type>message</type>
+    <nports>$num_inputs</nports>
+  </sink>
+ 
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>

@@ -18,5 +18,7 @@
 # Boston, MA 02110-1301, USA.
 install(FILES
     hydra_hydra_sink.xml
-    hydra_hydra_source.xml DESTINATION share/gnuradio/grc/blocks
+    hydra_hydra_async_sink.xml
+    hydra_hydra_source.xml
+	 DESTINATION share/gnuradio/grc/blocks
 )

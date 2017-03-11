@@ -48,7 +48,7 @@ VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
 {
    g_tx_samples.insert(g_tx_samples.end(), &samples[0], &samples[len]);
 
-   LOG_IF(g_tx_samples.size() > 5000, INFO) << "VR " << g_idx << ": g_tx_samples too big";
+   LOG_IF(g_tx_samples.size() > 5000, INFO) << "VR " << g_idx << ": g_tx_samples.size() == " << g_tx_samples.size();
 }
 
 void
@@ -99,6 +99,7 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
    LOG_IF(!ready_to_map_iq_samples(), ERROR) << "No samples to map";
    if (!ready_to_map_iq_samples()) return false;
 
+
    // Copy samples in TIME domain to FFT buffer, execute FFT
    std::copy(g_tx_samples.begin(),
          g_tx_samples.begin() + fft_n_len,
@@ -121,7 +122,6 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
    {
       samples_buf[*it] = outbuf[(idx + (fft_n_len/2)) % fft_n_len] / float(fft_n_len); 
    }
-
 
    return true;
 }
