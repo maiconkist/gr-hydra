@@ -256,7 +256,6 @@ def main():
     t1.start()
 
     if options.one_virtual_radio == False:
-        #t2 = ReadThread(options_vr2.file, options_vr2.buffersize, tb.txpath2, True)
         t2 = XMLRPCThread(options.host_ip, options_vr2.buffersize, tb.txpath2)
         t2.start()
 
@@ -266,6 +265,7 @@ if __name__ == '__main__':
     try:
        main()
     except KeyboardInterrupt:
+       print "Closing ..."
        t1._run = False
        t2._run = False
        tb.xmlrpc_server.stop()

@@ -26,7 +26,6 @@
 #include <gnuradio/io_signature.h>
 
 #include <string.h>
-#include "easylogging++.h"
 
 namespace gr {
    namespace hydra {
@@ -101,7 +100,7 @@ hydra_async_sink::general_work(int noutput_items,
       gr_vector_void_star &output_items)
 {
    // Gen output
-   int t =  g_hypervisor->tx_outbuf(output_items, noutput_items);
+   int t = g_hypervisor->tx_outbuf(output_items, noutput_items);
 
    return t;
 }

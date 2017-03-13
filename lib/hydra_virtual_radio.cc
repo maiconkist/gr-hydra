@@ -1,8 +1,6 @@
 #include <hydra/hydra_virtual_radio.h>
 #include <hydra/hydra_hypervisor.h>
 
-#include "easylogging++.h"
-
 namespace gr {
    namespace hydra {
 
@@ -48,13 +46,13 @@ VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
 {
    g_tx_samples.insert(g_tx_samples.end(), &samples[0], &samples[len]);
 
-   LOG_IF(g_tx_samples.size() > 5000, INFO) << "VR " << g_idx << ": g_tx_samples.size() == " << g_tx_samples.size();
+   //LOG_IF(g_tx_samples.size() > 5000, INFO) << "VR " << g_idx << ": g_tx_samples.size() == " << g_tx_samples.size();
 }
 
 void
 VirtualRadio::set_iq_mapping(const iq_map_vec &iq_map)
 {
-   LOG_IF(iq_map.size() != fft_n_len, ERROR)  << "iq_map.size() != fft_n_len";
+   //LOG_IF(iq_map.size() != fft_n_len, ERROR)  << "iq_map.size() != fft_n_len";
    g_iq_map = iq_map;
 }
 
@@ -85,7 +83,7 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf)
 void
 VirtualRadio::get_rx_samples(gr_complex *samples_buff, size_t len)
 {
-   LOG_IF(g_rx_samples.front().size() != fft_n_len, ERROR) << "wrong number of samples";
+   //LOG_IF(g_rx_samples.front().size() != fft_n_len, ERROR) << "wrong number of samples";
 
    std::copy(g_rx_samples.front().begin(), g_rx_samples.front().end(),
          samples_buff);
@@ -96,7 +94,7 @@ VirtualRadio::get_rx_samples(gr_complex *samples_buff, size_t len)
 bool
 VirtualRadio::map_iq_samples(gr_complex *samples_buf)
 {
-   LOG_IF(!ready_to_map_iq_samples(), ERROR) << "No samples to map";
+   //LOG_IF(!ready_to_map_iq_samples(), ERROR) << "No samples to map";
    if (!ready_to_map_iq_samples()) return false;
 
 

@@ -26,7 +26,6 @@
 #include <gnuradio/io_signature.h>
 
 #include <string.h>
-#include "easylogging++.h"
 
 namespace gr {
    namespace hydra {

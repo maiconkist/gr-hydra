@@ -58,7 +58,6 @@ class XMLRPCThread(threading.Thread):
             """
             data = s.recv(options.bufferbytes)
             """
-            print "-"
             data = struct.pack('!H', 0xaaaa) + str(self._value) + " ".join(["" for x in range(400)])
             payload = data
             self._tx_path.send_pkt(payload)
@@ -95,7 +94,6 @@ class ReadThread(threading.Thread):
             """
             data = s.recv(options.bufferbytes)
             """
-            print "."
             if self._read:
                   f = open(self._filename, "rb")
 

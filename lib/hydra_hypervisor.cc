@@ -1,8 +1,5 @@
 #include "hydra/hydra_hypervisor.h"
 
-#include "easylogging++.h"
-INITIALIZE_EASYLOGGINGPP;
-
 #include <algorithm>
 
 namespace gr {
@@ -31,7 +28,7 @@ Hypervisor::create_vradio(double cf, double bandwidth)
 		  vradio_ptr vradio(new VirtualRadio(*this, g_vradios.size(), cf, bandwidth, fft_n));
 		  g_vradios.push_back(vradio);
 
-		  LOG(INFO) << "VR " << g_vradios.size() - 1 << "- FFT N: " << vradio->get_id() << ", CF: " << vradio->get_central_frequency() << ", BW: " << vradio->get_bandwidth();
+		  //LOG(INFO) << "VR " << g_vradios.size() - 1 << "- FFT N: " << vradio->get_id() << ", CF: " << vradio->get_central_frequency() << ", BW: " << vradio->get_bandwidth();
 
 		  // ID representing the radio;
 		  return g_vradios.size() - 1;
@@ -40,7 +37,7 @@ Hypervisor::create_vradio(double cf, double bandwidth)
 int
 Hypervisor::notify(VirtualRadio &vr)
 {
-		  LOG(INFO) << "notify";
+		  //LOG(INFO) << "notify";
 		  iq_map_vec subcarriers_map = g_subcarriers_map;
 		  std::replace(subcarriers_map.begin(),
 								subcarriers_map.end(),
@@ -50,11 +47,11 @@ Hypervisor::notify(VirtualRadio &vr)
 		  // enter 'if' in case of success
 		  if (set_radio_mapping(vr, subcarriers_map ) > 0)
 		  {
-					 LOG(INFO) << "success";
+					 //LOG(INFO) << "success";
 					 g_subcarriers_map = subcarriers_map;
 					 return 1;
 		  }
-		  LOG(INFO) << "fail";
+		  //LOG(INFO) << "fail";
 
 		  return -1;
 }
@@ -62,7 +59,7 @@ Hypervisor::notify(VirtualRadio &vr)
 VirtualRadio * const
 Hypervisor::get_vradio(size_t idx)
 {
-   LOG_IF(idx > g_vradios.size(), WARNING) << "ERROR";
+   //LOG_IF(idx > g_vradios.size(), WARNING) << "ERROR";
    return g_vradios[idx].get();
 }
 
@@ -89,14 +86,13 @@ Hypervisor::forecast(int noutput_items,
 {
    size_t ninput = ninput_items_required.size();
 
-   LOG_IF(ninput != g_vradios.size(), ERROR);
+   //LOG_IF(ninput != g_vradios.size(), ERROR);
 
    int factor = noutput_items / fft_m_len;
 
    for (size_t i = 0; i < ninput; ++i)
 	{
       ninput_items_required[i] = g_vradios[i]->get_subcarriers() * factor;
-	   std::cout << ninput_items_required[i] << std::endl;
 	}
 
 }
@@ -117,7 +113,7 @@ Hypervisor::set_vradio_subcarriers(size_t vradio_id, size_t nsubcarriers)
       total_subcarriers += (*it)->get_subcarriers();
    }
 
-   LOG_IF(total_subcarriers + nsubcarriers > fft_m_len, ERROR) << "Number of subcarriers exceeds FFT M";
+   //LOG_IF(total_subcarriers + nsubcarriers > fft_m_len, ERROR) << "Number of subcarriers exceeds FFT M";
 
    if (total_subcarriers + nsubcarriers > fft_m_len)
       return -1;
@@ -155,18 +151,18 @@ Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    int sc = offset / (g_bw / fft_m_len);
    size_t fft_n = vr_bw /(g_bw /fft_m_len);
 
-   LOG_IF(sc < 0, ERROR) << "VR " << vr.get_id() << ": SC outside range - too low [" << offset << "]";
-   LOG_IF(sc > fft_m_len, ERROR) << "VR " << vr.get_id() << ": SC outside range - too high [" << offset << "]";
+   //LOG_IF(sc < 0, ERROR) << "VR " << vr.get_id() << ": SC outside range - too low [" << offset << "]";
+   //LOG_IF(sc > fft_m_len, ERROR) << "VR " << vr.get_id() << ": SC outside range - too high [" << offset << "]";
 
    if (sc < 0 || sc > fft_m_len) return -1;
 
-   LOG(INFO) << "VR " << vr.get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + fft_n;
+   //LOG(INFO) << "VR " << vr.get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + fft_n;
 
    // Allocate subcarriers sequentially from sc
    iq_map_vec the_map;
    for (; sc < fft_m_len; sc++)
    {
-      LOG_IF(subcarriers_map[sc] != -1, INFO) << "Subcarrier @" <<  sc << " already allocated";
+      //LOG_IF(subcarriers_map[sc] != -1, INFO) << "Subcarrier @" <<  sc << " already allocated";
       if (subcarriers_map[sc] != -1) return -1;
 
       the_map.push_back(sc);
@@ -302,7 +298,7 @@ Hypervisor::rx_add_samples(const gr_complex *samples, size_t len)
             &samples[consumed], &samples[consumed + rest]);
    }
 
-   LOG_IF(consumed > len, INFO) << "consumed > len";
+   //LOG_IF(consumed > len, INFO) << "consumed > len";
 }
 
 bool const
