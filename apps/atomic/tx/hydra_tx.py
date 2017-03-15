@@ -39,7 +39,8 @@ import threading
 from transmit_path import TransmitPath, ReadThread, XMLRPCThread
 from uhd_interface import uhd_transmitter
 
-hydra_center_frequency = 5.5e9
+#hydra_center_frequency = 5.5e9 # XCVR2450
+hydra_center_frequency = 3.0e9 # SBX
 vr1_initial_shift = -500e3
 vr2_initial_shift =  400e3
 
@@ -58,7 +59,6 @@ def dict2obj(d):
         for k in d:
             o.__dict__[k] = dict2obj(d[k])
         return o
-
 
 class my_top_block(gr.top_block):
     def __init__(self, options, options_vr1, options_vr2):
@@ -103,6 +103,7 @@ class my_top_block(gr.top_block):
             self.connect(self.txpath2, (hydra_sink, 1))
             self.hydra = hydra_sink
 
+	print 'Start XMLRPC Server ...'
         self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", 12345), allow_none=True)
         self.xmlrpc_server.register_instance(self)
         threading.Thread(target=self.xmlrpc_server.serve_forever).start()
@@ -140,10 +141,8 @@ class my_top_block(gr.top_block):
         print("called: get_hydra_bandwidth")
         return self.sink.get_sample_rate()
 
-
 t1 = None
 t2 = None
-
 
 # /////////////////////////////////////////////////////////////////////////////
 #                                   main
@@ -245,28 +244,27 @@ def main():
                             'verbose': False,
                             'log': False})
 
-    r = gr.enable_realtime_scheduling()
-    if r != gr.RT_OK:
-        print("Warning: failed to enable realtime scheduling")
-
     tb = my_top_block(options, options_vr1, options_vr2)
     tb.start()                       # start flow graph
 
+    print 'Starting VR1 data thread...'
     t1 = ReadThread(options_vr1.file, options_vr1.buffersize, tb.txpath1)
     t1.start()
 
     if options.one_virtual_radio == False:
+        print 'Starting VR2 data thread...'
         t2 = XMLRPCThread(options.host_ip, options_vr2.buffersize, tb.txpath2)
         t2.start()
 
-    tb.wait()                       # wait for it to finish
+    print 'Starting'
+    return tb
 
 if __name__ == '__main__':
+    tb = None
     try:
-       main()
-    except KeyboardInterrupt:
+       tb = main()
+       tb.wait()
+    except:
        print "Closing ..."
-       t1._run = False
-       t2._run = False
        tb.xmlrpc_server.stop()
        tb.stop()
