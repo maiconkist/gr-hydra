@@ -41,7 +41,7 @@ from uhd_interface import uhd_receiver
 
 import struct, sys
 
-from video_benchmark_tx import hydra_center_frequency, vr1_initial_shift, vr2_initial_shift
+from hydra_tx import hydra_center_frequency, vr1_initial_shift, vr2_initial_shift
 
 n_rcvd = 0
 n_fec = 0
