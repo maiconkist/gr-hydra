@@ -176,17 +176,17 @@ def main():
 
     options_vr1 = dict2obj({
                     'id': 0,
-                    'tx_amplitude': 0.125,
+                    'tx_amplitude': 0,
                     'freq': hydra_center_frequency + vr1_initial_shift,
                     'bandwidth': 1e6,
-                    'gain': 15,
-                    'snr' : options.snr,
+                    'gain': options.rx_gain,
+                    'snr' : 10,
                     'file': None,
                     'buffersize': 4072,
                     'modulation': 'qpsk',
-                    'fft_length': 1024,
-                    'occupied_tones': 800,
-                    'cp_length': 4,
+                    'fft_length': 512,
+                    'occupied_tones': 200,
+                    'cp_length': 128,
                     'host' : options.host,
                     'rpc_port' : options.rpc_port,
                     'port' : options.port,
@@ -199,11 +199,11 @@ def main():
                     'log': False})
     options_vr2 = dict2obj({
                     'id': 1,
-                    'tx_amplitude': 0.125,
+                    'tx_amplitude': 0,
                     'freq': hydra_center_frequency + vr2_initial_shift,
                     'bandwidth': 200e3,
-                    'gain': 15,
-                    'snr' : options.snr,
+                    'gain': options.rx_gain,
+                    'snr' : 10,
                     'file': None,
                     'buffersize': 4072,
                     'modulation': 'bpsk',
@@ -224,7 +224,7 @@ def main():
     vr_configuration = [options_vr1, options_vr2]
     if options.vr_configuration is not None:
         options = vr_configuration[options.vr_configuration - 1]
-		
+
     if options.freq is None:
         sys.stderr.write("You must specify -f FREQ or --freq FREQ\n")
         parser.print_help(sys.stderr)
