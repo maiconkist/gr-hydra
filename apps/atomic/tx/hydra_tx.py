@@ -178,7 +178,7 @@ def main():
             help="set the file to obtain data [default=%default]")
     vr1_options.add_option("", "--vr1-buffersize", type="intx", default=3072,
             help="set number of bytes to read from buffer size for VR1 [default=%default]")
-    vr1_options.add_option("-m", "--vr1-modulation", type="string", default="qpsk",
+    vr1_options.add_option("-m", "--vr1-modulation", type="string", default="bpsk",
             help="set modulation type (bpsk, qpsk, 8psk, qam{16,64}) [default=%default]")
     vr1_options.add_option("", "--vr1-fft-length", type="intx", default=512,
             help="set the number of FFT bins [default=%default]")
