@@ -52,7 +52,7 @@ class receive_path(gr.hier_block2):
 
         # Carrier Sensing Blocks
         alpha = 0.001
-        thresh = 30   # in dB, will have to adjust
+        thresh = options.snr   # in dB, will have to adjust
         self.probe = analog.probe_avg_mag_sqrd_c(thresh,alpha)
 
         self.connect(self, self.ofdm_rx)
