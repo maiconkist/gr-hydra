@@ -47,8 +47,7 @@ class receive_path(gr.hier_block2):
         self._rx_callback = rx_callback      # this callback is fired when there's a packet available
 
         # receiver
-        self.ofdm_rx = digital.ofdm_demod(options,
-                                          callback=self._rx_callback)
+        self.ofdm_rx = digital.ofdm_demod(options, callback=self._rx_callback)
 
         # Carrier Sensing Blocks
         alpha = 0.001
