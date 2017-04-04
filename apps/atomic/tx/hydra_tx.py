@@ -40,7 +40,7 @@ from transmit_path import TransmitPath, ReadThread, XMLRPCThread
 from uhd_interface import uhd_transmitter
 
 #hydra_center_frequency = 5.0e9 # XCVR2450
-hydra_center_frequency = 2.75e9 # SBX
+hydra_center_frequency = 5.48e9 # SBX
 vr1_initial_shift = -500e3
 vr2_initial_shift =  400e3
 

@@ -231,7 +231,9 @@ def main():
         sys.exit(1)
 
 
-    cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    cs.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
     def rx_callback_vr2(ok, payload):
         global n_rcvd, n_right, g_pkt_history
@@ -259,9 +261,10 @@ def main():
             if len(pkt_buffer) > 0 or ok:
                 if not ok and  len(pkt_buffer) > 0:
                     n_fec += 1
-                
+
                 data = payload[2:] if ok else pkt_buffer[0]
 
+                print "Forwarding to VLC @" + str(options.host) + ":" + str(options.port)
                 cs.sendto(data, (options.host, options.port))
                 g_pkt_history.append( PktHistory(len(data), time.time()))
                 pkt_buffer = []
