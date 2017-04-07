@@ -152,7 +152,7 @@ def main():
     parser = OptionParser(option_class=eng_option, conflict_handler="resolve")
 
     global_options = parser.add_option_group("Host Options")
-    global_options.add_option("", "--host-ip", type="string", default="localhost",
+    global_options.add_option("", "--host-ip", type="string", default="192.168.10.100",
             help="This host command interface IP address [default=%default]")
 
     hydra_options = parser.add_option_group("HyDRA Options")
