@@ -93,7 +93,7 @@ class my_top_block(gr.top_block):
         self.connect(self.source, self.rxpath)
 
         # rpc server to receive remote commands
-        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", options.rpc_port), allow_none=True)
+        self.xmlrpc_server = SimpleXMLRPCServer.SimpleXMLRPCServer((options.rpc_ip, options.rpc_port), allow_none=True)
         self.xmlrpc_server.register_instance(self)
         threading.Thread(target=self.xmlrpc_server.serve_forever).start()
 
@@ -162,12 +162,14 @@ def main():
 
     expert_grp = parser.add_option_group("Expert")
     
-    expert_grp.add_option("-p", "--port", type="intx", default=23451,
+    expert_grp.add_option("", "--udp-port", type="intx", default=23451,
                       help="set UDP socket port number to ouput the received data  [default=%default]")
-    expert_grp.add_option("-p", "--rpc-port", type="intx", default=12345,
+    expert_grp.add_option("", "--udp-ip", type="string", default="localhost",
+                      help="set UDP socket port number to ouput the received data  [default=%default]")
+    expert_grp.add_option("", "--rpc-port", type="intx", default=12345,
                       help="set UDP socket port number [default=%default]")
-    expert_grp.add_option("", "--host", default="127.0.0.1",
-                      help="set host IP address [default=%default]")  
+    expert_grp.add_option("", "--rpc-ip", type="string", default="127.0.0.1",
+                      help="set host IP address to received RPC calls [default=%default]")  
 
     receive_path.add_options(expert_grp, expert_grp)
     uhd_receiver.add_options(expert_grp)
@@ -187,9 +189,10 @@ def main():
                     'fft_length': 1024,
                     'occupied_tones': 800,
                     'cp_length': 64,
-                    'host' : options.host,
+                    'udp_port' : options.udp_port,
+                    'udp_ip' : options.udp_ip,
                     'rpc_port' : options.rpc_port,
-                    'port' : options.port,
+                    'rpc_ip' : options.rpc_ip,
                     'args' : options.args,
                     'lo_offset' : options.lo_offset,
                     'spec' : options.spec,
@@ -210,9 +213,10 @@ def main():
                     'fft_length': 64,
                     'occupied_tones': 48,
                     'cp_length': 2,
-                    'host' : options.host,
+                    'udp_port' : options.udp_port,
+                    'udp_ip' : options.udp_ip,
                     'rpc_port' : options.rpc_port,
-                    'port' : options.port + 1,
+                    'rpc_ip' : options.rpc_ip,
                     'args' : options.args,
                     'lo_offset' : options.lo_offset,
                     'spec' : options.spec,
@@ -245,7 +249,7 @@ def main():
         print "ok: %r \t pktno: %d \t n_rcvd: %d \t n_right: %d" % (ok, pktno, n_rcvd, n_right)
 
         data = payload[2:10]
-        cs.sendto(data, (options.host, options.port))
+        cs.sendto(data, (options.udp_ip, options.udp_port))
         g_pkt_history.append( PktHistory(len(data), time.time()))
 
     def rx_callback_vr1(ok, payload):
@@ -264,8 +268,8 @@ def main():
 
                 data = payload[2:] if ok else pkt_buffer[0]
 
-                print "Forwarding to VLC @" + str(options.host) + ":" + str(options.port)
-                cs.sendto(data, (options.host, options.port))
+                print "Forwarding to VLC @" + str(options.udp_ip) + ":" + str(options.udp_port)
+                cs.sendto(data, (options.udp_ip, options.udp_port))
                 g_pkt_history.append( PktHistory(len(data), time.time()))
                 pkt_buffer = []
         else:
