@@ -40,7 +40,7 @@ from transmit_path import TransmitPath, ReadThread, XMLRPCThread
 from uhd_interface import uhd_transmitter
 
 #hydra_center_frequency = 5.0e9 # XCVR2450
-hydra_center_frequency = 5.48e9 # SBX
+hydra_center_frequency = 2.9e9 # SBX
 vr1_initial_shift = -500e3
 vr2_initial_shift =  400e3
 
@@ -184,7 +184,7 @@ def main():
             help="set the number of FFT bins [default=%default]")
     vr1_options.add_option("", "--vr1-occupied-tones", type="intx", default=800,
             help="set the number of occupied FFT bins [default=%default]")
-    vr1_options.add_option("", "--vr1-cp-length", type="intx", default=64,
+    vr1_options.add_option("", "--vr1-cp-length", type="intx", default=2,
             help="set the number of bits in the cyclic prefix [default=%default]")
 
     vr2_options = parser.add_option_group("VR 2 Options")
@@ -204,7 +204,7 @@ def main():
                            help="set the number of FFT bins [default=%default]")
     vr2_options.add_option("", "--vr2-occupied-tones", type="intx", default=48,
                            help="set the number of occupied FFT bins [default=%default]")
-    vr2_options.add_option("", "--vr2-cp-length", type="intx", default=2,
+    vr2_options.add_option("", "--vr2-cp-length", type="intx", default=4,
                            help="set the number of bits in the cyclic prefix [default=%default]")
 
     expert_grp = parser.add_option_group("Expert")

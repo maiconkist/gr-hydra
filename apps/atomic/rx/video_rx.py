@@ -188,7 +188,7 @@ def main():
                     'modulation': 'bpsk',
                     'fft_length': 1024,
                     'occupied_tones': 800,
-                    'cp_length': 64,
+                    'cp_length': 2,
                     'udp_port' : options.udp_port,
                     'udp_ip' : options.udp_ip,
                     'rpc_port' : options.rpc_port,
@@ -212,7 +212,7 @@ def main():
                     'modulation': 'bpsk',
                     'fft_length': 64,
                     'occupied_tones': 48,
-                    'cp_length': 2,
+                    'cp_length': 4,
                     'udp_port' : options.udp_port,
                     'udp_ip' : options.udp_ip,
                     'rpc_port' : options.rpc_port,
@@ -268,7 +268,6 @@ def main():
 
                 data = payload[2:] if ok else pkt_buffer[0]
 
-                print "Forwarding to VLC @" + str(options.udp_ip) + ":" + str(options.udp_port)
                 cs.sendto(data, (options.udp_ip, options.udp_port))
                 g_pkt_history.append( PktHistory(len(data), time.time()))
                 pkt_buffer = []
