@@ -30,6 +30,7 @@ from gnuradio import digital
 from optparse import OptionParser
 import socket
 import time
+import xmlrpclib
 
 # Server for remote commands
 import SimpleXMLRPCServer
@@ -188,7 +189,7 @@ def main():
                     'modulation': 'bpsk',
                     'fft_length': 1024,
                     'occupied_tones': 800,
-                    'cp_length': 64,
+                    'cp_length': 2,
                     'udp_port' : options.udp_port,
                     'udp_ip' : options.udp_ip,
                     'rpc_port' : options.rpc_port,
@@ -212,7 +213,7 @@ def main():
                     'modulation': 'bpsk',
                     'fft_length': 64,
                     'occupied_tones': 48,
-                    'cp_length': 2,
+                    'cp_length': 4,
                     'udp_port' : options.udp_port,
                     'udp_ip' : options.udp_ip,
                     'rpc_port' : options.rpc_port,
@@ -235,10 +236,10 @@ def main():
         sys.exit(1)
 
 
-
     cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     cs.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
+    nbgui_server = xmlrpclib.ServerProxy("http://%s:%s" % (str(options.udp_ip), str(options.udp_port)))
     def rx_callback_vr2(ok, payload):
         global n_rcvd, n_right, g_pkt_history
         (pktno,) = struct.unpack('!H', payload[0:2])
@@ -248,8 +249,9 @@ def main():
             n_right += 1
         print "ok: %r \t pktno: %d \t n_rcvd: %d \t n_right: %d" % (ok, pktno, n_rcvd, n_right)
 
-        data = payload[2:10]
-        cs.sendto(data, (options.udp_ip, options.udp_port))
+        data = str(payload[2:10])
+        if ok:
+            nbgui_server.set_temperature(data)
         g_pkt_history.append( PktHistory(len(data), time.time()))
 
     def rx_callback_vr1(ok, payload):
@@ -268,7 +270,6 @@ def main():
 
                 data = payload[2:] if ok else pkt_buffer[0]
 
-                print "Forwarding to VLC @" + str(options.udp_ip) + ":" + str(options.udp_port)
                 cs.sendto(data, (options.udp_ip, options.udp_port))
                 g_pkt_history.append( PktHistory(len(data), time.time()))
                 pkt_buffer = []
