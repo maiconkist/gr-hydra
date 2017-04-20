@@ -114,12 +114,16 @@ class my_top_block(gr.top_block):
         return self.txpath1.set_tx_amplitude(gain)
 
     def set_vr1_center_freq(self, cf):
-        print("called: set_vr1_cf")
-        return self.hydra.get_hypervisor().get_vradio(0).set_central_frequency(hydra_center_frequency+cf)
+        cf = float(cf)
+        tmp = self.hydra.get_hypervisor().get_vradio(0).set_central_frequency(hydra_center_frequency+cf)
+        print tmp
+        return tmp
 
     def set_vr2_center_freq(self, cf):
-        print("called: set_vr2_cf")
-        return self.hydra.get_hypervisor().get_vradio(1).set_central_frequency(hydra_center_frequency+cf)
+        cf = float(cf)
+        tmp = self.hydra.get_hypervisor().get_vradio(1).set_central_frequency(hydra_center_frequency+cf)
+        print tmp
+        return tmp
 
     def set_vr2_gain(self, gain):
         print("called: set_vr2_gain")

@@ -95,27 +95,35 @@ class AppGui():
         return vr_pkt_recv_info, vr_pkt_right_info, vr_throughput_info, vr_cf_info, vr_bw_info
 
     def vr1_tx_amplitude_update(self, val):
+        if val is None:
+            return
         val = float(val)
         s = xmlrpclib.ServerProxy("http://%s" % (options.tx_ip))
         s.set_vr1_gain(val)
 
     def vr2_tx_amplitude_update(self, val):
+        if val is None:
+            return
         val = float(val)
         s = xmlrpclib.ServerProxy("http://%s" % (options.tx_ip))
         s.set_vr2_gain(val)
 
     def vr1_center_freq(self, val):
+        if val is None:
+            return
         val = float(val)
-        #s = xmlrpclib.ServerProxy("http://%s" % (options.tx_ip))
-        #s.set_vr1_center_freq(val)
+        s = xmlrpclib.ServerProxy("http://%s" % (options.tx_ip))
+        s.set_vr1_center_freq(val)
 
         #s = xmlrpclib.ServerProxy("http://%s" % (options.lte_ip))
         #s.set_center_freq(val)
 
     def vr2_center_freq(self, val):
+        if val is None:
+            return
         val = float(val)
-        #s = xmlrpclib.ServerProxy("http://%s" % (options.tx_ip))
-        #s.set_vr2_center_freq(val)
+        s = xmlrpclib.ServerProxy("http://%s" % (options.tx_ip))
+        s.set_vr2_center_freq(val)
 
         #s = xmlrpclib.ServerProxy("http://%s" % (options.nbiot_ip))
         #s.set_center_freq(val)
