@@ -139,7 +139,6 @@ def update_vars():
 
         try:
                 lte_s = xmlrpclib.ServerProxy("http://%s" % (options.lte_ip))
-
                 v['rx1_pkt_rcv']     = lte_s.get_pkt_rcvd()
                 v['rx1_pkt_right']   = lte_s.get_pkt_right()
                 v['rx1_throughput']  = lte_s.get_throughput()
