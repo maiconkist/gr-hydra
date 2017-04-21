@@ -80,7 +80,7 @@ class AppGui():
         self.pkt_right_info['text']  = server.get_pkt_right()
         self.throughput_info['text'] = server.get_throughput()
         self.cf_info['text']         = str(float(server.get_center_freq()/1e9)) + "G"
-        if options.radio == 0:
+        if options.radio_id == 0:
             self.bw_info['text']         = str(float(server.get_bandwidth())/1e6) + "MHz"
         else:
             self.bw_info['text']         = str(float(server.get_bandwidth())/1e3) + "KHz"
