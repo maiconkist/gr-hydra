@@ -19,7 +19,6 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 # 
-
 from gnuradio import gr
 from gnuradio import eng_notation
 from gnuradio import digital
@@ -31,14 +30,12 @@ import sys
 # /////////////////////////////////////////////////////////////////////////////
 #                              receive path
 # /////////////////////////////////////////////////////////////////////////////
-
-class receive_path(gr.hier_block2):
+class ReceivePath(gr.hier_block2):
     def __init__(self, rx_callback, options):
 
 	gr.hier_block2.__init__(self, "receive_path",
 				gr.io_signature(1, 1, gr.sizeof_gr_complex),
 				gr.io_signature(0, 0, 0))
-
 
         options = copy.copy(options)    # make a copy so we can destructively modify
 
@@ -47,11 +44,11 @@ class receive_path(gr.hier_block2):
         self._rx_callback = rx_callback      # this callback is fired when there's a packet available
 
         # receiver
+        options.snr = thresh = 10   # in dB, will have to adjust
         self.ofdm_rx = digital.ofdm_demod(options, callback=self._rx_callback)
 
         # Carrier Sensing Blocks
         alpha = 0.001
-        thresh = options.snr   # in dB, will have to adjust
         self.probe = analog.probe_avg_mag_sqrd_c(thresh,alpha)
 
         self.connect(self, self.ofdm_rx)
@@ -60,7 +57,7 @@ class receive_path(gr.hier_block2):
         # Display some information about the setup
         if self._verbose:
             self._print_verbage()
-        
+
     def carrier_sensed(self):
         """
         Return True if we think carrier is present.
@@ -82,25 +79,8 @@ class receive_path(gr.hier_block2):
             threshold_in_db: set detection threshold (float (dB))
         """
         self.probe.set_threshold(threshold_in_db)
-    
-        
-    def add_options(normal, expert):
-        """
-        Adds receiver-specific options to the Options Parser
-        """
-        normal.add_option("-W", "--bandwidth", type="eng_float",
-                          default=500e3,
-                          help="set symbol bandwidth [default=%default]")
-        normal.add_option("-v", "--verbose", action="store_true", default=False)
-        expert.add_option("", "--log", action="store_true", default=False,
-                          help="Log all parts of flow graph to files (CAUTION: lots of data)")
-
-    # Make a static method to call before instantiation
-    add_options = staticmethod(add_options)
 
 
-    def _print_verbage(self):
-        """
-        Prints information about the receive path
-        """
-        pass
+def generic_rx_callback(ok, payload):
+    (pktno,) = struct.unpack('!H', payload[0:2])
+    print "ok: %r \t pktno: %d \t len: %d, \t timestamp: %f" % (ok, pktno, len(payload). time.time())

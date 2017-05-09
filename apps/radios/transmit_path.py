@@ -105,16 +105,11 @@ class ReadThread(threading.Thread):
                 data = f.read(self._buffersize)
 
             # transmit the same pkt 2 times. Receiver can throw away one in case of errors
-            payload = struct.pack('!H', 0xffff & 0) + data
-            self._tx_path.send_pkt(payload)
-
-            payload = struct.pack('!H', 0xffff & 1) + data
+            payload = struct.pack('!H', 0xffff & pktno) + data
             self._tx_path.send_pkt(payload)
 
             n += len(payload)
-
             pktno += 1
-            pktno %= 2
 
         logging.info("tx_bytes = %d,\t tx_pkts = %d" % (n, pktno))
         self._tx_path.send_pkt(eof=True)
