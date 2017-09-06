@@ -77,13 +77,16 @@ hydra_sink::general_work(int noutput_items,
    g_hypervisor->tx_add_samples(noutput_items, ninput_items, input_items);
 
 	// Gen output
-   int t =  g_hypervisor->tx_outbuf(output_items, noutput_items);
+   int t = g_hypervisor->tx_outbuf(output_items, noutput_items);
 
    // Consume the items in the input port i
    for (size_t i = 0; i < ninput_items.size(); ++i)
       consume(i, ninput_items[i]);
 
-	return t;
+   produce(0, t);
+
+
+   return WORK_CALLED_PRODUCE;
 }
 
 } /* namespace hydra */
