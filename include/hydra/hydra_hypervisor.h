@@ -104,33 +104,6 @@ class SVL_API Hypervisor
        * @return true if can generate output
        */
       bool const tx_ready();
-
-
-		/*
-		 *
-		 * 
-		 * RX FUNCTIONS.
-		 *
-		 *
-		 */
-
-      /**
-		 * @param samples
-		 * @param len
-       */
-      void rx_add_samples(const gr_complex *samples, size_t len);
-
-      /**
-       * @param output_buff
-       * @param max_noutput_items
-       * @return 
-       */
-      size_t rx_outbuf(gr_complex *output_items,
-            size_t max_noutput_items);
-
-      /**
-       */
-      bool const rx_ready();
 };
 
 typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;

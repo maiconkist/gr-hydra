@@ -1,6 +1,8 @@
 #include <hydra/hydra_virtual_radio.h>
 #include <hydra/hydra_hypervisor.h>
 
+#include <iostream>
+
 namespace gr {
    namespace hydra {
 
@@ -45,14 +47,11 @@ void
 VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
 {
    g_tx_samples.insert(g_tx_samples.end(), &samples[0], &samples[len]);
-
-   //LOG_IF(g_tx_samples.size() > 5000, INFO) << "VR " << g_idx << ": g_tx_samples.size() == " << g_tx_samples.size();
 }
 
 void
 VirtualRadio::set_iq_mapping(const iq_map_vec &iq_map)
 {
-   //LOG_IF(iq_map.size() != fft_n_len, ERROR)  << "iq_map.size() != fft_n_len";
    g_iq_map = iq_map;
 }
 
@@ -96,7 +95,6 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
 {
    //LOG_IF(!ready_to_map_iq_samples(), ERROR) << "No samples to map";
    if (!ready_to_map_iq_samples()) return false;
-
 
    // Copy samples in TIME domain to FFT buffer, execute FFT
    std::copy(g_tx_samples.begin(),

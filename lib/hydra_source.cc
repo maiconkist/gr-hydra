@@ -71,17 +71,6 @@ hydra_source::general_work(int noutput_items,
 {
    // Get input buffer
    const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[0]);
-
-   g_hypervisor->rx_add_samples(in, ninput_items[0]);
-   consume(0, ninput_items[0]);
-
-   if (g_hypervisor->rx_ready())
-   {
-      size_t t =  g_hypervisor->rx_outbuf(reinterpret_cast<gr_complex *>(output_items[0]), noutput_items);
-      return t;
-   }
-
-
    // Tell runtime system how many output items we produced.
    return 0;
 }

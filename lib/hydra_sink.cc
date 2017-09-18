@@ -32,35 +32,34 @@ namespace gr {
 
 hydra_sink::hydra_sink_ptr
 hydra_sink::make(size_t _n_ports,
-      size_t _fft_m_len,
+    size_t _fft_m_len,
 		double central_frequency,
 		double bandwidth,
-      const std::vector<std::vector<double> > vradio_conf)
+    const std::vector<std::vector<double> > vradio_conf)
 {
-   return gnuradio::get_initial_sptr(new hydra_sink(_n_ports,
-         _fft_m_len,
-			central_frequency,
-			bandwidth,
-         vradio_conf));
+  return gnuradio::get_initial_sptr(new hydra_sink(_n_ports,
+                                                   _fft_m_len,
+                                                   central_frequency,
+                                                   bandwidth,
+                                                   vradio_conf));
 }
 
 hydra_sink::hydra_sink(size_t _n_inputs,
-      size_t _fft_m_len,
+    size_t _fft_m_len,
 		double central_frequency,
 		double bandwidth,
-      const std::vector< std::vector<double> > vradio_conf):
-			gr::block("hydra_sink",
-   				gr::io_signature::make(_n_inputs,
-							  _n_inputs, sizeof(gr_complex)),
+    const std::vector< std::vector<double> > vradio_conf):
+    gr::block("hydra_sink",
+   				gr::io_signature::make(_n_inputs, _n_inputs, sizeof(gr_complex)),
    				gr::io_signature::make(1, 1, sizeof(gr_complex))),
-			hydra_block(_n_inputs, _fft_m_len, central_frequency, bandwidth)
+    hydra_block(_n_inputs, _fft_m_len, central_frequency, bandwidth)
 {
-	set_output_multiple(_fft_m_len);
+   set_output_multiple(_fft_m_len);
 
-	for (size_t i = 0; i < _n_inputs; ++i)
-		create_vradio(vradio_conf[i][0], vradio_conf[i][1]);
+   for (size_t i = 0; i < _n_inputs; ++i)
+      create_vradio(vradio_conf[i][0], vradio_conf[i][1]);
 
-	g_hypervisor->set_radio_mapping();
+   g_hypervisor->set_radio_mapping();
 }
 
 hydra_sink::~hydra_sink()
@@ -76,15 +75,13 @@ hydra_sink::general_work(int noutput_items,
    // forward to hypervisor
    g_hypervisor->tx_add_samples(noutput_items, ninput_items, input_items);
 
-	// Gen output
-   int t = g_hypervisor->tx_outbuf(output_items, noutput_items);
-
    // Consume the items in the input port i
    for (size_t i = 0; i < ninput_items.size(); ++i)
-      consume(i, ninput_items[i]);
+     consume(i, ninput_items[i]);
 
+	 // Gen output
+   int t = g_hypervisor->tx_outbuf(output_items, noutput_items);
    produce(0, t);
-
 
    return WORK_CALLED_PRODUCE;
 }
