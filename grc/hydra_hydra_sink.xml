@@ -18,16 +18,16 @@
 	 ))
   </make>
   <callback>#if $num_inputs() > 0
-	  set_central_frequency(0, $center_freq1())
-  #end if</callback>
+set_central_frequency(0, $center_freq1())
+#end if</callback>
   <callback>#if $num_inputs() > 1
-	  set_central_frequency(1, $center_freq2())
+set_central_frequency(1, $center_freq2())
   #end if</callback>
   <callback>#if $num_inputs() > 2
-	  set_central_frequency(2, $center_freq3())
+set_central_frequency(2, $center_freq3())
   #end if</callback>
   <callback>#if $num_inputs() > 3
-	  set_central_frequency(3, $center_freq4())
+set_central_frequency(3, $center_freq4())
   #end if</callback>
   <param>
     <name>Num VRadios</name>
