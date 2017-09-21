@@ -5,19 +5,30 @@
   <category>hydra</category>
   <import>import hydra</import>
   <make>hydra.hydra_sink($num_inputs, $fft_m_size, $central_frequency, $bandwidth,
-	 ((freq1, samprate1), 
+	 (($center_freq1(), $samprate1()), 
 	 #if $num_inputs() > 1
-	 (freq2, samprate2),
+	 ($center_freq2(), $samprate2()),
 	 #end if
 	 #if $num_inputs() > 2
-	 (freq3, samprate3),
+	 ($center_freq3(), $samprate3()),
 	 #end if
 	 #if $num_inputs() > 3
-	 (freq4, samprate4),
+	 ($center_freq4, $samprate4()),
 	 #end if
 	 ))
   </make>
-
+  <callback>#if $num_inputs() > 0
+	  set_central_frequency(0, $center_freq1())
+  #end if</callback>
+  <callback>#if $num_inputs() > 1
+	  set_central_frequency(1, $center_freq2())
+  #end if</callback>
+  <callback>#if $num_inputs() > 2
+	  set_central_frequency(2, $center_freq3())
+  #end if</callback>
+  <callback>#if $num_inputs() > 3
+	  set_central_frequency(3, $center_freq4())
+  #end if</callback>
   <param>
     <name>Num VRadios</name>
     <key>num_inputs</key>
@@ -66,12 +77,10 @@
     <type>raw</type>
   </param>
 -->
-
-
 <!-- VR1 Configuration -->
   <param>
 	  <name>Freq VR1</name>
-	  <key>freq1</key>
+	  <key>center_freq1</key>
 	  <value></value>
 	  <type>string</type>
           <hide>#if $num_inputs() > 0 then 'none' else 'all'#</hide>
@@ -83,11 +92,10 @@
 	  <type>string</type>
           <hide>#if $num_inputs() > 0 then 'none' else 'all'#</hide>
   </param>
-
 <!-- VR2 Configuration -->
   <param>
 	  <name>Freq VR2</name>
-	  <key>freq2</key>
+	  <key>center_freq2</key>
 	  <value></value>
 	  <type>string</type>
           <hide>#if $num_inputs() > 1 then 'none' else 'all'#</hide>
@@ -99,11 +107,10 @@
 	  <type>string</type>
           <hide>#if $num_inputs() > 1 then 'none' else 'all'#</hide>
   </param>
-
 <!-- VR3 Configuration -->
   <param>
 	  <name>Freq VR3</name>
-	  <key>freq3</key>
+	  <key>center_freq3</key>
 	  <value></value>
 	  <type>string</type>
           <hide>#if $num_inputs() > 2 then 'none' else 'all'#</hide>
@@ -115,11 +122,10 @@
 	  <type>string</type>
           <hide>#if $num_inputs() > 2 then 'none' else 'all'#</hide>
   </param>
-
 <!-- VR4 Configuration -->
   <param>
 	  <name>Freq VR4</name>
-	  <key>freq4</key>
+	  <key>center_freq4</key>
 	  <value></value>
 	  <type>string</type>
           <hide>#if $num_inputs() > 3 then 'none' else 'all'#</hide>
@@ -131,9 +137,7 @@
 	  <type>string</type>
           <hide>#if $num_inputs() > 3 then 'none' else 'all'#</hide>
   </param>
-
   <check>$bandwidth &gt; 0</check>
-
   <!-- Make one 'sink' node per input. Sub-nodes:
        * name (an identifier for the GUI)
        * type
@@ -144,7 +148,6 @@
     <type>complex</type>
     <nports>$num_inputs</nports>
   </sink>
-
   <!-- Make one 'source' node per output. Sub-nodes:
        * name (an identifier for the GUI)
        * type

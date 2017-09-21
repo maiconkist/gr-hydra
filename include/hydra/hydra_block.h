@@ -31,48 +31,52 @@ namespace gr {
 
 class SVL_API hydra_block: virtual public gr::block
 {
-   protected:
-      hypervisor_ptr g_hypervisor;
+ protected:
+  hypervisor_ptr g_hypervisor;
+  size_t fft_m_len;
 
-		size_t fft_m_len;
+ public:
+  hydra_block(size_t n_ports,
+              size_t _fft_m_len,
+              double central_frequency,
+              double bandwidth)
+    {
+      g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len, central_frequency, bandwidth));
+    }
 
-   public:
-		hydra_block(size_t n_ports,
-				  size_t _fft_m_len,
-				  double central_frequency,
-				  double bandwidth)
-		{
-   		g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len, central_frequency, bandwidth));
-		}
-
-      /**
-       * @param cf Central frequency
-		 * @param bandwidth Bandwidth
-       */
-      size_t create_vradio(double cf, double bandwidth) {
-         return  g_hypervisor->create_vradio(cf, bandwidth);  
-      }
+  /**
+   * @param cf Central frequency
+   * @param bandwidth Bandwidth
+   */
+  size_t create_vradio(double cf, double bandwidth) {
+    return  g_hypervisor->create_vradio(cf, bandwidth);  
+  }
 
 
-		/** Return pointer to Hypervisor
-		 * ::NOTE:: I tried to return a hypervisor_ptr, but it did not worked when called from python using SWIG
-		 */
-		Hypervisor * get_hypervisor(){
-				  return g_hypervisor.get();
-		}
+  /** Return pointer to Hypervisor
+   * ::NOTE:: I tried to return a hypervisor_ptr, but it did not worked when called from python using SWIG
+   */
+  Hypervisor * get_hypervisor() {
+    return g_hypervisor.get();
+  }
 
-		/**
-		 * @param noutput_items
-		 * @param ninput_items_required
-		 */
-		void forecast(int noutput_items,gr_vector_int &ninput_items_required)
-		{
-			return g_hypervisor->forecast(noutput_items,
-					ninput_items_required);
-		}
+  int set_central_frequency(size_t vr_idx, float cf)
+  {
+    std::cout << "set_central_frequency" << std::endl;
+    return g_hypervisor->get_vradio(vr_idx)->set_central_frequency(cf);
+  }
+
+  /**
+   * @param noutput_items
+   * @param ninput_items_required
+   */
+  void forecast(int noutput_items, gr_vector_int &ninput_items_required)
+  {
+    return g_hypervisor->forecast(noutput_items, ninput_items_required);
+  }
 };
 
-} // namespace hydra
+   } // namespace hydra
 } // namespace gr
 
 #endif /* INCLUDED_SVL_SVL-SINK_H */

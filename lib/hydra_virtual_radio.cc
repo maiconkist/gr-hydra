@@ -21,7 +21,7 @@ VirtualRadio::VirtualRadio(Hypervisor &hypervisor,
    g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(fft_n_len, false));
 }
 
-void
+int
 VirtualRadio::set_central_frequency(double cf)
 {
    double old_cf = cf;
@@ -30,6 +30,8 @@ VirtualRadio::set_central_frequency(double cf)
    int err = g_hypervisor.notify(*this);
    if (err < 0)
       g_cf = old_cf;
+
+   return err;
 }
 
 void
