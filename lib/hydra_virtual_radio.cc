@@ -46,7 +46,7 @@ VirtualRadio::set_bandwidth(double bw)
 }
 
 void
-VirtualRadio::add_iq_sample(const gr_complex *samples, size_t len)
+VirtualRadio::add_sink_sample(const gr_complex *samples, size_t len)
 {
    g_tx_samples.insert(g_tx_samples.end(), &samples[0], &samples[len]);
 }
@@ -60,36 +60,34 @@ VirtualRadio::set_iq_mapping(const iq_map_vec &iq_map)
 void
 VirtualRadio::demap_iq_samples(const gr_complex *samples_buf)
 {
-   samples_vec rx_samples_freq(fft_n_len);
-   
    // Copy the samples used by this radio
-   size_t idx(0);
-   for (iq_map_vec::iterator it = g_iq_map.begin();
-         it != g_iq_map.end();
-         ++it, ++idx)
-   {
-      rx_samples_freq[idx] = samples_buf[*it];  
-   }
+   for (size_t idx = 0; idx < fft_n_len; ++idx)
+      g_ifft_complex->get_inbuf()[idx] = samples_buf[g_iq_map[idx]];
 
-   // Transfer samples to fft_complex buff and perform fft
-   std::copy(rx_samples_freq.begin(), rx_samples_freq.end(),
-         g_ifft_complex->get_inbuf());
+   std::rotate(g_ifft_complex->get_inbuf(),
+         g_ifft_complex->get_inbuf() + fft_n_len/2,
+         g_ifft_complex->get_inbuf() + fft_n_len);
+
    g_ifft_complex->execute();
 
-   g_rx_samples.push(samples_vec(g_ifft_complex->get_outbuf(),
-              g_ifft_complex->get_outbuf() + fft_n_len)
-   );
+   // Append new samples
+   g_rx_samples.insert(g_rx_samples.end(), g_ifft_complex->get_outbuf(),
+              g_ifft_complex->get_outbuf() + fft_n_len);
 }
 
-void
-VirtualRadio::get_rx_samples(gr_complex *samples_buff, size_t len)
+size_t
+VirtualRadio::get_source_samples(gr_complex *samples_buff)
 {
-   //LOG_IF(g_rx_samples.front().size() != fft_n_len, ERROR) << "wrong number of samples";
+   if (g_rx_samples.size() == 0)
+      return 0;
 
-   std::copy(g_rx_samples.front().begin(), g_rx_samples.front().end(),
+   size_t len = std::min(g_rx_samples.size(), g_rx_samples.size());
+   std::copy(g_rx_samples.begin(), g_rx_samples.begin() + len,
          samples_buff);
 
-   g_rx_samples.pop();
+   g_rx_samples.erase(g_rx_samples.begin(), g_rx_samples.begin() + len);
+
+   return len;
 }
 
 bool
@@ -124,13 +122,18 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
    return true;
 }
 
-
 bool const
 VirtualRadio::ready_to_map_iq_samples()
 {
    if (g_tx_samples.size() < fft_n_len)
       return false;
    return true;
+}
+
+bool const
+VirtualRadio::ready_to_demap_iq_samples()
+{
+   return g_rx_samples.size() > 0;
 }
 
 } /* namespace hydra */

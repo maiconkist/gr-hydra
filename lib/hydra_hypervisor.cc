@@ -1,6 +1,7 @@
 #include "hydra/hydra_hypervisor.h"
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
 
 namespace gr {
@@ -14,8 +15,8 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
         g_bw(bandwidth),
         g_subcarriers_map(fft_m_len, -1)
 {
-		  g_fft_complex  = sfft_complex(new gr::hydra::fft_complex(fft_m_len));
-		  g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(fft_m_len, false));
+   g_fft_complex  = sfft_complex(new gr::hydra::fft_complex(fft_m_len));
+   g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(fft_m_len, false));
 };
 
 /**
@@ -25,21 +26,18 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
 size_t
 Hypervisor::create_vradio(double cf, double bandwidth)
 {
-		  size_t fft_n = bandwidth / (g_bw / fft_m_len);
+   size_t fft_n = bandwidth / (g_bw / fft_m_len);
 
-		  vradio_ptr vradio(new VirtualRadio(*this, g_vradios.size(), cf, bandwidth, fft_n));
-		  g_vradios.push_back(vradio);
+   vradio_ptr vradio(new VirtualRadio(*this, g_vradios.size(), cf, bandwidth, fft_n));
+   g_vradios.push_back(vradio);
 
-		  //LOG(INFO) << "VR " << g_vradios.size() - 1 << "- FFT N: " << vradio->get_id() << ", CF: " << vradio->get_central_frequency() << ", BW: " << vradio->get_bandwidth();
-
-		  // ID representing the radio;
-		  return g_vradios.size() - 1;
+   // ID representing the radio;
+   return g_vradios.size() - 1;
 };
 
 int
 Hypervisor::notify(VirtualRadio &vr)
 {
-   std::cout << "notify" << std::endl;;
    iq_map_vec subcarriers_map = g_subcarriers_map;
    std::replace(subcarriers_map.begin(),
                 subcarriers_map.end(),
@@ -60,7 +58,6 @@ Hypervisor::notify(VirtualRadio &vr)
 VirtualRadio * const
 Hypervisor::get_vradio(size_t idx)
 {
-   //LOG_IF(idx > g_vradios.size(), WARNING) << "ERROR";
    return g_vradios[idx].get();
 }
 
@@ -78,24 +75,6 @@ Hypervisor::get_allocated_subcarriers()
    }
 
    return total_subcarriers;
-}
-
-
-void
-Hypervisor::forecast(int noutput_items,
-      gr_vector_int &ninput_items_required)
-{
-   size_t ninput = ninput_items_required.size();
-
-   //LOG_IF(ninput != g_vradios.size(), ERROR);
-
-   int factor = noutput_items / fft_m_len;
-
-   for (size_t i = 0; i < ninput; ++i)
-	{
-      ninput_items_required[i] = g_vradios[i]->get_subcarriers() * factor;
-	}
-
 }
 
 void
@@ -126,9 +105,6 @@ Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    int sc = offset / (g_bw / fft_m_len);
    size_t fft_n = vr_bw /(g_bw /fft_m_len);
 
-   //LOG_IF(sc < 0, ERROR) << "VR " << vr.get_id() << ": SC outside range - too low [" << offset << "]";
-   //LOG_IF(sc > fft_m_len, ERROR) << "VR " << vr.get_id() << ": SC outside range - too high [" << offset << "]";
-
    if (sc < 0 || sc > fft_m_len) {
       std::cout << "Cannot allocate subcarriers for VR " << vr.get_id() << std::endl;
       return -1;
@@ -158,7 +134,7 @@ Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
 }
 
 void
-Hypervisor::tx_add_samples(int noutput_items,
+Hypervisor::sink_add_samples(int noutput_items,
       gr_vector_int &ninput_items,
       gr_vector_const_void_star &input_items)
 {
@@ -173,7 +149,7 @@ Hypervisor::tx_add_samples(int noutput_items,
       //         ........................... 1 .......................... 1
       //         ........................... 2 .......................... 2
       //         ........................... N .......................... N
-      get_vradio(i)->add_iq_sample((const gr_complex *) input_items[i],
+      get_vradio(i)->add_sink_sample((const gr_complex *) input_items[i],
             get_vradio(i)->get_subcarriers() * factor);
 
       ninput_items[i] = get_vradio(i)->get_subcarriers() * factor;
@@ -181,7 +157,7 @@ Hypervisor::tx_add_samples(int noutput_items,
 }
 
 bool const
-Hypervisor::tx_ready()
+Hypervisor::sink_ready()
 {
    for (vradio_vec::iterator it = g_vradios.begin();
          it != g_vradios.end();
@@ -193,9 +169,8 @@ Hypervisor::tx_ready()
    return true;
 }
 
-
 size_t
-Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_items)
+Hypervisor::sink_outbuf(gr_vector_void_star &output_items, size_t max_noutput_items)
 {
    // While we can generate samples to transmit
    size_t noutput_items = 0;
@@ -203,7 +178,7 @@ Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_item
 
    // For each VirtualRadio call the map_iq_samples
    // func passing our buffer as parameter
-   while (tx_ready() && noutput_items < max_noutput_items)
+   while (sink_ready() && noutput_items < max_noutput_items)
    {
       for (vradio_vec::iterator it = g_vradios.begin();
             it != g_vradios.end();
@@ -238,6 +213,69 @@ Hypervisor::tx_outbuf(gr_vector_void_star &output_items, size_t max_noutput_item
    return noutput_items;
 }
 
+bool const Hypervisor::source_ready()
+{
+   for (vradio_vec::iterator it = g_vradios.begin();
+         it != g_vradios.end();
+         ++it)
+   {
+      if (!(*it)->ready_to_demap_iq_samples())
+         return false;
+   }
+
+   return true;
+}
+
+size_t Hypervisor::source_add_samples(int noutput_items,
+      gr_vector_int &ninput_items,
+      gr_vector_const_void_star &input_items)
+{
+   const gr_complex *samples = (const gr_complex *) input_items[0];
+
+   size_t idx = 0;
+   while (idx + fft_m_len <= ninput_items[0])
+   {
+      std::copy(samples + idx,
+            samples + idx + fft_m_len,
+            g_fft_complex->get_inbuf());
+
+      g_fft_complex->execute();
+
+      std::rotate(g_fft_complex->get_outbuf(),
+            g_fft_complex->get_outbuf() + fft_m_len/2,
+            g_fft_complex->get_outbuf() + fft_m_len);
+
+      for (size_t i = 0; i < fft_m_len; ++i)
+         g_fft_complex->get_outbuf()[i] = g_fft_complex->get_outbuf()[i] / float(fft_m_len);
+
+      for (vradio_vec::iterator it = g_vradios.begin();
+            it != g_vradios.end();
+            ++it)
+      {
+         (*it)->demap_iq_samples(g_fft_complex->get_outbuf());
+      }
+
+      idx += fft_m_len;
+   }
+
+   return idx;
+}
+
+gr_vector_int
+Hypervisor::source_outbuf(gr_vector_void_star &output_items)
+{
+   // vector indicating the number of items produced in each output port
+   gr_vector_int nproduced = gr_vector_int(g_vradios.size(), 0);
+
+   for (size_t idx = 0; idx < g_vradios.size(); ++idx)
+   {
+      gr_complex *optr = (gr_complex *) output_items[idx];
+      size_t noutitems = g_vradios[idx]->get_source_samples(optr);
+      nproduced[idx] = noutitems;
+   }
+
+   return nproduced;
+}
 
 } /* namespace hydra */
 } /* namespace gr */

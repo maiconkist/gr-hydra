@@ -89,7 +89,7 @@ hydra_async_sink::handle_msg(pmt::pmt_t val, size_t radio_id)
         xv = pmt::c32vector_elements(val);
    }
 
-   g_hypervisor->get_vradio(radio_id)->add_iq_sample(
+   g_hypervisor->get_vradio(radio_id)->add_sink_sample(
       (const gr_complex *) &xv[0], xv.size());
 }
 
@@ -100,7 +100,7 @@ hydra_async_sink::general_work(int noutput_items,
       gr_vector_void_star &output_items)
 {
    // Gen output
-   int t = g_hypervisor->tx_outbuf(output_items, noutput_items);
+   int t = g_hypervisor->sink_outbuf(output_items, noutput_items);
 
    return t;
 }

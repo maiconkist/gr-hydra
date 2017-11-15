@@ -32,27 +32,27 @@ namespace gr {
 
 hydra_sink::hydra_sink_ptr
 hydra_sink::make(size_t _n_ports,
-    size_t _fft_m_len,
-		double central_frequency,
-		double bandwidth,
-    const std::vector<std::vector<double> > vradio_conf)
+      size_t _fft_m_len,
+      double central_frequency,
+      double bandwidth,
+      const std::vector<std::vector<double> > vradio_conf)
 {
-  return gnuradio::get_initial_sptr(new hydra_sink(_n_ports,
-                                                   _fft_m_len,
-                                                   central_frequency,
-                                                   bandwidth,
-                                                   vradio_conf));
+   return gnuradio::get_initial_sptr(new hydra_sink(_n_ports,
+            _fft_m_len,
+            central_frequency,
+            bandwidth,
+            vradio_conf));
 }
 
 hydra_sink::hydra_sink(size_t _n_inputs,
-    size_t _fft_m_len,
-		double central_frequency,
-		double bandwidth,
-    const std::vector< std::vector<double> > vradio_conf):
-    gr::block("hydra_sink",
-   				gr::io_signature::make(_n_inputs, _n_inputs, sizeof(gr_complex)),
-   				gr::io_signature::make(1, 1, sizeof(gr_complex))),
-    hydra_block(_n_inputs, _fft_m_len, central_frequency, bandwidth)
+      size_t _fft_m_len,
+      double central_frequency,
+      double bandwidth,
+      const std::vector< std::vector<double> > vradio_conf):
+   gr::block("hydra_sink",
+         gr::io_signature::make(_n_inputs, _n_inputs, sizeof(gr_complex)),
+         gr::io_signature::make(1, 1, sizeof(gr_complex))),
+   hydra_block(_n_inputs, _fft_m_len, central_frequency, bandwidth)
 {
    set_output_multiple(_fft_m_len);
 
@@ -66,6 +66,18 @@ hydra_sink::~hydra_sink()
 {
 }
 
+void
+hydra_sink::forecast(int noutput_items, gr_vector_int &ninput_items_required)
+{
+   size_t ninput = ninput_items_required.size();
+   int factor = noutput_items / g_hypervisor->get_total_subcarriers();
+
+   for (size_t i = 0; i < ninput; ++i)
+   {
+      ninput_items_required[i] = g_hypervisor->get_vradio(i)->get_subcarriers() * factor;
+   }
+}
+
 int
 hydra_sink::general_work(int noutput_items,
       gr_vector_int &ninput_items,
@@ -73,14 +85,14 @@ hydra_sink::general_work(int noutput_items,
       gr_vector_void_star &output_items)
 {
    // forward to hypervisor
-   g_hypervisor->tx_add_samples(noutput_items, ninput_items, input_items);
+   g_hypervisor->sink_add_samples(noutput_items, ninput_items, input_items);
 
    // Consume the items in the input port i
    for (size_t i = 0; i < ninput_items.size(); ++i)
      consume(i, ninput_items[i]);
 
 	 // Gen output
-   int t = g_hypervisor->tx_outbuf(output_items, noutput_items);
+   int t = g_hypervisor->sink_outbuf(output_items, noutput_items);
    produce(0, t);
 
    return WORK_CALLED_PRODUCE;

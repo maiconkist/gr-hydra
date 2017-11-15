@@ -4,14 +4,53 @@
   <key>hydra_hydra_source</key>
   <category>hydra</category>
   <import>import hydra</import>
-  <make>hydra.hydra_source($num_outputs, $fft_m_size, $fft_n_size)</make>
-
+  <make>hydra.hydra_source($num_outputs, $fft_m_size, $central_frequency, $bandwidth,
+	 (($center_freq1(), $samprate1()), 
+	 #if $num_outputs() > 1
+	 ($center_freq2(), $samprate2()),
+	 #end if
+	 #if $num_outputs() > 2
+	 ($center_freq3(), $samprate3()),
+	 #end if
+	 #if $num_outputs() > 3
+	 ($center_freq4, $samprate4()),
+	 #end if
+	 ))
+  </make>
+  <callback>#if $num_outputs() > 0
+set_central_frequency(0, $center_freq1())
+#end if</callback>
+  <callback>#if $num_outputs() > 1
+set_central_frequency(1, $center_freq2())
+  #end if</callback>
+  <callback>#if $num_outputs() > 2
+set_central_frequency(2, $center_freq3())
+  #end if</callback>
+  <callback>#if $num_outputs() > 3
+set_central_frequency(3, $center_freq4())
+  #end if</callback>
 
   <param>
     <name>Num VRadios</name>
     <key>num_outputs</key>
     <value>2</value>
     <type>int</type>
+	<option>
+		<name>1</name>
+		<key>1</key>
+	</option>
+	<option>
+		<name>2</name>
+		<key>2</key>
+	</option>
+	<option>
+		<name>3</name>
+		<key>3</key>
+	</option>
+	<option>
+		<name>4</name>
+		<key>4</key>
+	</option>
   </param>
   <param>
     <name>FFT M Size</name>
@@ -20,33 +59,87 @@
     <type>int</type>
   </param>
   <param>
-    <name>FFT N Size</name>
-    <key>fft_n_size</key>
-    <value>()</value>
-    <type>raw</type>
+    <name>Central Frequency</name>
+    <key>central_frequency</key>
+    <value>0</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Bandwidth</name>
+    <key>bandwidth</key>
+    <value>4e6</value>
+    <type>float</type>
   </param>
 
-  <check>$num_outputs &gt; 0</check>
+<!-- VR1 Configuration -->
+  <param>
+	  <name>Freq VR1</name>
+	  <key>center_freq1</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_outputs() > 0 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR1</name>
+	  <key>samprate1</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_outputs() > 0 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR2 Configuration -->
+  <param>
+	  <name>Freq VR2</name>
+	  <key>center_freq2</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_outputs() > 1 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR2</name>
+	  <key>samprate2</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_outputs() > 1 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR3 Configuration -->
+  <param>
+	  <name>Freq VR3</name>
+	  <key>center_freq3</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_outputs() > 2 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR3</name>
+	  <key>samprate3</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_outputs() > 2 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR4 Configuration -->
+  <param>
+	  <name>Freq VR4</name>
+	  <key>center_freq4</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_outputs() > 3 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR4</name>
+	  <key>samprate4</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_outputs() > 3 then 'none' else 'all'#</hide>
+  </param>
 
-  <!-- Make one 'sink' node per input. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
   <sink>
     <name>in</name>
     <type>complex</type>
   </sink>
 
-  <!-- Make one 'source' node per output. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
   <source>
     <name>out</name>
     <type>complex</type>
-    <vlen>$fft_m_size</vlen>
+    <nports>$num_outputs</nports>
   </source>
-
 </block>
