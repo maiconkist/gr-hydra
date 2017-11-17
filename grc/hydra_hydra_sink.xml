@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <block>
-  <name>hydra_sink</name>
+  <name>HyDRA Sink</name>
   <key>hydra_hydra_sink</key>
   <category>hydra</category>
   <import>import hydra</import>
@@ -15,6 +15,84 @@
 	 #if $num_inputs() > 3
 	 ($center_freq4, $samprate4()),
 	 #end if
+	 #if $num_inputs() > 4
+	 ($center_freq5(), $samprate5()),
+	 #end if
+	 #if $num_inputs() > 5
+	 ($center_freq6(), $samprate6()),
+	 #end if
+	 #if $num_inputs() > 6
+	 ($center_freq7(), $samprate7()),
+	 #end if
+	 #if $num_inputs() > 7
+	 ($center_freq8(), $samprate8()),
+	 #end if
+	 #if $num_inputs() > 8
+	 ($center_freq9(), $samprate9()),
+	 #end if
+	 #if $num_inputs() > 9
+	 ($center_freq10(), $samprate10()),
+	 #end if
+	 #if $num_inputs() > 10
+	 ($center_freq11(), $samprate11()),
+	 #end if
+	 #if $num_inputs() > 11
+	 ($center_freq12(), $samprate12()),
+	 #end if
+	 #if $num_inputs() > 12
+	 ($center_freq13(), $samprate13()),
+	 #end if
+	 #if $num_inputs() > 13
+	 ($center_freq14(), $samprate14()),
+	 #end if
+	 #if $num_inputs() > 14
+	 ($center_freq15(), $samprate15()),
+	 #end if
+	 #if $num_inputs() > 15
+	 ($center_freq16(), $samprate16()),
+	 #end if
+	 #if $num_inputs() > 16
+	 ($center_freq17(), $samprate17()),
+	 #end if
+	 #if $num_inputs() > 17
+	 ($center_freq18(), $samprate18()),
+	 #end if
+	 #if $num_inputs() > 18
+	 ($center_freq19(), $samprate19()),
+	 #end if
+	 #if $num_inputs() > 19
+	 ($center_freq20(), $samprate20()),
+	 #end if
+	 #if $num_inputs() > 20
+	 ($center_freq21(), $samprate21()),
+	 #end if
+	 #if $num_inputs() > 21
+	 ($center_freq22(), $samprate22()),
+	 #end if
+	 #if $num_inputs() > 22
+	 ($center_freq23(), $samprate23()),
+	 #end if
+	 #if $num_inputs() > 23
+	 ($center_freq24(), $samprate24()),
+	 #end if
+	 #if $num_inputs() > 24
+	 ($center_freq25(), $samprate25()),
+	 #end if
+	 #if $num_inputs() > 25
+	 ($center_freq26(), $samprate26()),
+	 #end if
+	 #if $num_inputs() > 26
+	 ($center_freq27(), $samprate27()),
+	 #end if
+	 #if $num_inputs() > 27
+	 ($center_freq28(), $samprate28()),
+	 #end if
+	 #if $num_inputs() > 28
+	 ($center_freq29(), $samprate29()),
+	 #end if
+	 #if $num_inputs() > 29
+	 ($center_freq30(), $samprate30()),
+	 #end if
 	 ))
   </make>
   <callback>#if $num_inputs() > 0
@@ -28,6 +106,84 @@ set_central_frequency(2, $center_freq3())
   #end if</callback>
   <callback>#if $num_inputs() > 3
 set_central_frequency(3, $center_freq4())
+  #end if</callback>
+  <callback>#if $num_inputs() > 4
+set_central_frequency(4, $center_freq5())
+  #end if</callback>
+  <callback>#if $num_inputs() > 5
+set_central_frequency(5, $center_freq6())
+  #end if</callback>
+  <callback>#if $num_inputs() > 6
+set_central_frequency(6, $center_freq7())
+  #end if</callback>
+  <callback>#if $num_inputs() > 7
+set_central_frequency(7, $center_freq8())
+  #end if</callback>
+  <callback>#if $num_inputs() > 8
+set_central_frequency(8, $center_freq9())
+  #end if</callback>
+  <callback>#if $num_inputs() > 9
+set_central_frequency(9, $center_freq10())
+  #end if</callback>
+  <callback>#if $num_inputs() > 10
+set_central_frequency(10, $center_freq11())
+  #end if</callback>
+  <callback>#if $num_inputs() > 11
+set_central_frequency(11, $center_freq12())
+  #end if</callback>
+  <callback>#if $num_inputs() > 12
+set_central_frequency(12, $center_freq13())
+  #end if</callback>
+  <callback>#if $num_inputs() > 13
+set_central_frequency(13, $center_freq14())
+  #end if</callback>
+  <callback>#if $num_inputs() > 14
+set_central_frequency(14, $center_freq15())
+  #end if</callback>
+  <callback>#if $num_inputs() > 15
+set_central_frequency(15, $center_freq16())
+  #end if</callback>
+  <callback>#if $num_inputs() > 16
+set_central_frequency(16, $center_freq17())
+  #end if</callback>
+  <callback>#if $num_inputs() > 17
+set_central_frequency(17, $center_freq18())
+  #end if</callback>
+  <callback>#if $num_inputs() > 18
+set_central_frequency(18, $center_freq19())
+  #end if</callback>
+  <callback>#if $num_inputs() > 19
+set_central_frequency(19, $center_freq20())
+  #end if</callback>
+  <callback>#if $num_inputs() > 20
+set_central_frequency(20, $center_freq21())
+  #end if</callback>
+  <callback>#if $num_inputs() > 21
+set_central_frequency(21, $center_freq22())
+  #end if</callback>
+  <callback>#if $num_inputs() > 22
+set_central_frequency(22, $center_freq23())
+  #end if</callback>
+  <callback>#if $num_inputs() > 23
+set_central_frequency(23, $center_freq24())
+  #end if</callback>
+  <callback>#if $num_inputs() > 24
+set_central_frequency(24, $center_freq25())
+  #end if</callback>
+  <callback>#if $num_inputs() > 25
+set_central_frequency(25, $center_freq26())
+  #end if</callback>
+  <callback>#if $num_inputs() > 26
+set_central_frequency(26, $center_freq27())
+  #end if</callback>
+  <callback>#if $num_inputs() > 27
+set_central_frequency(27, $center_freq28())
+  #end if</callback>
+  <callback>#if $num_inputs() > 28
+set_central_frequency(28, $center_freq29())
+  #end if</callback>
+  <callback>#if $num_inputs() > 29
+set_central_frequency(29, $center_freq30())
   #end if</callback>
   <param>
     <name>Num VRadios</name>
@@ -49,6 +205,110 @@ set_central_frequency(3, $center_freq4())
 	<option>
 		<name>4</name>
 		<key>4</key>
+	</option>
+	<option>
+		<name>5</name>
+		<key>5</key>
+	</option>
+	<option>
+		<name>6</name>
+		<key>6</key>
+	</option>
+	<option>
+		<name>7</name>
+		<key>7</key>
+	</option>
+	<option>
+		<name>8</name>
+		<key>8</key>
+	</option>
+	<option>
+		<name>9</name>
+		<key>9</key>
+	</option>
+	<option>
+		<name>10</name>
+		<key>10</key>
+	</option>
+	<option>
+		<name>11</name>
+		<key>11</key>
+	</option>
+	<option>
+		<name>12</name>
+		<key>12</key>
+	</option>
+	<option>
+		<name>13</name>
+		<key>13</key>
+	</option>
+	<option>
+		<name>14</name>
+		<key>14</key>
+	</option>
+	<option>
+		<name>15</name>
+		<key>15</key>
+	</option>
+	<option>
+		<name>16</name>
+		<key>16</key>
+	</option>
+	<option>
+		<name>17</name>
+		<key>17</key>
+	</option>
+	<option>
+		<name>18</name>
+		<key>18</key>
+	</option>
+	<option>
+		<name>19</name>
+		<key>19</key>
+	</option>
+	<option>
+		<name>20</name>
+		<key>20</key>
+	</option>
+	<option>
+		<name>21</name>
+		<key>21</key>
+	</option>
+	<option>
+		<name>22</name>
+		<key>22</key>
+	</option>
+	<option>
+		<name>23</name>
+		<key>23</key>
+	</option>
+	<option>
+		<name>24</name>
+		<key>24</key>
+	</option>
+	<option>
+		<name>25</name>
+		<key>25</key>
+	</option>
+	<option>
+		<name>26</name>
+		<key>26</key>
+	</option>
+	<option>
+		<name>27</name>
+		<key>27</key>
+	</option>
+	<option>
+		<name>28</name>
+		<key>28</key>
+	</option>
+	<option>
+		<name>29</name>
+		<key>29</key>
+	</option>
+	<option>
+		<name>30</name>
+		<key>30</key>
 	</option>
   </param>
   <param>
@@ -137,6 +397,397 @@ set_central_frequency(3, $center_freq4())
 	  <type>string</type>
           <hide>#if $num_inputs() > 3 then 'none' else 'all'#</hide>
   </param>
+<!-- VR5 Configuration -->
+  <param>
+	  <name>Freq VR5</name>
+	  <key>center_freq5</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 4 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR5</name>
+	  <key>samprate5</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 4 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR6 Configuration -->
+  <param>
+	  <name>Freq VR6</name>
+	  <key>center_freq6</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 5 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR6</name>
+	  <key>samprate6</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 5 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR7 Configuration -->
+  <param>
+	  <name>Freq VR7</name>
+	  <key>center_freq7</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 6 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR7</name>
+	  <key>samprate7</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 6 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR8 Configuration -->
+  <param>
+	  <name>Freq VR8</name>
+	  <key>center_freq8</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 7 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR8</name>
+	  <key>samprate8</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 7 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR9 Configuration -->
+  <param>
+	  <name>Freq VR9</name>
+	  <key>center_freq9</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 8 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR9</name>
+	  <key>samprate9</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 8 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR10 Configuration -->
+  <param>
+	  <name>Freq VR10</name>
+	  <key>center_freq10</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 9 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR10</name>
+	  <key>samprate10</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 9 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR11 Configuration -->
+  <param>
+	  <name>Freq VR11</name>
+	  <key>center_freq11</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 10 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR11</name>
+	  <key>samprate11</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 10 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR12 Configuration -->
+  <param>
+	  <name>Freq VR12</name>
+	  <key>center_freq12</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 11 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR12</name>
+	  <key>samprate12</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 11 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR13 Configuration -->
+  <param>
+	  <name>Freq VR13</name>
+	  <key>center_freq13</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 12 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR13</name>
+	  <key>samprate13</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 12 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR14 Configuration -->
+  <param>
+	  <name>Freq VR14</name>
+	  <key>center_freq14</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 13 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR14</name>
+	  <key>samprate14</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 13 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR15 Configuration -->
+  <param>
+	  <name>Freq VR15</name>
+	  <key>center_freq15</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 14 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR15</name>
+	  <key>samprate15</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 14 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR16 Configuration -->
+  <param>
+	  <name>Freq VR16</name>
+	  <key>center_freq16</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 15 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR16</name>
+	  <key>samprate16</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 15 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR17 Configuration -->
+  <param>
+	  <name>Freq VR17</name>
+	  <key>center_freq17</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 16 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR17</name>
+	  <key>samprate17</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 16 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR18 Configuration -->
+  <param>
+	  <name>Freq VR18</name>
+	  <key>center_freq18</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 17 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR18</name>
+	  <key>samprate18</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 17 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR19 Configuration -->
+  <param>
+	  <name>Freq VR19</name>
+	  <key>center_freq19</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 18 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR19</name>
+	  <key>samprate19</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 18 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR20 Configuration -->
+  <param>
+	  <name>Freq VR20</name>
+	  <key>center_freq20</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 19 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR20</name>
+	  <key>samprate20</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 19 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR21 Configuration -->
+  <param>
+	  <name>Freq VR21</name>
+	  <key>center_freq21</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 20 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR21</name>
+	  <key>samprate21</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 20 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR22 Configuration -->
+  <param>
+	  <name>Freq VR22</name>
+	  <key>center_freq22</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 21 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR22</name>
+	  <key>samprate22</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 21 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR23 Configuration -->
+  <param>
+	  <name>Freq VR23</name>
+	  <key>center_freq23</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 22 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR23</name>
+	  <key>samprate23</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 22 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR24 Configuration -->
+  <param>
+	  <name>Freq VR24</name>
+	  <key>center_freq24</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 23 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR24</name>
+	  <key>samprate24</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 23 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR25 Configuration -->
+  <param>
+	  <name>Freq VR25</name>
+	  <key>center_freq25</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 24 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR25</name>
+	  <key>samprate25</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 24 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR26 Configuration -->
+  <param>
+	  <name>Freq VR26</name>
+	  <key>center_freq26</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 25 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR26</name>
+	  <key>samprate26</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 25 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR27 Configuration -->
+  <param>
+	  <name>Freq VR27</name>
+	  <key>center_freq27</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 26 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR27</name>
+	  <key>samprate27</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 26 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR28 Configuration -->
+  <param>
+	  <name>Freq VR28</name>
+	  <key>center_freq28</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 27 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR28</name>
+	  <key>samprate28</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 27 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR29 Configuration -->
+  <param>
+	  <name>Freq VR29</name>
+	  <key>center_freq29</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 28 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR29</name>
+	  <key>samprate29</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 28 then 'none' else 'all'#</hide>
+  </param>
+<!-- VR30 Configuration -->
+  <param>
+	  <name>Freq VR30</name>
+	  <key>center_freq30</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 29 then 'none' else 'all'#</hide>
+  </param>
+  <param>
+	  <name>Samp Rate VR30</name>
+	  <key>samprate30</key>
+	  <value></value>
+	  <type>string</type>
+          <hide>#if $num_inputs() > 29 then 'none' else 'all'#</hide>
+  </param>
+
   <check>$bandwidth &gt; 0</check>
   <!-- Make one 'sink' node per input. Sub-nodes:
        * name (an identifier for the GUI)
