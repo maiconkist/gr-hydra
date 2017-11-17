@@ -195,10 +195,6 @@ Hypervisor::sink_outbuf(gr_vector_void_star &output_items, size_t max_noutput_it
         }
       }
 
-      std::rotate(g_ifft_complex->get_inbuf(),
-            g_ifft_complex->get_inbuf() + fft_m_len/2,
-            g_ifft_complex->get_inbuf() + fft_m_len);
-
       // Transform buffer from FREQ domain to TIME domain using IFFT
       g_ifft_complex->execute();
 
@@ -235,18 +231,8 @@ size_t Hypervisor::source_add_samples(int noutput_items,
    size_t idx = 0;
    while (idx + fft_m_len <= ninput_items[0])
    {
-      std::copy(samples + idx,
-            samples + idx + fft_m_len,
-            g_fft_complex->get_inbuf());
-
+      g_fft_complex->set_data(samples + idx, fft_m_len);
       g_fft_complex->execute();
-
-      std::rotate(g_fft_complex->get_outbuf(),
-            g_fft_complex->get_outbuf() + fft_m_len/2,
-            g_fft_complex->get_outbuf() + fft_m_len);
-
-      for (size_t i = 0; i < fft_m_len; ++i)
-         g_fft_complex->get_outbuf()[i] = g_fft_complex->get_outbuf()[i] / float(fft_m_len);
 
       for (vradio_vec::iterator it = g_vradios.begin();
             it != g_vradios.end();
@@ -262,16 +248,14 @@ size_t Hypervisor::source_add_samples(int noutput_items,
 }
 
 gr_vector_int
-Hypervisor::source_outbuf(gr_vector_void_star &output_items)
+Hypervisor::get_source_outbuf(gr_vector_void_star &output_items)
 {
-   // vector indicating the number of items produced in each output port
-   gr_vector_int nproduced = gr_vector_int(g_vradios.size(), 0);
+   gr_vector_int nproduced = gr_vector_int(g_vradios.size());
 
    for (size_t idx = 0; idx < g_vradios.size(); ++idx)
    {
       gr_complex *optr = (gr_complex *) output_items[idx];
-      size_t noutitems = g_vradios[idx]->get_source_samples(optr);
-      nproduced[idx] = noutitems;
+      nproduced[idx] = g_vradios[idx]->get_source_samples(optr);
    }
 
    return nproduced;

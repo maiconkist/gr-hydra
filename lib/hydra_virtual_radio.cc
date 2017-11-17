@@ -64,10 +64,6 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf)
    for (size_t idx = 0; idx < fft_n_len; ++idx)
       g_ifft_complex->get_inbuf()[idx] = samples_buf[g_iq_map[idx]];
 
-   std::rotate(g_ifft_complex->get_inbuf(),
-         g_ifft_complex->get_inbuf() + fft_n_len/2,
-         g_ifft_complex->get_inbuf() + fft_n_len);
-
    g_ifft_complex->execute();
 
    // Append new samples
@@ -78,14 +74,11 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf)
 size_t
 VirtualRadio::get_source_samples(gr_complex *samples_buff)
 {
-   if (g_rx_samples.size() == 0)
-      return 0;
+   if (g_rx_samples.size() == 0) return 0;
 
-   size_t len = std::min(g_rx_samples.size(), g_rx_samples.size());
-   std::copy(g_rx_samples.begin(), g_rx_samples.begin() + len,
-         samples_buff);
-
-   g_rx_samples.erase(g_rx_samples.begin(), g_rx_samples.begin() + len);
+   size_t len = g_rx_samples.size();
+   std::copy(g_rx_samples.begin(), g_rx_samples.end(), samples_buff);
+   g_rx_samples = samples_vec();
 
    return len;
 }
@@ -97,16 +90,9 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
    if (!ready_to_map_iq_samples()) return false;
 
    // Copy samples in TIME domain to FFT buffer, execute FFT
-   std::copy(g_tx_samples.begin(),
-         g_tx_samples.begin() + fft_n_len,
-         g_fft_complex->get_inbuf());
-
-   // Delete samples from our buffer
-   g_tx_samples.erase(g_tx_samples.begin(),
-         g_tx_samples.begin() + fft_n_len);
+   g_fft_complex->set_data(&g_tx_samples[0], fft_n_len);
 
    g_fft_complex->execute();
-
    gr_complex *outbuf = g_fft_complex->get_outbuf();
 
    // map samples in FREQ domain to samples_buff
@@ -114,10 +100,14 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
    size_t idx = 0;
    for (iq_map_vec::iterator it = g_iq_map.begin();
          it != g_iq_map.end();
-         it++, idx++)
+         ++it, ++idx)
    {
-      samples_buf[*it] = outbuf[(idx + (fft_n_len/2)) % fft_n_len] / float(fft_n_len); 
+      samples_buf[*it] = outbuf[idx]; 
    }
+
+   // Delete samples from our buffer
+   g_tx_samples.erase(g_tx_samples.begin(),
+         g_tx_samples.begin() + fft_n_len);
 
    return true;
 }

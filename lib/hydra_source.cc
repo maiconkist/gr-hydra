@@ -65,7 +65,8 @@ hydra_source::~hydra_source()
 }
 
 void
-hydra_source::forecast(int nouput_items, gr_vector_int &ninput_items_required)
+hydra_source::forecast(int noutput_items,
+      gr_vector_int &ninput_items_required)
 {
    ninput_items_required[0] = g_hypervisor->get_total_subcarriers();
 }
@@ -80,25 +81,17 @@ hydra_source::general_work(int noutput_items,
          ninput_items,
          input_items);
 
-   std::cout << "ninput: " << ninput_items[0] << std::endl;
-
-   // Consume items in the input port.
-   // We use the for loop even though we have only one input port
-   for (size_t i = 0; i < ninput_items.size(); ++i)
-      consume(i, ninput_items[i]);
+   consume(0, ninput_items[0]);
 
    // Get demultiplexed output from VRs
-   gr_vector_int nproduced = g_hypervisor->source_outbuf(output_items);
+   gr_vector_int nproduced = g_hypervisor->get_source_outbuf(output_items);
 
-   for (size_t it = 0; it < nproduced.size(); ++it)
-   {
-      produce(it , nproduced[it]);
-      std::cout << "produced: " << nproduced[it] << std::endl;
-   }
+   // Tell scheduler that input samples have been consumed
+   for (size_t idx = 0; idx < output_items.size(); ++idx)
+      produce(idx, nproduced[idx]);
 
    return WORK_CALLED_PRODUCE;
 }
-
 
 } /* namespace hydra */
 } /* namespace gr */

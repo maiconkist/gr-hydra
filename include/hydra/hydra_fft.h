@@ -41,15 +41,33 @@ class SVL_API fft_complex
 {
 	private:
 		size_t g_fft_size;
-		gr_complex *g_inbuf, *g_outbuf;
+      bool g_forward;
+		gr_complex *g_inbuf;
+      gr_complex *g_outbuf;
 		fftwf_plan g_plan;
 
 	public:
+      /** CTOR
+       * @param fft_size
+       * @param fortward
+       */
 		fft_complex(size_t fft_size, bool forward = true);
 
+      /**
+       */
+      int set_data(const gr_complex *data, size_t len);
+
+      /**
+       */
 		gr_complex* get_inbuf();
+
+
+      /**
+       */
 		gr_complex* get_outbuf();
 
+      /**
+       */
 		void execute();
 };
 
