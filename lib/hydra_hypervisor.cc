@@ -222,16 +222,20 @@ bool const Hypervisor::source_ready()
    return true;
 }
 
-size_t Hypervisor::source_add_samples(int noutput_items,
+size_t
+Hypervisor::source_add_samples(int noutput_items,
       gr_vector_int &ninput_items,
       gr_vector_const_void_star &input_items)
 {
    const gr_complex *samples = (const gr_complex *) input_items[0];
+	g_source_samples.insert(g_source_samples.end(), samples, samples + ninput_items[0]);
 
    size_t idx = 0;
-   while (idx + fft_m_len <= ninput_items[0])
+   //while (idx + fft_m_len <= ninput_items[0])
+   while (g_source_samples.size() > fft_m_len)
    {
-      g_fft_complex->set_data(samples + idx, fft_m_len);
+      //g_fft_complex->set_data(samples + idx, fft_m_len);
+      g_fft_complex->set_data(&g_source_samples[0], fft_m_len);
       g_fft_complex->execute();
 
       for (vradio_vec::iterator it = g_vradios.begin();
@@ -240,6 +244,8 @@ size_t Hypervisor::source_add_samples(int noutput_items,
       {
          (*it)->demap_iq_samples(g_fft_complex->get_outbuf());
       }
+
+		g_source_samples.erase(g_source_samples.begin(), g_source_samples.begin() + fft_m_len);
 
       idx += fft_m_len;
    }

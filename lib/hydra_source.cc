@@ -77,29 +77,20 @@ hydra_source::general_work(int noutput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
 {
-   g_hypervisor->source_add_samples(noutput_items,
+   size_t consumed = g_hypervisor->source_add_samples(noutput_items,
          ninput_items,
          input_items);
-
 
    // Get demultiplexed output from VRs
    gr_vector_int nproduced = g_hypervisor->get_source_outbuf(output_items);
 
-   if (output_items.size() > 1)
-   {
-      // Tell scheduler that input samples have been consumed
-      consume(0, ninput_items[0]);
+	// Tell scheduler that input samples have been consumed
+	consume(0, consumed);
 
-      for (size_t idx = 0; idx < output_items.size(); ++idx)
-         produce(idx, nproduced[idx]);
+	for (size_t idx = 0; idx < output_items.size(); ++idx)
+		produce(idx, nproduced[idx]);
 
-      return WORK_CALLED_PRODUCE;
-   }
-   else
-   {
-      consume_each(ninput_items[0]);
-      return nproduced[0];
-   }
+	return WORK_CALLED_PRODUCE;
 }
 
 } /* namespace hydra */

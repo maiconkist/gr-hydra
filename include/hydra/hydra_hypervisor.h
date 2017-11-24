@@ -19,7 +19,7 @@ class SVL_API Hypervisor
       double g_cf; // Hypervisor central frequency
       double g_bw; // Hypervisor bandwidth
 
-	  samples_vec_vec g_source_samples;
+	   samples_vec g_source_samples;
 
       sfft_complex g_fft_complex;
       sfft_complex g_ifft_complex;
