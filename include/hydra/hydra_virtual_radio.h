@@ -112,11 +112,11 @@ class SVL_API VirtualRadio
       void demap_iq_samples(const gr_complex *samples_buf);
 
       /** Copy rx samples in the buff to samples_buff
+       * @param noutput_items
        * @param samples_buff
-       * @param len
        * @return Number of samples mapped to samples_buff
        */
-      size_t get_source_samples(gr_complex *samples_buff);
+      size_t get_source_samples(size_t noutput_items, gr_complex *samples_buff);
 
       /**
        * @param samples_buf

@@ -228,13 +228,11 @@ Hypervisor::source_add_samples(int noutput_items,
       gr_vector_const_void_star &input_items)
 {
    const gr_complex *samples = (const gr_complex *) input_items[0];
-	g_source_samples.insert(g_source_samples.end(), samples, samples + ninput_items[0]);
+   g_source_samples.insert(g_source_samples.end(), samples, samples + ninput_items[0]);
 
-   size_t idx = 0;
    //while (idx + fft_m_len <= ninput_items[0])
-   while (g_source_samples.size() > fft_m_len)
+   while (g_source_samples.size() >= fft_m_len)
    {
-      //g_fft_complex->set_data(samples + idx, fft_m_len);
       g_fft_complex->set_data(&g_source_samples[0], fft_m_len);
       g_fft_complex->execute();
 
@@ -246,22 +244,20 @@ Hypervisor::source_add_samples(int noutput_items,
       }
 
 		g_source_samples.erase(g_source_samples.begin(), g_source_samples.begin() + fft_m_len);
-
-      idx += fft_m_len;
    }
 
-   return idx;
+   return ninput_items[0];
 }
 
 gr_vector_int
-Hypervisor::get_source_outbuf(gr_vector_void_star &output_items)
+Hypervisor::get_source_outbuf(size_t noutput_items, gr_vector_void_star &output_items)
 {
    gr_vector_int nproduced = gr_vector_int(g_vradios.size());
 
    for (size_t idx = 0; idx < g_vradios.size(); ++idx)
    {
       gr_complex *optr = (gr_complex *) output_items[idx];
-      nproduced[idx] = g_vradios[idx]->get_source_samples(optr);
+      nproduced[idx] = g_vradios[idx]->get_source_samples(noutput_items, optr);
    }
 
    return nproduced;

@@ -112,7 +112,7 @@ class SVL_API Hypervisor
     /**
      * @param output_items
      */
-    gr_vector_int get_source_outbuf(gr_vector_void_star &output_items);
+    gr_vector_int get_source_outbuf(size_t noutput_items, gr_vector_void_star &output_items);
 
     /**
      */

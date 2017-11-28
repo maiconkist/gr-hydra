@@ -56,6 +56,8 @@ hydra_source::hydra_source(size_t _n_outputs,
       create_vradio(vradio_conf[i][0], vradio_conf[i][1]);
 
    g_hypervisor->set_radio_mapping();
+
+   set_output_multiple(_fft_m_len);
 }
 
 /** DTOR
@@ -68,7 +70,7 @@ void
 hydra_source::forecast(int noutput_items,
       gr_vector_int &ninput_items_required)
 {
-   ninput_items_required[0] = g_hypervisor->get_total_subcarriers();
+   ninput_items_required[0] = noutput_items;
 }
 
 int
@@ -77,20 +79,21 @@ hydra_source::general_work(int noutput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
 {
+
    size_t consumed = g_hypervisor->source_add_samples(noutput_items,
          ninput_items,
          input_items);
 
    // Get demultiplexed output from VRs
-   gr_vector_int nproduced = g_hypervisor->get_source_outbuf(output_items);
+   gr_vector_int nproduced = g_hypervisor->get_source_outbuf(noutput_items, output_items);
 
-	// Tell scheduler that input samples have been consumed
-	consume(0, consumed);
+   // Tell scheduler that input samples have been consumed
+   consume(0, consumed);
 
-	for (size_t idx = 0; idx < output_items.size(); ++idx)
-		produce(idx, nproduced[idx]);
+   for (size_t idx = 0; idx < output_items.size(); ++idx)
+      produce(idx, nproduced[idx]);
 
-	return WORK_CALLED_PRODUCE;
+   return WORK_CALLED_PRODUCE;
 }
 
 } /* namespace hydra */
