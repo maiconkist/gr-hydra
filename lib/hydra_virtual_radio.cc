@@ -68,17 +68,17 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf)
 
    // Append new samples
    g_rx_samples.insert(g_rx_samples.end(), g_ifft_complex->get_outbuf(),
-              g_ifft_complex->get_outbuf() + fft_n_len);
+         g_ifft_complex->get_outbuf() + fft_n_len);
 }
 
 size_t
-VirtualRadio::get_source_samples(gr_complex *samples_buff)
+VirtualRadio::get_source_samples(size_t noutput_items, gr_complex *samples_buff)
 {
    if (g_rx_samples.size() == 0) return 0;
 
-   size_t len = g_rx_samples.size();
-   std::copy(g_rx_samples.begin(), g_rx_samples.end(), samples_buff);
-   g_rx_samples = samples_vec();
+   size_t len = std::min(g_rx_samples.size(), noutput_items);
+   std::copy(g_rx_samples.begin(), g_rx_samples.begin() + len, samples_buff);
+   g_rx_samples.erase(g_rx_samples.begin(), g_rx_samples.begin() + len);
 
    return len;
 }
@@ -86,7 +86,6 @@ VirtualRadio::get_source_samples(gr_complex *samples_buff)
 bool
 VirtualRadio::map_iq_samples(gr_complex *samples_buf)
 {
-   //LOG_IF(!ready_to_map_iq_samples(), ERROR) << "No samples to map";
    if (!ready_to_map_iq_samples()) return false;
 
    // Copy samples in TIME domain to FFT buffer, execute FFT
@@ -106,8 +105,7 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
    }
 
    // Delete samples from our buffer
-   g_tx_samples.erase(g_tx_samples.begin(),
-         g_tx_samples.begin() + fft_n_len);
+   g_tx_samples.erase(g_tx_samples.begin(), g_tx_samples.begin() + fft_n_len);
 
    return true;
 }
