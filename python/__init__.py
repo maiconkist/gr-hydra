@@ -19,7 +19,7 @@
 # The presence of this file turns this directory into a Python package
 
 '''
-This is the GNU Radio SVL module. Place your Python package
+This is the GNU Radio HYDRA module. Place your Python package
 description here (python/__init__.py).
 '''
 

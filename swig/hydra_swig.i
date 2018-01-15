@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 
-#define SVL_API
+#define HYDRA_API
 
 %include "gnuradio.i" // the common stuff
 

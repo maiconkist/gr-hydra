@@ -1,13 +1,13 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2016 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2016 Trinity Connect Centre.
  * 
- * This is free software; you can redistribute it and/or modify
+ * HyDRA is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
  * 
- * This software is distributed in the hope that it will be useful,
+ * HyDRA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -18,9 +18,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-
-#ifndef _QA_SVL_SINK_H_
-#define _QA_SVL_SINK_H_
+#ifndef _QA_HYDRA_SINK_H_
+#define _QA_HYDRA_SINK_H_
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
@@ -42,5 +41,4 @@ namespace gr {
   } /* namespace hydra */
 } /* namespace gr */
 
-#endif /* _QA_SVL-SINK_H_ */
-
+#endif /* _QA_HYDRA_SINK_H_ */

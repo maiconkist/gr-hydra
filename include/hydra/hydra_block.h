@@ -2,12 +2,12 @@
 /* 
  * Copyright 2016 Trinity Connect Centre.
  * 
- * This is free software; you can redistribute it and/or modify
+ * HyDRA is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
  * 
- * This software is distributed in the hope that it will be useful,
+ * HyDRA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -17,8 +17,9 @@
  * the Free Software Foundation, Inc., 51 Franklin Street,
  * Boston, MA 02110-1301, USA.
  */
-#ifndef INCLUDED_SVL_SVL_BLOCK_H
-#define INCLUDED_SVL_SVL_BLOCK_H
+
+#ifndef INCLUDED_HYDRA_HYDRA_BLOCK_H
+#define INCLUDED_HYDRA_HYDRA_BLOCK_H
 
 #include <gnuradio/block.h>
 
@@ -29,7 +30,7 @@
 namespace gr {
    namespace hydra {
 
-class SVL_API hydra_block: virtual public gr::block
+class HYDRA_API hydra_block: virtual public gr::block
 {
  protected:
   hypervisor_ptr g_hypervisor;
@@ -70,4 +71,4 @@ class SVL_API hydra_block: virtual public gr::block
 } // namespace hydra
 } // namespace gr
 
-#endif /* INCLUDED_SVL_SVL-SINK_H */
+#endif /* INCLUDED_HYDRA_HYDRA_H */

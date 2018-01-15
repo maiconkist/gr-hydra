@@ -1,4 +1,4 @@
-title: The SVL OOT Module
+title: The HYDRA OOT Module
 brief: Short description of gr-hydra
 tags: # Tags are arbitrary, but look at CGRAN what other authors are using
   - sdr
