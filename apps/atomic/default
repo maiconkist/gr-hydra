@@ -1,0 +1,81 @@
+[split1]
+ip = 192.168.10.101
+headerport = 2100
+payloadport = 2101
+throttle=100000e9
+xmlrpcport = 8081
+
+[split2]
+ip = 192.168.10.102
+port = 2200
+xmlrpcport = 8082
+
+[split3]
+ip = 192.168.10.103
+port = 2300
+xmlrpcport = 8083
+
+[vr1_tx]
+ip = 192.168.10.103
+port = 2300
+xmlrpcport = 8081
+
+[vr2_tx]
+ip = 192.168.10.113
+port = 2300
+xmlrpcport = 8081
+
+[usrp]
+ip = 192.168.10.104
+txoutport = 2300
+rxoutport = 2301
+xmlrpcport = 8084
+txgain = 0.9
+rxgain = 0
+txfreq1 = 949.5e6
+rxfreq1 = 954e6
+samprate1 = 500e3
+amplitude1 = 0.01
+# use the ip/port of the last split
+finalsplitip = 192.168.10.103
+finalsplitport = 2300
+
+[usrp_hydra]
+ip = 192.168.10.104
+txoutport = 2300
+rxoutport = 2301
+xmlrpcport = 8084
+txfreq = 950e6
+rxfreq = 954e6
+samprate = 2e6
+txgain = 0.9
+txamplitude = 0.05
+rxgain = 0
+# use the ip/port of the last split for each VR
+# VR 1
+finalsplitip1 = 192.168.10.103
+finalsplitport1 = 2300
+rxport1 = 2301
+txfreq1 = 949.5e6
+samprate1 = 500e3
+amplitude1 =0.05
+# VR 2
+finalsplitip2 = 192.168.10.113
+finalsplitport2 = 2300
+rxport2 = 2302
+txfreq2 = 950.5e6
+samprate2 = 200e3
+amplitude2 =0.05
+
+[rx]
+ip = 192.168.10.30
+port = 2401
+xmlrpcport = 8085
+txgain = 1
+txamplitude = 0.05
+rxgain = 0
+
+[global]
+zmqtimeout = 100
+maxnoutput = 0
+maxnoutbuffer = 20000
