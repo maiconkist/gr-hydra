@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.10'?>
+<?grc format='1' created='3.7.9'?>
 <flow_graph>
   <timestamp>Thu Mar 15 11:23:08 2018</timestamp>
   <block>
@@ -82,30 +82,26 @@
     </param>
   </block>
   <block>
-    <key>variable_function_probe</key>
-    <param>
-      <key>block_id</key>
-      <value>zcpu</value>
-    </param>
+    <key>variable_config</key>
     <param>
       <key>comment</key>
       <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>./default</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>function_args</key>
-      <value></value>
-    </param>
-    <param>
-      <key>function_name</key>
-      <value>cpu_percent</value>
-    </param>
-    <param>
       <key>_coordinate</key>
-      <value>(296, 1232)</value>
+      <value>(0, 1146)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -113,15 +109,23 @@
     </param>
     <param>
       <key>id</key>
-      <value>cpu_percent</value>
+      <value>freq1</value>
     </param>
     <param>
-      <key>value</key>
-      <value>0</value>
+      <key>option</key>
+      <value>"txfreq1"</value>
     </param>
     <param>
-      <key>poll_rate</key>
-      <value>1</value>
+      <key>section</key>
+      <value>"usrp_hydra"</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>real</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>None</value>
     </param>
   </block>
   <block>
@@ -136,7 +140,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>"127.0.0.1"</value>
+      <value>0</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -144,7 +148,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(296, 1080)</value>
+      <value>(144, 1146)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -152,19 +156,19 @@
     </param>
     <param>
       <key>id</key>
-      <value>ip</value>
+      <value>freq2</value>
     </param>
     <param>
       <key>option</key>
-      <value>"ip"</value>
+      <value>"txfreq2"</value>
     </param>
     <param>
       <key>section</key>
-      <value>"vr1_tx"</value>
+      <value>"usrp_hydra"</value>
     </param>
     <param>
       <key>type</key>
-      <value>string</value>
+      <value>real</value>
     </param>
     <param>
       <key>writeback</key>
@@ -218,7 +222,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(152, 1032)</value>
+      <value>(128, 1002)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -265,7 +269,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(0, 1184)</value>
+      <value>(0, 1274)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -312,7 +316,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(152, 1184)</value>
+      <value>(144, 1274)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -374,12 +378,12 @@
       <value>tx_goodput</value>
     </param>
     <param>
-      <key>value</key>
-      <value>0</value>
-    </param>
-    <param>
       <key>poll_rate</key>
       <value>10</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
     </param>
   </block>
   <block>
@@ -417,12 +421,12 @@
       <value>tx_goodput_0</value>
     </param>
     <param>
-      <key>value</key>
-      <value>0</value>
-    </param>
-    <param>
       <key>poll_rate</key>
       <value>10</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
     </param>
   </block>
   <block>
@@ -445,7 +449,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(0, 1032)</value>
+      <value>(0, 1002)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -492,7 +496,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(520, 0)</value>
+      <value>(496, 2)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -598,7 +602,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(0, 544)</value>
+      <value>(0, 543)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -657,7 +661,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(200, 216)</value>
+      <value>(200, 213)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -669,7 +673,7 @@
     </param>
     <param>
       <key>len_tag_key</key>
-      <value>"packet_len"</value>
+      <value>"length"</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -712,7 +716,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(176, 560)</value>
+      <value>(176, 557)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -724,7 +728,7 @@
     </param>
     <param>
       <key>len_tag_key</key>
-      <value>"packet_len"</value>
+      <value>"length"</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -2006,7 +2010,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(600, 856)</value>
+      <value>(640, 848)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2131,10 +2135,6 @@
     <param>
       <key>hide_cmd_port</key>
       <value>False</value>
-    </param>
-    <param>
-      <key>hide_lo_controls</key>
-      <value>True</value>
     </param>
     <param>
       <key>stream_args</key>
@@ -2269,7 +2269,7 @@
     <key>xmlrpc_server</key>
     <param>
       <key>addr</key>
-      <value>ip</value>
+      <value>172.16.16.5</value>
     </param>
     <param>
       <key>alias</key>
@@ -2285,7 +2285,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(928, 0)</value>
+      <value>(656, 5)</value>
     </param>
     <param>
       <key>_rotation</key>
