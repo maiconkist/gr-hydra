@@ -1,0 +1,17 @@
+## WiSHFUL Agent config file
+
+agent_info:
+  name: 'rx2'
+  info: 'agent_info'
+  iface: 'enx8cae4cdf4e35'
+
+modules:
+  discovery:
+      module : wishful_module_discovery_pyre
+      class_name : PyreDiscoveryAgentModule
+      kwargs: {"iface":"enx8cae4cdf4e35", "groupName":"wishful_1234"}
+
+  gnuradio:
+      module : wishful_module_gnuradio
+      class_name : GnuRadioModule
+      interfaces : ['usrp', ]
