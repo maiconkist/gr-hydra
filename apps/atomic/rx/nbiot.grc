@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>vr1_rx</value>
+      <value>nbiot</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -219,7 +219,7 @@
     </param>
     <param>
       <key>option</key>
-      <value>"txfreq1"</value>
+      <value>"txfreq2"</value>
     </param>
     <param>
       <key>section</key>
@@ -372,7 +372,7 @@
     </param>
     <param>
       <key>option</key>
-      <value>"samprate1"</value>
+      <value>"samprate2"</value>
     </param>
     <param>
       <key>section</key>
@@ -495,53 +495,6 @@
     <param>
       <key>widget</key>
       <value>counter_slider</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_config</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>config_file</key>
-      <value>./default</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(208, 0)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>xmlrpcport</value>
-    </param>
-    <param>
-      <key>option</key>
-      <value>"xmlrpcport"</value>
-    </param>
-    <param>
-      <key>section</key>
-      <value>"rx"</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>int</value>
-    </param>
-    <param>
-      <key>writeback</key>
-      <value>None</value>
     </param>
   </block>
   <block>
@@ -2240,6 +2193,41 @@
     <param>
       <key>otw</key>
       <value></value>
+    </param>
+  </block>
+  <block>
+    <key>xmlrpc_server</key>
+    <param>
+      <key>addr</key>
+      <value>172.16.16.8</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(184, 5)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>xmlrpc_server_0</value>
+    </param>
+    <param>
+      <key>port</key>
+      <value>1235</value>
     </param>
   </block>
   <connection>

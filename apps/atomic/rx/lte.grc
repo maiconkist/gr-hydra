@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>vr2_rx</value>
+      <value>lte</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -219,7 +219,7 @@
     </param>
     <param>
       <key>option</key>
-      <value>"txfreq2"</value>
+      <value>"txfreq1"</value>
     </param>
     <param>
       <key>section</key>
@@ -372,7 +372,7 @@
     </param>
     <param>
       <key>option</key>
-      <value>"samprate2"</value>
+      <value>"samprate1"</value>
     </param>
     <param>
       <key>section</key>
@@ -529,7 +529,7 @@
     </param>
     <param>
       <key>option</key>
-      <value>"xmlrpcport"</value>
+      <value>1235</value>
     </param>
     <param>
       <key>section</key>

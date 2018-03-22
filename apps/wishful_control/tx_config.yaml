@@ -3,13 +3,13 @@
 agent_info:
   name: 'tx'
   info: 'agent_info'
-  iface: 'eth3'
+  iface: 'eth0'
 
 modules:
   discovery:
       module : wishful_module_discovery_pyre
       class_name : PyreDiscoveryAgentModule
-      kwargs: {"iface":"eth3", "groupName":"wishful_1234"}
+      kwargs: {"iface":"eth0", "groupName":"tcd_hydra"}
 
   gnuradio:
       module : wishful_module_gnuradio
