@@ -37,7 +37,7 @@ enabled = False
 nodes = {}
 the_variables = {}
 
-TOTAL_NODES = 2
+TOTAL_NODES = 1
 NODE_NAMES = ["tx", "lte", "nbiot"]
 
 conf = {
@@ -134,7 +134,7 @@ def exec_loop():
     """
     ****** setup the communication with the solution global controller ******
     """
-    solutionCtrProxy = GlobalSolutionControllerProxy(ip_address="172.16.16.12", requestPort=7001, subPort=7000)
+    solutionCtrProxy = GlobalSolutionControllerProxy(ip_address="172.16.16.5", requestPort=7001, subPort=7000)
     solutionName = 'RadioVirtualization'
     commands = {"ON": enable_solution, "OFF": disable_solution}
     eventList = []
@@ -153,7 +153,7 @@ def exec_loop():
     #Start controller
     controller.start()
 
-    while len(nodes) < TOTAL_NODES:
+    while len(nodes) < TOTAL_NODES or not enabled:
     # Waiting for 2 nodes
         log.info("%d nodes connected. Waiting for %d more" % (len(nodes), TOTAL_NODES - len(nodes)))
         gevent.sleep(2)
@@ -161,6 +161,8 @@ def exec_loop():
     log.info("All nodes connected. Starting showcase...")
 
     #control loop
+    print("Enabled: " + str(enabled))
+    print("Nodes: " + str(nodes))
     while nodes and enabled:
             # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
             if 'tx' in nodes:
