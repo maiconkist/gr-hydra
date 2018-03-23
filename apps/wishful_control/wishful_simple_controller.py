@@ -68,10 +68,20 @@ def enable_solution():
     global enabled
     enabled = True
 
+    if 'tx' in nodes:
+        log.info("Enabling transmitter by request from GlobalController")
+        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.1})
+        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude2': 0.1})
+
 def disable_solution():
     print("Disabling RadioVirtualization solution")
     global enabled
     enabled = False
+
+    if 'tx' in nodes:
+        log.info("Enabling transmitter by request from GlobalController")
+        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.0})
+        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude2': 0.0})
 	
 
 @controller.new_node_callback()
@@ -163,7 +173,7 @@ def exec_loop():
     #control loop
     print("Enabled: " + str(enabled))
     print("Nodes: " + str(nodes))
-    while nodes and enabled:
+    while nodes:
             # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
             if 'tx' in nodes:
                 log.info("Requesting data to VR TX")
