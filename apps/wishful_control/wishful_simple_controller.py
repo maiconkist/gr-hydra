@@ -64,26 +64,21 @@ conf = {
 }
 
 def enable_solution():
-    print("Enabling RadioVirtualization solution")
     global enabled
     enabled = True
 
-    if 'tx' in nodes:
-        log.info("Enabling transmitter by request from GlobalController")
-        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.1})
-        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude2': 0.1})
+    try:
+        if 'tx' in nodes:
+            log.info("Enabling transmitter by request from GlobalController")
+            controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.1, 'amplitude2': 0.1})
+    except Exception as e:
+        print("Caught Except in enable_solution:" + str(e))
 
 def disable_solution():
-    print("Disabling RadioVirtualization solution")
     global enabled
     enabled = False
 
-    if 'tx' in nodes:
-        log.info("Enabling transmitter by request from GlobalController")
-        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.0})
-        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude2': 0.0})
 	
-
 @controller.new_node_callback()
 def new_node(node):
     log.info("New node appeared: Name: %s" % (node.name, ))
@@ -179,6 +174,13 @@ def exec_loop():
                 log.info("Requesting data to VR TX")
                 controller.blocking(False).node(nodes['tx']).radio.iface('usrp').get_parameters(conf['program_getters']['tx'])
 
+                if not enabled:
+                   print("Enabling Transmitter bacause enabled == False")
+                   controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.0, 'amplitude2': 0.0})
+                else:
+                   print("Disabling Transmitter bacause enabled == True")
+                   controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.1, 'amplitude2': 0.1})
+
             if 'lte' in nodes:
                 log.info("Requesting data to VR LTE")
                 controller.blocking(False).node(nodes['lte']).radio.iface('usrp').get_parameters(conf['program_getters']['lte'])
@@ -186,6 +188,7 @@ def exec_loop():
             if 'nbiot' in nodes:
                 log.info("Requesting data to VR NB-IoT")
                 controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
+
 
             gevent.sleep(2)
 
