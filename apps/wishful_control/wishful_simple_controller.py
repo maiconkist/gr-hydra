@@ -9,6 +9,7 @@ import wishful_upis as upis
 import os
 import sys
 import time
+from lib.global_controller_proxy import GlobalSolutionControllerProxy
 
 __author__ = "Maicon Kist"
 __copyright__ = "Copyright (c) 2017 Connect Centre - Trinity College Dublin" 
@@ -32,6 +33,7 @@ controller.add_module(moduleName="discovery",
 	kwargs={"iface":"eth0", "groupName":"tcd_hydra", "downlink":"tcp://172.16.16.5:8990", "uplink":"tcp://172.16.16.5:8989"})
 
 
+enabled = False
 nodes = {}
 the_variables = {}
 
@@ -43,9 +45,9 @@ conf = {
     # list of files that will be send to agents
     'files' : {
 
-    	"tx"    :  "/users/kistm/gr-hydra/apps/atomic/tx/tx.py", 
-    	"lte"   : "/users/kistm/gr-hydra/apps/atomic/rx/lte.py", 
-    	"nbiot" : "/users/kistm/gr-hydra/apps/atomic/rx/nbiot.py", 
+		"tx"    :  "/users/kistm/gr-hydra/apps/atomic/tx/tx.py", 
+		"lte"   : "/users/kistm/gr-hydra/apps/atomic/rx/lte.py", 
+		"nbiot" : "/users/kistm/gr-hydra/apps/atomic/rx/nbiot.py", 
     },
 
     'program_getters' : {
@@ -61,9 +63,16 @@ conf = {
     },
 }
 
+def enable_solution():
+    print("Enabling RadioVirtualization solution")
+    global enabled
+    enabled = True
 
-SETTER_FILE = "./setter.bin"
-
+def disable_solution():
+    print("Disabling RadioVirtualization solution")
+    global enabled
+    enabled = False
+	
 
 @controller.new_node_callback()
 def new_node(node):
@@ -119,11 +128,30 @@ def get_vars_response(group, node, data):
            the_variables['rx2_throughput'] = 'NA'
 
 def exec_loop():
+    global enabled
+
+    'Discovered Controller'
+    """
+    ****** setup the communication with the solution global controller ******
+    """
+    solutionCtrProxy = GlobalSolutionControllerProxy(ip_address="172.16.16.12", requestPort=7001, subPort=7000)
+    solutionName = 'RadioVirtualization'
+    commands = {"ON": enable_solution, "OFF": disable_solution}
+    eventList = []
+    commandList = []
+    monitorList = []
+    solutionCtrProxy.set_solution_attributes(solutionName, commands, eventList, monitorList)
+    # Register SpectrumSensing solution to global solution controller
+    response = solutionCtrProxy.register_solution()
+    if response:
+        print("RadioVirtualization was correctly registered to GlobalSolutionController")
+        solutionCtrProxy.start_command_listener()
+    else:
+        print("RadioVirtualization was not registered to GlobalSolutionController")
+
+
     #Start controller
     controller.start()
-
-    running = False
-    first_time = True
 
     while len(nodes) < TOTAL_NODES:
     # Waiting for 2 nodes
@@ -133,7 +161,7 @@ def exec_loop():
     log.info("All nodes connected. Starting showcase...")
 
     #control loop
-    while nodes:
+    while nodes and enabled:
             # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
             if 'tx' in nodes:
                 log.info("Requesting data to VR TX")
@@ -147,35 +175,14 @@ def exec_loop():
                 log.info("Requesting data to VR NB-IoT")
                 controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
 
-
-            ## set variables
-            #setters = {}
-            #try:
-            #    setters = pickle.load(open(SETTER_FILE, "rb"))
-            #    pickle.dump({}, open(SETTER_FILE, "wb"))
-            #except Exception as e:
-            #    log.info("Could not open setters file")
-            #    log.info(e)
-
-            #if 'tx' in setters.keys() and 'tx' in nodes:
-            #        log.info("Setting configuration of node TX") 
-            #        controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters(setters['tx'])
-
-            #if 'lte' in setters.keys() and 'lte' in nodes:
-            #        log.info("Setting configuration of node LTE") 
-            #        controller.blocking(False).node(nodes['lte']).radio.iface('usrp').set_parameters(setters['lte'])
-
-            #if 'nbiot' in setters.keys() and 'nbiot' in nodes:
-            #        log.info("Setting configuration of node NB-IoT") 
-            #        controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').set_parameters(setters['nbiot'])
-
             gevent.sleep(2)
 
     log.info("All nodes disconnected. Exiting controller")
     controller.stop()
 
+
 if __name__ == '__main__':
-   try:
-   	exec_loop()
-   except KeyboardInterrupt:
-        controller.stop() 
+    try:
+        exec_loop()
+    except KeyboardInterrupt:
+       controller.stop() 
