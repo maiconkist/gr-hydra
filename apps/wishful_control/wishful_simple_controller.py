@@ -9,14 +9,11 @@ import wishful_upis as upis
 import os
 import sys
 import time
-import pickle
-import wishful_module_gnuradio
 
 __author__ = "Maicon Kist"
 __copyright__ = "Copyright (c) 2017 Connect Centre - Trinity College Dublin" 
 __version__ = "0.1.0"
 __email__ = "kistm@tcd.ie"
-
 
 log = logging.getLogger('wishful_controller')
 log_level = logging.INFO
@@ -36,7 +33,6 @@ controller.add_module(moduleName="discovery",
 
 
 nodes = {}
-program_running = None
 the_variables = {}
 
 TOTAL_NODES = 2
@@ -47,15 +43,15 @@ conf = {
     # list of files that will be send to agents
     'files' : {
 
-    	"tx" :  "/users/kistm/gr-hydra/apps/atomic/tx/vr1_vr2_tx.grc", 
-    	"lte" : "/users/kistm/gr-hydra/apps/atomic/rx/lte.grc", 
-    	"nbiot" : "/users/kistm/gr-hydra/apps/atomic/rx/nbiot.grc", 
+    	"tx"    :  "/users/kistm/gr-hydra/apps/atomic/tx/tx.py", 
+    	"lte"   : "/users/kistm/gr-hydra/apps/atomic/rx/lte.py", 
+    	"nbiot" : "/users/kistm/gr-hydra/apps/atomic/rx/nbiot.py", 
     },
 
     'program_getters' : {
-        "tx":    ["bandwidth", "center_freq"],
-        "lte":   ["bandwidth", "center_freq", "throughput" ],
-        "nbiot": ["bandwidth", "center_freq", "throughput"],
+        "tx":    ["cpu_percent", ],
+        "lte":   ["cpu_percent", ],
+        "nbiot": ["cpu_percent", ],
     },
 
     'program_args': {
@@ -82,14 +78,11 @@ def new_node(node):
         program_code = open(conf['files'][program_name], "r").read()
         program_args = conf['program_args'][node.name]
 
-        controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_args': program_args,'program_type': 'grc', 'program_port': 1235})
+        controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_args': program_args,'program_type': 'py', 'program_port': 1235})
 
 @controller.node_exit_callback()
 def node_exit(node, reason):
-
     if node in nodes.values():
-        if node.name == 'rx':
-            program_running = None
         del nodes[node.name]
 
     log.info(("NodeExit : NodeID : {} Reason : {}".format(node.id, reason)))
@@ -124,8 +117,6 @@ def get_vars_response(group, node, data):
            the_variables['rx2_throughput'] = str( float(data['throughput'])/1000.0) + " Kbps"
         else:
            the_variables['rx2_throughput'] = 'NA'
-
-    pickle.dump(the_variables, open("./getter.bin", "wb"))
 
 def exec_loop():
     #Start controller

@@ -30,7 +30,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(0, 16)</value>
+      <value>(0, 22)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -38,7 +38,7 @@
     </param>
     <param>
       <key>generate_options</key>
-      <value>qt_gui</value>
+      <value>no_gui</value>
     </param>
     <param>
       <key>hier_block_src_path</key>
@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>vr1_vr2_tx</value>
+      <value>tx</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -66,7 +66,7 @@
     </param>
     <param>
       <key>run_options</key>
-      <value>prompt</value>
+      <value>run</value>
     </param>
     <param>
       <key>run</key>
@@ -93,7 +93,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -156,7 +156,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -205,6 +205,49 @@
     <param>
       <key>widget</key>
       <value>counter_slider</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_function_probe</key>
+    <param>
+      <key>block_id</key>
+      <value>zcpu</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>function_args</key>
+      <value></value>
+    </param>
+    <param>
+      <key>function_name</key>
+      <value>cpu_percent</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(776, 1240)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>cpu_percent</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
     </param>
   </block>
   <block>
@@ -313,7 +356,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -376,7 +419,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(176, 16)</value>
+      <value>(184, 21)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -774,26 +817,18 @@
     </param>
   </block>
   <block>
-    <key>variable_config</key>
+    <key>variable</key>
     <param>
       <key>comment</key>
       <value></value>
     </param>
     <param>
-      <key>config_file</key>
-      <value>./default</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>8081</value>
-    </param>
-    <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(496, 2)</value>
+      <value>(768, 1181)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -801,23 +836,128 @@
     </param>
     <param>
       <key>id</key>
-      <value>xmlrpcport</value>
+      <value>zcpu</value>
     </param>
     <param>
-      <key>option</key>
-      <value>"xmlrpcport"</value>
+      <key>value</key>
+      <value>psutil</value>
+    </param>
+  </block>
+  <block>
+    <key>import</key>
+    <param>
+      <key>alias</key>
+      <value></value>
     </param>
     <param>
-      <key>section</key>
-      <value>"vr1_tx"</value>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(816, 1140)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>acpu</value>
+    </param>
+    <param>
+      <key>import</key>
+      <value>import psutil</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(448, 1184)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>amplitude1</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>amplitude1</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
     </param>
     <param>
       <key>type</key>
-      <value>int</value>
+      <value></value>
     </param>
     <param>
-      <key>writeback</key>
-      <value>None</value>
+      <key>value</key>
+      <value>0.1</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(568, 1182)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>amplitude2</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>amplitude2</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0.1</value>
     </param>
   </block>
   <block>
@@ -1761,7 +1901,7 @@
     </param>
     <param>
       <key>gain0</key>
-      <value>gain</value>
+      <value>0.9</value>
     </param>
     <param>
       <key>ant10</key>
@@ -2668,7 +2808,7 @@
     <key>xmlrpc_server</key>
     <param>
       <key>addr</key>
-      <value>172.16.16.5</value>
+      <value>localhost</value>
     </param>
     <param>
       <key>alias</key>
@@ -2696,7 +2836,7 @@
     </param>
     <param>
       <key>port</key>
-      <value>xmlrpcport</value>
+      <value>1235</value>
     </param>
   </block>
   <block>
