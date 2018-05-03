@@ -1,7 +1,7 @@
 ## WiSHFUL Agent config file
 
 agent_info:
-  name: 'rx2'
+  name: 'nbiot'
   info: 'agent_info'
   iface: 'eth0'
 
