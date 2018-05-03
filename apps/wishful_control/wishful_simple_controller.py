@@ -25,7 +25,7 @@ logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s.%(funcName)s
 controller = wishful_controller.Controller(dl="tcp://172.16.16.5:8990", ul="tcp://172.16.16.5:8989")
 
 #Configure controller
-controller.set_controller_info(name="WishfulController", info="WishfulControllerInfo")
+controller.set_controller_info(name="TCD_RadioVirtualization", info="WishfulControllerInfo")
 # ::TRICKY:: update IP addresses to external interface
 controller.add_module(moduleName="discovery",
 	pyModuleName="wishful_module_discovery_pyre",
@@ -45,9 +45,9 @@ conf = {
     # list of files that will be send to agents
     'files' : {
 
-		"tx"    :  "/users/kistm/gr-hydra/apps/atomic/tx/tx.py", 
-		"lte"   : "/users/kistm/gr-hydra/apps/atomic/rx/lte.py", 
-		"nbiot" : "/users/kistm/gr-hydra/apps/atomic/rx/nbiot.py", 
+		"tx"    : "/root/gr-hydra/apps/atomic/tx/tx.py", 
+		"lte"   : "/root/gr-hydra/apps/atomic/rx/lte.py", 
+		"nbiot" : "/root/gr-hydra/apps/atomic/rx/nbiot.py", 
     },
 
     'program_getters' : {
@@ -140,12 +140,14 @@ def exec_loop():
     ****** setup the communication with the solution global controller ******
     """
     solutionCtrProxy = GlobalSolutionControllerProxy(ip_address="172.16.16.5", requestPort=7001, subPort=7000)
-    solutionName = 'RadioVirtualization'
+    networkName = "TCD_LTE_NETWORK"
+    solutionName = controller.name
     commands = {"ON": enable_solution, "OFF": disable_solution}
     eventList = []
     commandList = []
     monitorList = []
-    solutionCtrProxy.set_solution_attributes(solutionName, commands, eventList, monitorList)
+    #solutionCtrProxy.set_solution_attributes(solutionName, commands, eventList, monitorList)
+    solutionCtrProxy.set_solution_attributes(networkName, solutionName, commands, monitorList) 
     # Register SpectrumSensing solution to global solution controller
     response = solutionCtrProxy.register_solution()
     if response:
