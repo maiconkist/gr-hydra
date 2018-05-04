@@ -44,7 +44,6 @@ conf = {
 
     # list of files that will be send to agents
     'files' : {
-
 		"tx"    : "/root/gr-hydra/apps/atomic/tx/tx.py", 
 		"lte"   : "/root/gr-hydra/apps/atomic/rx/lte.py", 
 		"nbiot" : "/root/gr-hydra/apps/atomic/rx/nbiot.py", 
@@ -111,26 +110,18 @@ def get_vars_response(group, node, data):
     log.info("{} get_vars_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
     if node.name == 'lte':
-        the_variables['rx1_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
-        the_variables['rx1_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
-        the_variables['rx1_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
-        the_variables['rx1_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
-
-        if 'throughput' in data:
-           the_variables['rx1_throughput'] = str( float(data['throughput'])/1000.0) + " Kbps"
-        else:
-           the_variables['rx1_throughput'] = 'NA'
+        the_variables['lte_rate'] =  data['rx_rate'] if 'rx_rate' in data  and enabled else 'NA'
+        the_variables['lte_cpu']  =  data['cpu_percent'] if 'cpu_percent' in data and enabled else 'NA'
 
     elif node.name == 'nbiot':
-        the_variables['rx2_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
-        the_variables['rx2_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
-        the_variables['rx2_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
-        the_variables['rx2_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
+        the_variables['nbiot_rate'] =  data['rx_rate'] if 'rx_rate' in data and enabled else 'NA'
+        the_variables['nbiot_cpu']  =  data['cpu_percent'] if 'cpu_percent' in data and enabled else 'NA'
 
-        if 'throughput' in data:
-           the_variables['rx2_throughput'] = str( float(data['throughput'])/1000.0) + " Kbps"
-        else:
-           the_variables['rx2_throughput'] = 'NA'
+    elif node.name == "tx":
+        the_variables['tx_cpu']  =  data['cpu_percent'] if 'cpu_percent' in data and enabled else 'NA'
+        the_variables['tx_lte_rate']  =  data['lte_rate'] if 'lte_rate' in data and enabled else 'NA'
+        the_variables['tx_nbiot_rate']  =  data['nbiot_rate'] if 'nbiot_rate' in data and enabled else 'NA'
+
 
 def exec_loop():
     global enabled
@@ -183,11 +174,13 @@ def exec_loop():
 
             if 'lte' in nodes:
                 log.info("Requesting data to VR LTE")
-                controller.blocking(False).node(nodes['lte']).radio.iface('usrp').get_parameters(conf['program_getters']['lte'])
+                if enabled:
+                   controller.blocking(False).node(nodes['lte']).radio.iface('usrp').get_parameters(conf['program_getters']['lte'])
 
             if 'nbiot' in nodes:
                 log.info("Requesting data to VR NB-IoT")
-                controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
+                if enabled:
+                   controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
 
             gevent.sleep(2)
 
