@@ -37,7 +37,7 @@ enabled = False
 nodes = {}
 the_variables = {}
 
-TOTAL_NODES = 1
+TOTAL_NODES = 2
 NODE_NAMES = ["tx", "lte", "nbiot"]
 
 conf = {
@@ -51,9 +51,9 @@ conf = {
     },
 
     'program_getters' : {
-        "tx":    ["cpu_percent", ],
-        "lte":   ["cpu_percent", ],
-        "nbiot": ["cpu_percent", ],
+        "tx":    ["cpu_percent", "lte_rate", "nbiot_rate" ],
+        "lte":   ["cpu_percent", "rx_rate"],
+        "nbiot": ["cpu_percent", "rx_rate" ],
     },
 
     'program_args': {
@@ -142,11 +142,9 @@ def exec_loop():
     solutionCtrProxy = GlobalSolutionControllerProxy(ip_address="172.16.16.5", requestPort=7001, subPort=7000)
     networkName = "TCD_LTE_NETWORK"
     solutionName = controller.name
-    commands = {"ON": enable_solution, "OFF": disable_solution}
+    commands = {"START_LTE": enable_solution, "STOP_LTE": disable_solution}
     eventList = []
-    commandList = []
     monitorList = []
-    #solutionCtrProxy.set_solution_attributes(solutionName, commands, eventList, monitorList)
     solutionCtrProxy.set_solution_attributes(networkName, solutionName, commands, monitorList) 
     # Register SpectrumSensing solution to global solution controller
     response = solutionCtrProxy.register_solution()
@@ -162,7 +160,7 @@ def exec_loop():
 
     while len(nodes) < TOTAL_NODES or not enabled:
     # Waiting for 2 nodes
-        log.info("%d nodes connected. Waiting for %d more" % (len(nodes), TOTAL_NODES - len(nodes)))
+        log.info("%d/%d nodes connected. ENABLED: %s"  % (len(nodes), TOTAL_NODES, "TRUE" if enabled else "FALSE"))
         gevent.sleep(2)
 
     log.info("All nodes connected. Starting showcase...")
@@ -190,7 +188,6 @@ def exec_loop():
             if 'nbiot' in nodes:
                 log.info("Requesting data to VR NB-IoT")
                 controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
-
 
             gevent.sleep(2)
 
