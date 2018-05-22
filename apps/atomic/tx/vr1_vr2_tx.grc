@@ -454,6 +454,49 @@
     <key>variable_function_probe</key>
     <param>
       <key>block_id</key>
+      <value>zlterate</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>function_args</key>
+      <value></value>
+    </param>
+    <param>
+      <key>function_name</key>
+      <value>rate</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(488, 392)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>lte_tx_goodput</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_function_probe</key>
+    <param>
+      <key>block_id</key>
       <value>zznbiot_rate</value>
     </param>
     <param>
@@ -491,6 +534,49 @@
     <param>
       <key>poll_rate</key>
       <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_function_probe</key>
+    <param>
+      <key>block_id</key>
+      <value>znbiotrate</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>function_args</key>
+      <value></value>
+    </param>
+    <param>
+      <key>function_name</key>
+      <value>rate</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(464, 736)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>nbiot_tx_goodput</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
     </param>
   </block>
   <block>
@@ -659,92 +745,6 @@
     <param>
       <key>writeback</key>
       <value>None</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_function_probe</key>
-    <param>
-      <key>block_id</key>
-      <value>ztxrate</value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>function_args</key>
-      <value></value>
-    </param>
-    <param>
-      <key>function_name</key>
-      <value>rate</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(488, 392)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>tx_goodput</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>poll_rate</key>
-      <value>10</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_function_probe</key>
-    <param>
-      <key>block_id</key>
-      <value>ztxrate</value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>function_args</key>
-      <value></value>
-    </param>
-    <param>
-      <key>function_name</key>
-      <value>rate</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(464, 736)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>tx_goodput_0</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>poll_rate</key>
-      <value>10</value>
     </param>
   </block>
   <block>
@@ -1743,7 +1743,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(664, 152)</value>
+      <value>(656, 176)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3095,7 +3095,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ztxrate</value>
+      <value>zlterate</value>
     </param>
     <param>
       <key>type</key>
@@ -3150,7 +3150,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ztxrate_0</value>
+      <value>znbiotrate</value>
     </param>
     <param>
       <key>type</key>
@@ -3343,7 +3343,7 @@
   </connection>
   <connection>
     <source_block_id>blocks_stream_to_tagged_stream_0</source_block_id>
-    <sink_block_id>ztxrate</sink_block_id>
+    <sink_block_id>zlterate</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -3361,7 +3361,7 @@
   </connection>
   <connection>
     <source_block_id>blocks_stream_to_tagged_stream_0_0</source_block_id>
-    <sink_block_id>ztxrate_0</sink_block_id>
+    <sink_block_id>znbiotrate</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
