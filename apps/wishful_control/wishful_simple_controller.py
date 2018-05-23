@@ -33,7 +33,8 @@ controller.add_module(moduleName="discovery",
 	kwargs={"iface":"eth0", "groupName":"tcd_hydra", "downlink":"tcp://172.16.16.5:8990", "uplink":"tcp://172.16.16.5:8989"})
 
 
-enabled = False
+lte_enabled = False
+nbiot_enabled = False
 solutionCtrProxy = None
 nodes = {}
 the_variables = {}
@@ -63,30 +64,43 @@ conf = {
     },
 }
 
-def enable_solution():
-    global enabled
-    enabled = True
+def _toogle_solution(mode, toogle):
 
-    try:
-        if 'tx' in nodes:
-            log.info("Enabling transmitter by request from GlobalController")
-            controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.1, 'amplitude2': 0.1})
-    except Exception as e:
-        print("Caught Except in enable_solution:" + str(e))
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    param = 'amplitude1' if mode == 'LTE' else 'amplitude2'
+    val = 0.1 if toogle == 'ON' else '0.0'
 
-def disable_solution():
-    global enabled
-    enabled = False
+    if 'tx' in nodes:
+        try:
+            print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            controller.node(nodes['tx']).radio.iface('usrp').set_parameters({param: val})
+        except Exception as e:
+            print("Caught Except in _toogle_solution:" + str(e))
 
-	
+
+def enable_lte_solution():
+    global lte_enabled
+    lte_enabled = True
+
+
+def disable_lte_solution():
+    global lte_enabled
+    lte_enabled = False
+
+def enable_nbiot_solution():
+    global nbiot_enabled
+    nbiot_enabled = True
+
+def disable_nbiot_solution():
+    global nbiot_enabled
+    nbiot_enabled = False
+
+
 @controller.new_node_callback()
 def new_node(node):
     log.info("New node appeared: Name: %s" % (node.name, ))
     nodes[node.name] = node
 
-    #if node.name not in NODE_NAMES:
-    #    log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
-    #else:
     if node.name in ['tx', 'lte', 'nbiot']:
         program_name = node.name
         program_code = open(conf['files'][program_name], "r").read()
@@ -94,12 +108,13 @@ def new_node(node):
 
         controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_args': program_args,'program_type': 'py', 'program_port': 1235})
 
+
 @controller.node_exit_callback()
 def node_exit(node, reason):
     if node in nodes.values():
         del nodes[node.name]
-
     log.info(("NodeExit : NodeID : {} Reason : {}".format(node.id, reason)))
+
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
@@ -110,21 +125,26 @@ def default_callback(group, node, cmd, data):
 def get_vars_response(group, node, data):
     log.info("{} get_vars_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
-    value = {
-            "THR" : data['rx_goodput'] ,
-            "timestamp" : time.time(),
-    }
 
     if node.name == 'lte':
-        solutionCtrProxy.send_monitor_report("performance", "LTEVirtual",  value)
+        value = {
+            "THR" : data['rx_goodput'] ,
+            "timestamp" : time.time(),
+        }
+        solutionCtrProxy.send_monitor_report("performance", "LTE Virtual",  value)
     elif node.name == 'nbiot':
+        value = {
+            "THR" : data['rx_goodput'] ,
+            "timestamp" : time.time(),
+        }
         solutionCtrProxy.send_monitor_report("performance", "NB-IoT Virtual",  value)
     elif node.name == "tx":
         pass
 
 
 def exec_loop():
-    global enabled
+    global lte_enabled
+    global nbiot_enabled
     global solutionCtrProxy
 
     'Discovered Controller'
@@ -134,54 +154,53 @@ def exec_loop():
     solutionCtrProxy = GlobalSolutionControllerProxy(ip_address="172.16.16.5", requestPort=7001, subPort=7000)
     networkName = "TCD_LTE_NETWORK"
     solutionName = controller.name
-    commands = {"START_LTE": enable_solution, "STOP_LTE": disable_solution}
+    commands = {
+            "START_LTE": enable_lte_solution,
+            "STOP_LTE": disable_lte_solution,
+
+            "START_NBIOT": enable_nbiot_solution,
+            "STOP_NBIOT": disable_nbiot_solution,
+    }
     eventList = []
     monitorList = []
     solutionCtrProxy.set_solution_attributes("Radio Virtualization", networkName, solutionName, commands, monitorList) 
     # Register SpectrumSensing solution to global solution controller
     response = solutionCtrProxy.register_solution()
     if response:
-        print("RadioVirtualization was correctly registered to GlobalSolutionController")
+        print("Radio Virtualization was correctly registered to GlobalSolutionController")
         solutionCtrProxy.start_command_listener()
     else:
-        print("RadioVirtualization was not registered to GlobalSolutionController")
-
+        print("Radio Virtualization was not registered to GlobalSolutionController")
+        sys.exit(1)
 
     #Start controller
     controller.start()
 
-    while len(nodes) < TOTAL_NODES or not enabled:
-    # Waiting for 2 nodes
-        log.info("%d/%d nodes connected. ENABLED: %s"  % (len(nodes), TOTAL_NODES, "TRUE" if enabled else "FALSE"))
+    while len(nodes) < TOTAL_NODES or (not lte_enabled and not nbiot_enabled):
+        # Waiting for all nodes to connect
+        log.info("%d/%d nodes connected. LTE enabled: %s, NB-IoT enabled: %s"  % (len(nodes), TOTAL_NODES, lte_enabled, nbiot_enabled))
         gevent.sleep(2)
 
     log.info("All nodes connected. Starting showcase...")
 
     #control loop
-    print("Enabled: " + str(enabled))
-    print("Nodes: " + str(nodes))
     while nodes:
             # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
             if 'tx' in nodes:
                 log.info("Requesting data to VR TX")
                 controller.blocking(False).node(nodes['tx']).radio.iface('usrp').get_parameters(conf['program_getters']['tx'])
 
-                if not enabled:
-                   print("Enabling Transmitter bacause enabled == False")
-                   controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.0, 'amplitude2': 0.0})
-                else:
-                   print("Disabling Transmitter bacause enabled == True")
-                   controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters({'amplitude1': 0.1, 'amplitude2': 0.1})
-
             if 'lte' in nodes:
-                log.info("Requesting data to VR LTE")
-                if enabled:
+                _toogle_solution('LTE', 'ON' if lte_enabled else 'OFF') 
+                if lte_enabled:
+
                    controller.blocking(False).node(nodes['lte']).radio.iface('usrp').get_parameters(conf['program_getters']['lte'])
 
             if 'nbiot' in nodes:
-                log.info("Requesting data to VR NB-IoT")
-                if enabled:
+                _toogle_solution('NB-IoT', 'ON' if nbiot_enabled else 'OFF') 
+                if nbiot_enabled:
                    controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
+
 
             gevent.sleep(2)
 

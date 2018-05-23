@@ -314,6 +314,15 @@ def print_menu_command():  ## Your menu design here
             msg["commandList"][solutionCompatibilityMatrix[solutionIndex].solution[0]] = {"ENABLE_LTE_6_SUBFRAME": {}}
             # msg["commandList"][solutionCompatibilityMatrix[solutionIndex].solution[0]]["ENABLE_LTE_6_SUBFRAME"] = {}
 
+        # NBIOT NETWORK COMMAND
+        if commandToSend == "START_NBIOT":
+            msg["commandList"][solutionCompatibilityMatrix[solutionIndex].solution[0]] = {"START_NBIOT": {}}
+            msg["commandList"][solutionCompatibilityMatrix[solutionIndex].solution[0]]["START_NBIOT"]= {"2437": True}
+        if commandToSend == "STOP_NBIOT":
+            msg["commandList"][solutionCompatibilityMatrix[solutionIndex].solution[0]] = {"STOP_NBIOT": {}}
+            msg["commandList"][solutionCompatibilityMatrix[solutionIndex].solution[0]]["STOP_NBIOT"]= {"2437": False}
+
+
     if msg:
         print('update message %s' % str(msg))
         # Distribute as key-value message
