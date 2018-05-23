@@ -68,7 +68,7 @@ def _toogle_solution(mode, toogle):
 
     print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     param = 'amplitude1' if mode == 'LTE' else 'amplitude2'
-    val = 0.1 if toogle == 'ON' else '0.0'
+    val = 0.1 if toogle == 'ON' else 0.0
 
     if 'tx' in nodes:
         try:
@@ -192,14 +192,11 @@ def exec_loop():
 
             if 'lte' in nodes:
                 _toogle_solution('LTE', 'ON' if lte_enabled else 'OFF') 
-                if lte_enabled:
-
-                   controller.blocking(False).node(nodes['lte']).radio.iface('usrp').get_parameters(conf['program_getters']['lte'])
+                controller.blocking(False).node(nodes['lte']).radio.iface('usrp').get_parameters(conf['program_getters']['lte'])
 
             if 'nbiot' in nodes:
                 _toogle_solution('NB-IoT', 'ON' if nbiot_enabled else 'OFF') 
-                if nbiot_enabled:
-                   controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
+                controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
 
 
             gevent.sleep(2)
