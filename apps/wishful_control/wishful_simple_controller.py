@@ -34,10 +34,11 @@ controller.add_module(moduleName="discovery",
 
 
 enabled = False
+solutionCtrProxy = None
 nodes = {}
 the_variables = {}
 
-TOTAL_NODES = 2
+TOTAL_NODES = 3
 NODE_NAMES = ["tx", "lte", "nbiot"]
 
 conf = {
@@ -51,8 +52,8 @@ conf = {
 
     'program_getters' : {
         "tx":    ["cpu_percent", "lte_rate", "nbiot_rate" ],
-        "lte":   ["cpu_percent", "rx_rate"],
-        "nbiot": ["cpu_percent", "rx_rate" ],
+        "lte":   ["cpu_percent", "rx_goodput", "rx_rate"],
+        "nbiot": ["cpu_percent", "rx_goodput", "rx_rate"],
     },
 
     'program_args': {
@@ -109,22 +110,22 @@ def default_callback(group, node, cmd, data):
 def get_vars_response(group, node, data):
     log.info("{} get_vars_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
+    value = {
+            "THR" : data['rx_goodput'] ,
+            "timestamp" : time.time(),
+    }
+
     if node.name == 'lte':
-        the_variables['lte_rate'] =  data['rx_rate'] if 'rx_rate' in data  and enabled else 'NA'
-        the_variables['lte_cpu']  =  data['cpu_percent'] if 'cpu_percent' in data and enabled else 'NA'
-
+        solutionCtrProxy.send_monitor_report("performance", "LTEVirtual",  value)
     elif node.name == 'nbiot':
-        the_variables['nbiot_rate'] =  data['rx_rate'] if 'rx_rate' in data and enabled else 'NA'
-        the_variables['nbiot_cpu']  =  data['cpu_percent'] if 'cpu_percent' in data and enabled else 'NA'
-
+        solutionCtrProxy.send_monitor_report("performance", "NB-IoT Virtual",  value)
     elif node.name == "tx":
-        the_variables['tx_cpu']  =  data['cpu_percent'] if 'cpu_percent' in data and enabled else 'NA'
-        the_variables['tx_lte_rate']  =  data['lte_rate'] if 'lte_rate' in data and enabled else 'NA'
-        the_variables['tx_nbiot_rate']  =  data['nbiot_rate'] if 'nbiot_rate' in data and enabled else 'NA'
+        pass
 
 
 def exec_loop():
     global enabled
+    global solutionCtrProxy
 
     'Discovered Controller'
     """
@@ -136,7 +137,7 @@ def exec_loop():
     commands = {"START_LTE": enable_solution, "STOP_LTE": disable_solution}
     eventList = []
     monitorList = []
-    solutionCtrProxy.set_solution_attributes(networkName, solutionName, commands, monitorList) 
+    solutionCtrProxy.set_solution_attributes("Radio Virtualization", networkName, solutionName, commands, monitorList) 
     # Register SpectrumSensing solution to global solution controller
     response = solutionCtrProxy.register_solution()
     if response:
