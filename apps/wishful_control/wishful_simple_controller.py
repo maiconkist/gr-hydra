@@ -129,12 +129,14 @@ def get_vars_response(group, node, data):
     if node.name == 'lte':
         value = {
             "THR" : data['rx_goodput'] ,
+            "PER" : 0,
             "timestamp" : time.time(),
         }
-        solutionCtrProxy.send_monitor_report("performance", "LTE Virtual",  value)
+        solutionCtrProxy.send_monitor_report("performance", "LTE_virt",  value)
     elif node.name == 'nbiot':
         value = {
             "THR" : data['rx_goodput'] ,
+            "PER" : 0,
             "timestamp" : time.time(),
         }
         solutionCtrProxy.send_monitor_report("performance", "NB-IoT Virtual",  value)
@@ -152,8 +154,6 @@ def exec_loop():
     ****** setup the communication with the solution global controller ******
     """
     solutionCtrProxy = GlobalSolutionControllerProxy(ip_address="172.16.16.5", requestPort=7001, subPort=7000)
-    networkName = "TCD_LTE_NETWORK"
-    solutionName = controller.name
     commands = {
             "START_LTE": enable_lte_solution,
             "STOP_LTE": disable_lte_solution,
@@ -161,9 +161,12 @@ def exec_loop():
             "START_NBIOT": enable_nbiot_solution,
             "STOP_NBIOT": disable_nbiot_solution,
     }
-    eventList = []
-    monitorList = []
-    solutionCtrProxy.set_solution_attributes("Radio Virtualization", networkName, solutionName, commands, monitorList) 
+    solutionCtrProxy.set_solution_attributes(
+                    controllerName = "LTE_virt",
+                    networkType = "LTE-U",
+                    solutionName = ["Radio Virtualization"],
+                    commands = commands,
+                    monitorList = ["LTE-THR", "LTE-PER"]) 
     # Register SpectrumSensing solution to global solution controller
     response = solutionCtrProxy.register_solution()
     if response:
