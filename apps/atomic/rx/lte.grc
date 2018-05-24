@@ -148,6 +148,92 @@
     <key>variable_function_probe</key>
     <param>
       <key>block_id</key>
+      <value>digital_ofdm_rx_0</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>function_args</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>function_name</key>
+      <value>crc.nitems_read</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(592, 504)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>bytes_rx</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_function_probe</key>
+    <param>
+      <key>block_id</key>
+      <value>digital_ofdm_rx_0</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>function_args</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>function_name</key>
+      <value>crc.nitems_written</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(768, 504)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>bytes_tx</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_function_probe</key>
+    <param>
+      <key>block_id</key>
       <value>zcpu</value>
     </param>
     <param>
@@ -185,6 +271,33 @@
     <param>
       <key>poll_rate</key>
       <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(856, 596)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>error_rate</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>bytes_rx/(bytes_tx if bytes_tx&gt;0 else 1)</value>
     </param>
   </block>
   <block>
