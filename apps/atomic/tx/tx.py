@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Tx
-# Generated: Tue May 22 18:42:29 2018
+# Generated: Fri May 25 19:18:24 2018
 ##################################################
 
 from gnuradio import blocks
@@ -25,7 +25,7 @@ import time
 
 class tx(gr.top_block):
 
-    def __init__(self, amplitude1=0.1, amplitude2=0.1):
+    def __init__(self, amplitude1=0.5, amplitude2=0.5):
         gr.top_block.__init__(self, "Tx")
 
         ##################################################
@@ -39,22 +39,22 @@ class tx(gr.top_block):
         ##################################################
         self.zcpu = zcpu = psutil
         self._txfreq_config = ConfigParser.ConfigParser()
-        self._txfreq_config.read('./default')
+        self._txfreq_config.read("./default")
         try: txfreq = self._txfreq_config.getfloat("usrp_hydra", "txfreq")
-        except: txfreq = 950e6
+        except: txfreq = 2.484e9
         self.txfreq = txfreq
         self._samprate2_config = ConfigParser.ConfigParser()
-        self._samprate2_config.read('./default')
+        self._samprate2_config.read("./default")
         try: samprate2 = self._samprate2_config.getfloat("usrp_hydra", "samprate2")
         except: samprate2 = 200e3
         self.samprate2 = samprate2
         self._samprate1_config = ConfigParser.ConfigParser()
-        self._samprate1_config.read('./default')
+        self._samprate1_config.read("./default")
         try: samprate1 = self._samprate1_config.getfloat("usrp_hydra", "samprate1")
         except: samprate1 = 500e3
         self.samprate1 = samprate1
         self._samprate_config = ConfigParser.ConfigParser()
-        self._samprate_config.read('./default')
+        self._samprate_config.read("./default")
         try: samprate = self._samprate_config.getfloat("usrp_hydra", "samprate")
         except: samprate = 2e6
         self.samprate = samprate
@@ -64,14 +64,14 @@ class tx(gr.top_block):
         self.lte_tx_goodput = lte_tx_goodput = 0
         self.lte_rate = lte_rate = 0
         self._freq2_config = ConfigParser.ConfigParser()
-        self._freq2_config.read('./default')
+        self._freq2_config.read("./default")
         try: freq2 = self._freq2_config.getfloat("usrp_hydra", "txfreq2")
-        except: freq2 = 950.5e6
+        except: freq2 = 2.484e9+500e3
         self.freq2 = freq2
         self._freq1_config = ConfigParser.ConfigParser()
-        self._freq1_config.read('./default')
+        self._freq1_config.read("./default")
         try: freq1 = self._freq1_config.getfloat("usrp_hydra", "txfreq1")
-        except: freq1 = 949.5e6
+        except: freq1 = 2.484e9-500e3
         self.freq1 = freq1
         self.cpu_percent = cpu_percent = 0
 
@@ -82,7 +82,7 @@ class tx(gr.top_block):
         self.zlterate = blocks.probe_rate(gr.sizeof_char*1, 2000, 0.15)
         self.zznbiot_rate = blocks.probe_rate(gr.sizeof_gr_complex*1, 500.0, 0.15)
         self.zzlte_rate = blocks.probe_rate(gr.sizeof_gr_complex*1, 500.0, 0.15)
-        self.xmlrpc_server_0_0 = SimpleXMLRPCServer.SimpleXMLRPCServer(('localhost', 1235), allow_none=True)
+        self.xmlrpc_server_0_0 = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", 1235), allow_none=True)
         self.xmlrpc_server_0_0.register_instance(self)
         self.xmlrpc_server_0_0_thread = threading.Thread(target=self.xmlrpc_server_0_0.serve_forever)
         self.xmlrpc_server_0_0_thread.daemon = True
@@ -97,8 +97,7 @@ class tx(gr.top_block):
         self.uhd_usrp_sink_0.set_samp_rate(samprate)
         self.uhd_usrp_sink_0.set_center_freq(txfreq, 0)
         self.uhd_usrp_sink_0.set_normalized_gain(0.9, 0)
-        self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
-
+        self.uhd_usrp_sink_0.set_antenna("TX/RX", 0)
         def _nbiot_tx_goodput_probe():
             while True:
                 val = self.znbiotrate.rate()
@@ -110,8 +109,6 @@ class tx(gr.top_block):
         _nbiot_tx_goodput_thread = threading.Thread(target=_nbiot_tx_goodput_probe)
         _nbiot_tx_goodput_thread.daemon = True
         _nbiot_tx_goodput_thread.start()
-
-
         def _nbiot_rate_probe():
             while True:
                 val = self.zznbiot_rate.rate()
@@ -123,8 +120,6 @@ class tx(gr.top_block):
         _nbiot_rate_thread = threading.Thread(target=_nbiot_rate_probe)
         _nbiot_rate_thread.daemon = True
         _nbiot_rate_thread.start()
-
-
         def _lte_tx_goodput_probe():
             while True:
                 val = self.zlterate.rate()
@@ -136,8 +131,6 @@ class tx(gr.top_block):
         _lte_tx_goodput_thread = threading.Thread(target=_lte_tx_goodput_probe)
         _lte_tx_goodput_thread.daemon = True
         _lte_tx_goodput_thread.start()
-
-
         def _lte_rate_probe():
             while True:
                 val = self.zzlte_rate.rate()
@@ -149,15 +142,14 @@ class tx(gr.top_block):
         _lte_rate_thread = threading.Thread(target=_lte_rate_probe)
         _lte_rate_thread.daemon = True
         _lte_rate_thread.start()
-
         self.hydra_hydra_sink_0 = hydra.hydra_sink(2, 1024, txfreq, samprate,
-        	 ((freq1, samprate1),
+        	 ((freq1, samprate1), 
         	 (freq2, samprate2),
         	 ))
-
+          
         self.digital_ofdm_tx_0_0_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
-        	  packet_length_tag_key='length',
+        	  packet_length_tag_key="length",
         	  bps_header=1,
         	  bps_payload=1,
         	  rolloff=0,
@@ -166,14 +158,13 @@ class tx(gr.top_block):
         	 )
         self.digital_ofdm_tx_0_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
-        	  packet_length_tag_key='length',
+        	  packet_length_tag_key="length",
         	  bps_header=1,
         	  bps_payload=1,
         	  rolloff=0,
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-
         def _cpu_percent_probe():
             while True:
                 val = self.zcpu.cpu_percent()
@@ -185,7 +176,6 @@ class tx(gr.top_block):
         _cpu_percent_thread = threading.Thread(target=_cpu_percent_probe)
         _cpu_percent_thread.daemon = True
         _cpu_percent_thread.start()
-
         self.blocks_stream_to_tagged_stream_0_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, packet_len, "length")
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, packet_len, "length")
         self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((amplitude2, ))
@@ -196,19 +186,19 @@ class tx(gr.top_block):
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_random_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
-        self.connect((self.analog_random_source_x_0_0, 0), (self.blocks_stream_to_tagged_stream_0_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_hydra_sink_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.zzlte_rate, 0))
-        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.hydra_hydra_sink_0, 1))
-        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.zznbiot_rate, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0_0_0, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.zlterate, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0_0, 0), (self.digital_ofdm_tx_0_0, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0_0, 0), (self.znbiotrate, 0))
-        self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
-        self.connect((self.digital_ofdm_tx_0_0_0, 0), (self.blocks_multiply_const_vxx_0, 0))
-        self.connect((self.hydra_hydra_sink_0, 0), (self.uhd_usrp_sink_0, 0))
+        self.connect((self.analog_random_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))    
+        self.connect((self.analog_random_source_x_0_0, 0), (self.blocks_stream_to_tagged_stream_0_0, 0))    
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_hydra_sink_0, 0))    
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.zzlte_rate, 0))    
+        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.hydra_hydra_sink_0, 1))    
+        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.zznbiot_rate, 0))    
+        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0_0_0, 0))    
+        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.zlterate, 0))    
+        self.connect((self.blocks_stream_to_tagged_stream_0_0, 0), (self.digital_ofdm_tx_0_0, 0))    
+        self.connect((self.blocks_stream_to_tagged_stream_0_0, 0), (self.znbiotrate, 0))    
+        self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))    
+        self.connect((self.digital_ofdm_tx_0_0_0, 0), (self.blocks_multiply_const_vxx_0, 0))    
+        self.connect((self.hydra_hydra_sink_0, 0), (self.uhd_usrp_sink_0, 0))    
 
     def get_amplitude1(self):
         return self.amplitude1
@@ -261,10 +251,10 @@ class tx(gr.top_block):
 
     def set_packet_len(self, packet_len):
         self.packet_len = packet_len
-        self.blocks_stream_to_tagged_stream_0_0.set_packet_len(self.packet_len)
-        self.blocks_stream_to_tagged_stream_0_0.set_packet_len_pmt(self.packet_len)
         self.blocks_stream_to_tagged_stream_0.set_packet_len(self.packet_len)
         self.blocks_stream_to_tagged_stream_0.set_packet_len_pmt(self.packet_len)
+        self.blocks_stream_to_tagged_stream_0_0.set_packet_len(self.packet_len)
+        self.blocks_stream_to_tagged_stream_0_0.set_packet_len_pmt(self.packet_len)
 
     def get_nbiot_tx_goodput(self):
         return self.nbiot_tx_goodput
@@ -312,7 +302,7 @@ class tx(gr.top_block):
 
 
 def argument_parser():
-    parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
+    parser = OptionParser(option_class=eng_option, usage="%prog: [options]")
     return parser
 
 

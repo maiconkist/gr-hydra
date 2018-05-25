@@ -53,8 +53,8 @@ conf = {
 
     'program_getters' : {
         "tx":    ["cpu_percent", "lte_rate", "nbiot_rate" ],
-        "lte":   ["cpu_percent", "rx_goodput", "rx_rate"],
-        "nbiot": ["cpu_percent", "rx_goodput", "rx_rate"],
+        "lte":   ["cpu_percent", "rx_goodput", "rx_rate", "error_rate"],
+        "nbiot": ["cpu_percent", "rx_goodput", "rx_rate", "error_rate"],
     },
 
     'program_args': {
@@ -65,14 +65,11 @@ conf = {
 }
 
 def _toogle_solution(mode, toogle):
-
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     param = 'amplitude1' if mode == 'LTE' else 'amplitude2'
     val = 0.1 if toogle == 'ON' else 0.0
 
     if 'tx' in nodes:
         try:
-            print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
             controller.node(nodes['tx']).radio.iface('usrp').set_parameters({param: val})
         except Exception as e:
             print("Caught Except in _toogle_solution:" + str(e))
@@ -81,7 +78,6 @@ def _toogle_solution(mode, toogle):
 def enable_lte_solution():
     global lte_enabled
     lte_enabled = True
-
 
 def disable_lte_solution():
     global lte_enabled
@@ -125,21 +121,29 @@ def default_callback(group, node, cmd, data):
 def get_vars_response(group, node, data):
     log.info("{} get_vars_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
+    global lte_enabled
+    global nbiot_enabled
 
     if node.name == 'lte':
         value = {
-            "THR" : data['rx_goodput'] ,
+            "THR" : data['rx_goodput'] if lte_enabled else 0.0,
             "PER" : 0,
             "timestamp" : time.time(),
         }
+
+        solutionCtrProxy.controllerName = "LTE_virt"
         solutionCtrProxy.send_monitor_report("performance", "LTE_virt",  value)
+        solutionCtrProxy.controllerName = "TCD"
     elif node.name == 'nbiot':
         value = {
-            "THR" : data['rx_goodput'] ,
+            "THR" : data['rx_goodput'] if nbiot_enabled else 0.0,
             "PER" : 0,
             "timestamp" : time.time(),
         }
-        solutionCtrProxy.send_monitor_report("performance", "NB-IoT Virtual",  value)
+
+        solutionCtrProxy.controllerName = "LTE_nb"
+        solutionCtrProxy.send_monitor_report("performance", "LTE_nb",  value)
+        solutionCtrProxy.controllerName = "TCD"
     elif node.name == "tx":
         pass
 
@@ -157,12 +161,11 @@ def exec_loop():
     commands = {
             "START_LTE": enable_lte_solution,
             "STOP_LTE": disable_lte_solution,
-
             "START_NBIOT": enable_nbiot_solution,
             "STOP_NBIOT": disable_nbiot_solution,
     }
     solutionCtrProxy.set_solution_attributes(
-                    controllerName = "LTE_virt",
+                    controllerName = "TCD",
                     networkType = "LTE-U",
                     solutionName = ["Radio Virtualization"],
                     commands = commands,

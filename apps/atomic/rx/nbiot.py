@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Nbiot
-# Generated: Thu May 24 15:42:51 2018
+# Generated: Fri May 25 19:18:20 2018
 ##################################################
 
 from gnuradio import blocks
@@ -33,16 +33,16 @@ class nbiot(gr.top_block):
         self.bytes_rx = bytes_rx = 0
         self.zcpu = zcpu = psutil
         self._samprate_config = ConfigParser.ConfigParser()
-        self._samprate_config.read('./default')
+        self._samprate_config.read("./default")
         try: samprate = self._samprate_config.getfloat("usrp_hydra", "samprate2")
         except: samprate = 200e3
         self.samprate = samprate
         self.rx_rate = rx_rate = 0
         self.rx_goodput = rx_goodput = 0
         self._freq_config = ConfigParser.ConfigParser()
-        self._freq_config.read('./default')
+        self._freq_config.read("./default")
         try: freq = self._freq_config.getfloat("usrp_hydra", "txfreq2")
-        except: freq = 950.5e6
+        except: freq = 2.484e9+500e3
         self.freq = freq
         self.error_rate = error_rate = bytes_rx/(bytes_tx if bytes_tx>0 else 1)
         self.cpu_percent = cpu_percent = 0
@@ -61,7 +61,7 @@ class nbiot(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.xmlrpc_server_0 = SimpleXMLRPCServer.SimpleXMLRPCServer(('localhost', 1235), allow_none=True)
+        self.xmlrpc_server_0 = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", 1235), allow_none=True)
         self.xmlrpc_server_0.register_instance(self)
         self.xmlrpc_server_0_thread = threading.Thread(target=self.xmlrpc_server_0.serve_forever)
         self.xmlrpc_server_0_thread.daemon = True
@@ -76,8 +76,7 @@ class nbiot(gr.top_block):
         self.uhd_usrp_source_0.set_samp_rate(samprate)
         self.uhd_usrp_source_0.set_center_freq(freq, 0)
         self.uhd_usrp_source_0.set_normalized_gain(0, 0)
-        self.uhd_usrp_source_0.set_antenna('TX/RX', 0)
-
+        self.uhd_usrp_source_0.set_antenna("TX/RX", 0)
         def _rx_rate_probe():
             while True:
                 val = self.probeiq.rate()
@@ -89,8 +88,6 @@ class nbiot(gr.top_block):
         _rx_rate_thread = threading.Thread(target=_rx_rate_probe)
         _rx_rate_thread.daemon = True
         _rx_rate_thread.start()
-
-
         def _rx_goodput_probe():
             while True:
                 val = self.probe1_1.rate()
@@ -102,8 +99,6 @@ class nbiot(gr.top_block):
         _rx_goodput_thread = threading.Thread(target=_rx_goodput_probe)
         _rx_goodput_thread.daemon = True
         _rx_goodput_thread.start()
-
-
         def _cpu_percent_probe():
             while True:
                 val = self.zcpu.cpu_percent()
@@ -115,8 +110,6 @@ class nbiot(gr.top_block):
         _cpu_percent_thread = threading.Thread(target=_cpu_percent_probe)
         _cpu_percent_thread.daemon = True
         _cpu_percent_thread.start()
-
-
         def _bytes_tx_probe():
             while True:
                 val = self.digital_ofdm_rx_0.crc.nitems_written(0)
@@ -128,8 +121,6 @@ class nbiot(gr.top_block):
         _bytes_tx_thread = threading.Thread(target=_bytes_tx_probe)
         _bytes_tx_thread.daemon = True
         _bytes_tx_thread.start()
-
-
         def _bytes_rx_probe():
             while True:
                 val = self.digital_ofdm_rx_0.crc.nitems_read(0)
@@ -141,16 +132,15 @@ class nbiot(gr.top_block):
         _bytes_rx_thread = threading.Thread(target=_bytes_rx_probe)
         _bytes_rx_thread.daemon = True
         _bytes_rx_thread.start()
-
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, "Rx'd Packet", ""); self.blocks_tag_debug_0.set_display(True)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
-        self.connect((self.digital_ofdm_rx_0, 0), (self.probe1_1, 0))
-        self.connect((self.uhd_usrp_source_0, 0), (self.digital_ofdm_rx_0, 0))
-        self.connect((self.uhd_usrp_source_0, 0), (self.probeiq, 0))
+        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))    
+        self.connect((self.digital_ofdm_rx_0, 0), (self.probe1_1, 0))    
+        self.connect((self.uhd_usrp_source_0, 0), (self.digital_ofdm_rx_0, 0))    
+        self.connect((self.uhd_usrp_source_0, 0), (self.probeiq, 0))    
 
     def get_bytes_tx(self):
         return self.bytes_tx
