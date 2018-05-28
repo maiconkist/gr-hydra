@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Tx
-# Generated: Mon May 28 12:06:53 2018
+# Generated: Mon May 28 12:11:25 2018
 ##################################################
 
 from gnuradio import blocks
@@ -174,7 +174,7 @@ class tx(gr.top_block):
         	 )
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=fft_len, cp_len=16,
-        	  packet_length_tag_key="packet_len",
+        	  packet_length_tag_key="length",
         	  occupied_carriers=occupied_carriers,
         	  pilot_carriers=pilot_carriers,
         	  pilot_symbols=pilot_symbols,

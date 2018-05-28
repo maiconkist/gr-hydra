@@ -1738,7 +1738,7 @@
     </param>
     <param>
       <key>packet_len_key</key>
-      <value>"packet_len"</value>
+      <value>"length"</value>
     </param>
     <param>
       <key>log</key>
