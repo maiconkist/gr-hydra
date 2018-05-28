@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.9'?>
+<?grc format='1' created='3.7.10'?>
 <flow_graph>
   <timestamp>Thu Mar 15 12:33:56 2018</timestamp>
   <block>
@@ -168,7 +168,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(592, 504)</value>
+      <value>(584, 504)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -179,12 +179,12 @@
       <value>bytes_rx</value>
     </param>
     <param>
-      <key>poll_rate</key>
-      <value>10</value>
-    </param>
-    <param>
       <key>value</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
     </param>
   </block>
   <block>
@@ -222,12 +222,12 @@
       <value>bytes_tx</value>
     </param>
     <param>
-      <key>poll_rate</key>
-      <value>10</value>
-    </param>
-    <param>
       <key>value</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
     </param>
   </block>
   <block>
@@ -265,12 +265,12 @@
       <value>cpu_percent</value>
     </param>
     <param>
-      <key>poll_rate</key>
-      <value>1</value>
-    </param>
-    <param>
       <key>value</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>1</value>
     </param>
   </block>
   <block>
@@ -298,6 +298,33 @@
     <param>
       <key>value</key>
       <value>bytes_rx/(bytes_tx if bytes_tx&gt;0 else 1)</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(784, 68)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>fft_len</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>64</value>
     </param>
   </block>
   <block>
@@ -348,6 +375,141 @@
     </param>
   </block>
   <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(344, 4)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>occupied_carriers</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>(sorted(tuple(set([x for x in range(-26,27)]) - set(pilot_carriers[0]) - set([0,]))),)</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(808, 4)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pattern1</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>[0., 1.41421356, 0., -1.41421356]</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(856, 68)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pattern2</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>[1, -1, 1, -1]</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(656, 4)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pilot_carriers</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>((-27, -14, -7, 7, 14, 27),)</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(504, 4)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pilot_symbols</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>((-1,1, 1, -1, -1, -1),)</value>
+    </param>
+  </block>
+  <block>
     <key>variable_function_probe</key>
     <param>
       <key>block_id</key>
@@ -371,7 +533,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(680, 408)</value>
+      <value>(576, 408)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -382,12 +544,12 @@
       <value>rx_goodput</value>
     </param>
     <param>
-      <key>poll_rate</key>
-      <value>10</value>
-    </param>
-    <param>
       <key>value</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
     </param>
   </block>
   <block>
@@ -414,7 +576,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(320, 128)</value>
+      <value>(256, 112)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -425,12 +587,12 @@
       <value>rx_rate</value>
     </param>
     <param>
-      <key>poll_rate</key>
-      <value>10</value>
-    </param>
-    <param>
       <key>value</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
     </param>
   </block>
   <block>
@@ -541,6 +703,60 @@
     <param>
       <key>writeback</key>
       <value>None</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(968, 4)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>sync_word1</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>[0., 0., 0., 0., 0., 0.,] + pattern1 * ((fft_len-12)/len(pattern1))  +[0., 0., 0., 0., 0., 0.,] </value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(968, 68)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>sync_word2</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>[0., 0., 0., 0., 0., 0.,] + pattern2 * ((fft_len-12)/len(pattern2))  +[0., 0., 0., 0., 0., 0.,] </value>
     </param>
   </block>
   <block>
@@ -684,7 +900,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(920, 264)</value>
+      <value>(752, 260)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -786,7 +1002,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(664, 272)</value>
+      <value>(552, 268)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -837,7 +1053,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1176, 256)</value>
+      <value>(1096, 252)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -892,7 +1108,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(304, 232)</value>
+      <value>(296, 196)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -920,7 +1136,7 @@
     </param>
     <param>
       <key>occupied_carriers</key>
-      <value>()</value>
+      <value>occupied_carriers</value>
     </param>
     <param>
       <key>packet_len_key</key>
@@ -932,11 +1148,11 @@
     </param>
     <param>
       <key>pilot_carriers</key>
-      <value>()</value>
+      <value>pilot_carriers</value>
     </param>
     <param>
       <key>pilot_symbols</key>
-      <value>()</value>
+      <value>pilot_symbols</value>
     </param>
     <param>
       <key>scramble_bits</key>
@@ -944,11 +1160,11 @@
     </param>
     <param>
       <key>sync_word1</key>
-      <value>()</value>
+      <value>sync_word1</value>
     </param>
     <param>
       <key>sync_word2</key>
-      <value>()</value>
+      <value>sync_word2</value>
     </param>
   </block>
   <block>
@@ -971,7 +1187,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(664, 360)</value>
+      <value>(560, 364)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1026,7 +1242,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(304, 92)</value>
+      <value>(240, 60)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1064,6 +1280,10 @@
   <block>
     <key>qtgui_waterfall_sink_x</key>
     <param>
+      <key>axislabels</key>
+      <value>True</value>
+    </param>
+    <param>
       <key>bw</key>
       <value>100</value>
     </param>
@@ -1093,7 +1313,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(296, 416)</value>
+      <value>(156, 360)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1101,7 +1321,7 @@
     </param>
     <param>
       <key>_rotation</key>
-      <value>0</value>
+      <value>270</value>
     </param>
     <param>
       <key>grid</key>
@@ -1315,6 +1535,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export0</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source0</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant10</key>
       <value></value>
     </param>
@@ -1341,6 +1569,14 @@
     <param>
       <key>gain10</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export10</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source10</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant11</key>
@@ -1371,6 +1607,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export11</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source11</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant12</key>
       <value></value>
     </param>
@@ -1397,6 +1641,14 @@
     <param>
       <key>gain12</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export12</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source12</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant13</key>
@@ -1427,6 +1679,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export13</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source13</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant14</key>
       <value></value>
     </param>
@@ -1453,6 +1713,14 @@
     <param>
       <key>gain14</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export14</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source14</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant15</key>
@@ -1483,6 +1751,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export15</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source15</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant16</key>
       <value></value>
     </param>
@@ -1509,6 +1785,14 @@
     <param>
       <key>gain16</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export16</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source16</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant17</key>
@@ -1539,6 +1823,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export17</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source17</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant18</key>
       <value></value>
     </param>
@@ -1565,6 +1857,14 @@
     <param>
       <key>gain18</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export18</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source18</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant19</key>
@@ -1595,6 +1895,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export19</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source19</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant1</key>
       <value></value>
     </param>
@@ -1621,6 +1929,14 @@
     <param>
       <key>gain1</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export1</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source1</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant20</key>
@@ -1651,6 +1967,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export20</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source20</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant21</key>
       <value></value>
     </param>
@@ -1677,6 +2001,14 @@
     <param>
       <key>gain21</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export21</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source21</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant22</key>
@@ -1707,6 +2039,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export22</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source22</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant23</key>
       <value></value>
     </param>
@@ -1733,6 +2073,14 @@
     <param>
       <key>gain23</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export23</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source23</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant24</key>
@@ -1763,6 +2111,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export24</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source24</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant25</key>
       <value></value>
     </param>
@@ -1789,6 +2145,14 @@
     <param>
       <key>gain25</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export25</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source25</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant26</key>
@@ -1819,6 +2183,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export26</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source26</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant27</key>
       <value></value>
     </param>
@@ -1845,6 +2217,14 @@
     <param>
       <key>gain27</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export27</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source27</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant28</key>
@@ -1875,6 +2255,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export28</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source28</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant29</key>
       <value></value>
     </param>
@@ -1901,6 +2289,14 @@
     <param>
       <key>gain29</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export29</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source29</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant2</key>
@@ -1931,6 +2327,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export2</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source2</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant30</key>
       <value></value>
     </param>
@@ -1957,6 +2361,14 @@
     <param>
       <key>gain30</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export30</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source30</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant31</key>
@@ -1987,6 +2399,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export31</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source31</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant3</key>
       <value></value>
     </param>
@@ -2013,6 +2433,14 @@
     <param>
       <key>gain3</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export3</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source3</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant4</key>
@@ -2043,6 +2471,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export4</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source4</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant5</key>
       <value></value>
     </param>
@@ -2069,6 +2505,14 @@
     <param>
       <key>gain5</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export5</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source5</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant6</key>
@@ -2099,6 +2543,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export6</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source6</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant7</key>
       <value></value>
     </param>
@@ -2125,6 +2577,14 @@
     <param>
       <key>gain7</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export7</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source7</key>
+      <value>internal</value>
     </param>
     <param>
       <key>ant8</key>
@@ -2155,6 +2615,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>lo_export8</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source8</key>
+      <value>internal</value>
+    </param>
+    <param>
       <key>ant9</key>
       <value></value>
     </param>
@@ -2181,6 +2649,14 @@
     <param>
       <key>gain9</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>lo_export9</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>lo_source9</key>
+      <value>internal</value>
     </param>
     <param>
       <key>clock_rate</key>
@@ -2343,6 +2819,10 @@
       <value>False</value>
     </param>
     <param>
+      <key>hide_lo_controls</key>
+      <value>True</value>
+    </param>
+    <param>
       <key>stream_args</key>
       <value></value>
     </param>
@@ -2379,7 +2859,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(184, 5)</value>
+      <value>(8, 76)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2397,12 +2877,6 @@
   <connection>
     <source_block_id>blocks_tagged_stream_to_pdu_0</source_block_id>
     <sink_block_id>blocks_pdu_set_0_0</sink_block_id>
-    <source_key>pdus</source_key>
-    <sink_key>pdus</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_tagged_stream_to_pdu_0</source_block_id>
-    <sink_block_id>blocks_tuntap_pdu_0</sink_block_id>
     <source_key>pdus</source_key>
     <sink_key>pdus</sink_key>
   </connection>
