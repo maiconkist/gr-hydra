@@ -17,7 +17,7 @@ __version__ = "0.1.0"
 __email__ = "kistm@tcd.ie"
 
 log = logging.getLogger('wishful_controller')
-log_level = logging.INFO
+log_level = logging.CRITICAL
 logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
 #Create controller
@@ -32,10 +32,10 @@ controller.add_module(moduleName="discovery",
 	className="PyreDiscoveryControllerModule",
 	kwargs={"iface":"eth0", "groupName":"tcd_hydra", "downlink":"tcp://172.16.16.5:8990", "uplink":"tcp://172.16.16.5:8989"})
 
-
-lte_enabled = False
-nbiot_enabled = False
-solutionCtrProxy = None
+lte_enabled = True
+nbiot_enabled = True
+solutionCtrProxyLTE = None
+solutionCtrProxyNBIoT = None
 nodes = {}
 the_variables = {}
 
@@ -119,64 +119,87 @@ def default_callback(group, node, cmd, data):
 
 @controller.add_callback(upis.radio.get_parameters)
 def get_vars_response(group, node, data):
-    log.info("{} get_vars_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
     global lte_enabled
     global nbiot_enabled
 
     if node.name == 'lte':
+        if data['rx_goodput'] > 0:
+            print("\t ... LTE RX is OK")
+        else:
+            print("\t ... LTE RX is FAIL")
+
         value = {
             "THR" : data['rx_goodput'] if lte_enabled else 0.0,
             "PER" : 0,
             "timestamp" : time.time(),
         }
+        solutionCtrProxyLTE.send_monitor_report("performance", "LTE_virt",  value)
 
-        solutionCtrProxy.controllerName = "LTE_virt"
-        solutionCtrProxy.send_monitor_report("performance", "LTE_virt",  value)
-        solutionCtrProxy.controllerName = "TCD"
     elif node.name == 'nbiot':
+        if data['rx_goodput'] > 0:
+            print("\t ... NB-IoT RX is OK")
+        else:
+            print("\t ... NB-IoT RX is FAIL")
+
         value = {
             "THR" : data['rx_goodput'] if nbiot_enabled else 0.0,
             "PER" : 0,
             "timestamp" : time.time(),
         }
+        solutionCtrProxyNBIoT.send_monitor_report("performance", "LTE_nb",  value)
 
-        solutionCtrProxy.controllerName = "LTE_nb"
-        solutionCtrProxy.send_monitor_report("performance", "LTE_nb",  value)
-        solutionCtrProxy.controllerName = "TCD"
     elif node.name == "tx":
+        if data['nbiot_rate'] > 0:
+            print("\t ... TX is OK")
+        else:
+            print("\t ... TX is FAIL")
         pass
 
 
 def exec_loop():
     global lte_enabled
     global nbiot_enabled
-    global solutionCtrProxy
+    global solutionCtrProxyLTE
+    global solutionCtrProxyNBIoT
 
     'Discovered Controller'
     """
     ****** setup the communication with the solution global controller ******
     """
-    solutionCtrProxy = GlobalSolutionControllerProxy(ip_address="172.16.16.5", requestPort=7001, subPort=7000)
-    commands = {
+    solutionCtrProxyLTE = GlobalSolutionControllerProxy(ip_address="172.16.17.2", requestPort=7001, subPort=7000)
+    solutionCtrProxyNBIoT = GlobalSolutionControllerProxy(ip_address="172.16.17.2", requestPort=7001, subPort=7000)
+
+    commandsLTE = {
             "START_LTE": enable_lte_solution,
             "STOP_LTE": disable_lte_solution,
+    }
+
+    commandsNBIoT = {
             "START_NBIOT": enable_nbiot_solution,
             "STOP_NBIOT": disable_nbiot_solution,
     }
-    solutionCtrProxy.set_solution_attributes(
-                    controllerName = "TCD",
+
+    solutionCtrProxyLTE.set_solution_attributes(
+                    controllerName = "LTE_virt",
                     networkType = "LTE-U",
                     solutionName = ["Radio Virtualization"],
-                    commands = commands,
+                    commands = commandsLTE,
                     monitorList = ["LTE-THR", "LTE-PER"]) 
+    solutionCtrProxyNBIoT.set_solution_attributes(
+                    controllerName = "LTE_nb",
+                    networkType = "LTE-U",
+                    solutionName = ["Radio Virtualization"],
+                    commands = commandsNBIoT,
+                    monitorList = ["NBIOT-THR", "NBIOT-PER"]) 
     # Register SpectrumSensing solution to global solution controller
-    response = solutionCtrProxy.register_solution()
-    if response:
-        print("Radio Virtualization was correctly registered to GlobalSolutionController")
-        solutionCtrProxy.start_command_listener()
+    responseLTE = solutionCtrProxyLTE.register_solution()
+    responseNBIoT = solutionCtrProxyNBIoT.register_solution()
+    if responseLTE and responseNBIoT:
+        print("Controllers were correctly registered to GlobalSolutionController")
+        solutionCtrProxyLTE.start_command_listener()
     else:
-        print("Radio Virtualization was not registered to GlobalSolutionController")
+        print("Controllers were not registered to GlobalSolutionController")
         sys.exit(1)
 
     #Start controller
@@ -205,7 +228,13 @@ def exec_loop():
                 controller.blocking(False).node(nodes['nbiot']).radio.iface('usrp').get_parameters(conf['program_getters']['nbiot'])
 
 
-            gevent.sleep(2)
+            value = {
+                "channels": [14, ],
+                "frequencies": {"2484": "2", },
+            }
+            solutionCtrProxyLTE.send_monitor_report("channelUsage", "LTE_virt",  value)
+            solutionCtrProxyLTE.send_monitor_report("channelUsage", "LTE_nb",  value)
+            gevent.sleep(1)
 
     log.info("All nodes disconnected. Exiting controller")
     controller.stop()
