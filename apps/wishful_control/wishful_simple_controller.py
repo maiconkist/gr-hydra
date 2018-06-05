@@ -130,7 +130,7 @@ def get_vars_response(group, node, data):
             print("\t ... LTE RX is FAIL")
 
         value = {
-            "THR" : data['rx_goodput'] if lte_enabled else 0.0,
+            "THR" : (data['rx_goodput'] if lte_enabled else 0.0) * 8.0,
             "PER" : 0,
             "timestamp" : time.time(),
         }
@@ -143,7 +143,7 @@ def get_vars_response(group, node, data):
             print("\t ... NB-IoT RX is FAIL")
 
         value = {
-            "THR" : data['rx_goodput'] if nbiot_enabled else 0.0,
+            "THR" : (data['rx_goodput'] if nbiot_enabled else 0.0) * 8.0,
             "PER" : 0,
             "timestamp" : time.time(),
         }
@@ -167,7 +167,7 @@ def exec_loop():
     """
     ****** setup the communication with the solution global controller ******
     """
-    solutionCtrProxyLTE = GlobalSolutionControllerProxy(ip_address="172.16.17.2", requestPort=7001, subPort=7000)
+    solutionCtrProxyLTE   = GlobalSolutionControllerProxy(ip_address="172.16.17.2", requestPort=7001, subPort=7000)
     solutionCtrProxyNBIoT = GlobalSolutionControllerProxy(ip_address="172.16.17.2", requestPort=7001, subPort=7000)
 
     commandsLTE = {
@@ -193,7 +193,10 @@ def exec_loop():
                     commands = commandsNBIoT,
                     monitorList = ["NBIOT-THR", "NBIOT-PER"]) 
     # Register SpectrumSensing solution to global solution controller
+
+    print ("Connecting LTE Controller")
     responseLTE = solutionCtrProxyLTE.register_solution()
+    print ("Connecting NBIOT Controller")
     responseNBIoT = solutionCtrProxyNBIoT.register_solution()
     if responseLTE and responseNBIoT:
         print("Controllers were correctly registered to GlobalSolutionController")
