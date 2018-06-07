@@ -37,7 +37,7 @@ nbiot_enabled = True
 solutionCtrProxyLTE = None
 solutionCtrProxyNBIoT = None
 nodes = {}
-the_variables = {}
+the_variables = {'tx': {}, 'lte': {}, 'nbiot': {} }
 
 TOTAL_NODES = 3
 NODE_NAMES = ["tx", "lte", "nbiot"]
@@ -129,11 +129,17 @@ def get_vars_response(group, node, data):
         else:
             print("\t ... LTE RX is FAIL")
 
+
+        the_variables['lte'] = data
+
         value = {
-            "THR" : (data['rx_goodput'] if lte_enabled else 0.0) * 8.0,
-            "PER" : 0,
+            "THR" : (data['rx_goodput'] if lte_enabled else 0.0) * 100.0,
             "timestamp" : time.time(),
         }
+
+        if 'lte_rate'in the_variables['tx'] and the_variables['tx']['lte_rate'] > 0 and lte_enabled:
+            value["PER"] = (data['rx_goodput']/the_variables['tx']['lte_rate']) if lte_enabled else 0.0
+
         solutionCtrProxyLTE.send_monitor_report("performance", "LTE_virt",  value)
 
     elif node.name == 'nbiot':
@@ -142,11 +148,16 @@ def get_vars_response(group, node, data):
         else:
             print("\t ... NB-IoT RX is FAIL")
 
+        the_variables['nbiot'] = data
+
         value = {
-            "THR" : (data['rx_goodput'] if nbiot_enabled else 0.0) * 8.0,
-            "PER" : 0,
+            "THR" : (data['rx_goodput'] if nbiot_enabled else 0.0) * 100.0,
             "timestamp" : time.time(),
         }
+
+        if 'nbiot_rate'in the_variables['tx'] and the_variables['tx']['nbiot_rate'] > 0 and nbiot_enabled:
+            value["PER"] = (data['rx_goodput']/the_variables['tx']['nbiot_rate']) if nbiot_enabled else 0.0
+
         solutionCtrProxyNBIoT.send_monitor_report("performance", "LTE_nb",  value)
 
     elif node.name == "tx":
@@ -154,6 +165,8 @@ def get_vars_response(group, node, data):
             print("\t ... TX is OK")
         else:
             print("\t ... TX is FAIL")
+
+        the_variables['tx'] = data
         pass
 
 
@@ -201,6 +214,7 @@ def exec_loop():
     if responseLTE and responseNBIoT:
         print("Controllers were correctly registered to GlobalSolutionController")
         solutionCtrProxyLTE.start_command_listener()
+        solutionCtrProxyNBIoT.start_command_listener()
     else:
         print("Controllers were not registered to GlobalSolutionController")
         sys.exit(1)
