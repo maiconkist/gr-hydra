@@ -30,7 +30,17 @@ list(APPEND hydra_sources
 	 hydra_hypervisor.cc
     hydra_sink.cc
     hydra_async_sink.cc
-	 hydra_source.cc)
+	 hydra_source.cc
+    hydra_buffer.cc
+    hydra_socket.cc
+    hydra_stats.cc
+    hydra_resource.cc
+    hydra_server.cc
+    hydra_client.cc
+    hydra_core.cc
+    hydra_main.cc
+    hydra_xvl_wrapper.cc
+)
 
 set(hydra_sources "${hydra_sources}" PARENT_SCOPE)
 if(NOT hydra_sources)
@@ -38,13 +48,16 @@ if(NOT hydra_sources)
 	return()
 endif(NOT hydra_sources)
 
-add_library(gnuradio-hydra SHARED ${hydra_sources})
+add_library(gnuradio-hydra STATIC ${hydra_sources})
 target_link_libraries(gnuradio-hydra
 	${Boost_LIBRARIES}
 	${GNURADIO_ALL_LIBRARIES}
 	${FFTW_LIBRARIES}
+   ${ZeroMQ_LIBRARY}
 	fftw3f
 	fftw3l
+   opencv_core
+   opencv_imgcodecs
 )
 set_target_properties(gnuradio-hydra PROPERTIES DEFINE_SYMBOL "gnuradio_hydra_EXPORTS")
 
@@ -84,9 +97,12 @@ target_link_libraries(
   ${Boost_LIBRARIES}
   ${CPPUNIT_LIBRARIES}
   ${FFTW_LIBRARIES}
+  ${ZeroMQ_LIBRARY}
   fftw3f
   fftw3l
   gnuradio-hydra
+  opencv_core
+  opencv_imgcodecs
 )
 
 GR_ADD_TEST(test_hydra test-hydra)

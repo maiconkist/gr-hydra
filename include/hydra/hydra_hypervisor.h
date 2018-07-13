@@ -17,7 +17,6 @@
  * the Free Software Foundation, Inc., 51 Franklin Street,
  * Boston, MA 02110-1301, USA.
  */
-
 #ifndef INCLUDED_HYDRA_HYPERVISOR_H
 #define INCLUDED_HYDRA_HYPERVISOR_H
 
@@ -27,7 +26,8 @@
 #include <hydra/hydra_virtual_radio.h>
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <thread>
+
 
 namespace gr {
    namespace hydra {
@@ -35,19 +35,24 @@ namespace gr {
 class HYDRA_API Hypervisor
 {
  private:
-  size_t fft_m_len; // FFT M length
-  double g_cf; // Hypervisor central frequency
-  double g_bw; // Hypervisor bandwidth
 
-  samples_vec g_source_samples;
-
-  sfft_complex g_fft_complex;
+  size_t tx_fft_len; // FFT M length
+  double g_tx_cf; // Hypervisor central frequency
+  double g_tx_bw; // Hypervisor bandwidth
   sfft_complex g_ifft_complex;
+  std::unique_ptr<std::thread> g_tx_thread;
+
+  size_t rx_fft_len; // FFT M length
+  double g_rx_cf; // Hypervisor central frequency
+  double g_rx_bw; // Hypervisor bandwidth
+  samples_vec g_source_samples;
+  sfft_complex g_fft_complex;
 
   vradio_vec g_vradios;
   iq_map_vec g_subcarriers_map; // mapping of subcarriers
 
  public:
+  Hypervisor();
   Hypervisor(size_t _fft_m_len,
              double central_frequency,
              double bandwidth);
@@ -60,20 +65,15 @@ class HYDRA_API Hypervisor
   size_t create_vradio(double cf, double bandwidth);
 
   /**
+   */
+  void attach_virtual_radio(VirtualRadioPtr vr);
+  bool detach_virtual_radio(size_t radio_id);
+
+  /**
    * @param idx
    * @return vradio_ptr to VR
    */
-  VirtualRadio * const get_vradio(size_t idx);
-
-  /** Get total number of subcarriers, i.e., FFT M
-   * @return fft_m_len
-   */
-  size_t const get_total_subcarriers() { return fft_m_len; }
-
-  /** Get total of subcarriers allocated
-   * @return Total of subcarriers allocated
-   */
-  size_t const get_allocated_subcarriers();
+  VirtualRadioPtr const get_vradio(size_t idx) { return g_vradios[idx]; };
 
   /** Called by Virtual Radio instances to notify changes
    * @param vr
@@ -81,15 +81,22 @@ class HYDRA_API Hypervisor
    */
   int notify(VirtualRadio &vr);
 
-  /**
-   * @param cf central frequency
-   */
-  void set_central_frequency(double cf){ g_cf = cf; }
+  void set_tx_resources(double cf, double bw, size_t fft_len);
+  void set_tx_bandwidth(double bw){ g_tx_bw = bw; }
+  void set_tx_central_frequency(double cf){ g_tx_cf = cf; }
+  double const get_tx_central_frequency() { return g_tx_cf; }
+  double const get_tx_bandwidth() { return g_tx_bw; }
+  size_t const get_tx_fft() { return tx_fft_len; }
 
-  /**
-   * @param bw The hypervisor bandwidth
-   */
-  void set_bandwidth(double bw){ g_bw = bw; }
+  void tx_run();
+
+  void set_rx_resources(double cf, double bw, size_t fft_len);
+  void set_rx_bandwidth(double bw){ g_rx_bw = bw; }
+  void set_rx_central_frequency(double cf){ g_rx_cf = cf; }
+  double const get_rx_central_frequency() { return g_rx_cf; }
+  double const get_rx_bandwidth() { return g_rx_bw; }
+  size_t const get_rx_fft() { return rx_fft_len; }
+
 
   /** Map all virtual radios to subcarriers. Reset all mapping.
    */
@@ -110,15 +117,10 @@ class HYDRA_API Hypervisor
                         gr_vector_const_void_star &input_items);
 
   /**
-   * @param output_buff
-   * @param max_noutput_items
-   * @return 
    */
-  size_t sink_outbuf(gr_vector_void_star &output_items, size_t max_noutput_items);
+  bool const tx_window_ready();
+ size_t get_tx_window(gr_complex *optr, size_t len);
 
-  /**
-   */
-  bool const sink_ready();
 
   /**
    * @param noutput_items
@@ -139,9 +141,7 @@ class HYDRA_API Hypervisor
   bool const source_ready();
 };
 
-typedef boost::shared_ptr<Hypervisor> hypervisor_ptr;
-
-} /* namespace hydra */
-} /* namespace gr */
+   }; /* namespace hydra */
+}; /* namespace gr */
 
 #endif /*  INCLUDED_HYDRA_HYPERVISOR_H */

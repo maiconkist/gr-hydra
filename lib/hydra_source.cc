@@ -79,7 +79,7 @@ hydra_source::general_work(int noutput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
 {
-
+#if 0
    size_t consumed = g_hypervisor->source_add_samples(noutput_items,
          ninput_items,
          input_items);
@@ -93,6 +93,7 @@ hydra_source::general_work(int noutput_items,
    for (size_t idx = 0; idx < output_items.size(); ++idx)
       produce(idx, nproduced[idx]);
 
+#endif
    return WORK_CALLED_PRODUCE;
 }
 

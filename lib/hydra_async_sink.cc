@@ -63,8 +63,7 @@ hydra_async_sink::hydra_async_sink(size_t _n_inputs,
       std::string msg_id = std::string("vr") + std::to_string(i);
       message_port_register_in(pmt::mp(msg_id));
 
-      set_msg_handler(pmt::mp(msg_id),
-                      boost::bind(&hydra_async_sink::handle_msg, this, _1, i));
+      //set_msg_handler(pmt::mp(msg_id), boost::bind(&hydra_async_sink::handle_msg, this, _1, i));
    }
 
    g_hypervisor->set_radio_mapping();
@@ -100,9 +99,9 @@ hydra_async_sink::general_work(int noutput_items,
       gr_vector_void_star &output_items)
 {
    // Gen output
-   int t = g_hypervisor->sink_outbuf(output_items, noutput_items);
+   //int t = g_hypervisor->sink_outbuf(output_items, noutput_items);
 
-   return t;
+   return 0;
 }
 
 } /* namespace hydra */

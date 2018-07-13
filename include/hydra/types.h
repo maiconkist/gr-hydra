@@ -23,17 +23,26 @@
 
 #include <vector>
 #include <queue>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <gnuradio/types.h>
 
 namespace gr {
   namespace hydra {
-    typedef boost::shared_ptr<gr_complex[]> samples_ptr;
+    class Hypervisor;
+    class VirtualRadio;
+
+
+    typedef std::shared_ptr<gr_complex[]> samples_ptr;
     typedef std::vector<gr_complex> samples_vec;
     typedef std::queue<samples_vec> samples_vec_vec;
 
     typedef std::vector<int> iq_map_vec;
+
+    typedef std::shared_ptr<Hypervisor> HypervisorPtr;
+    typedef std::shared_ptr<VirtualRadio> VirtualRadioPtr;
+
+
   } /* namespace hydra */
 
 } /* namespace gr */

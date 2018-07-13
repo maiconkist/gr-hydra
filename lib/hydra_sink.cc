@@ -70,11 +70,11 @@ void
 hydra_sink::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 {
    size_t ninput = ninput_items_required.size();
-   int factor = noutput_items / g_hypervisor->get_total_subcarriers();
+   int factor = noutput_items / g_hypervisor->get_tx_fft();
 
    for (size_t i = 0; i < ninput; ++i)
    {
-      ninput_items_required[i] = g_hypervisor->get_vradio(i)->get_subcarriers() * factor;
+      ninput_items_required[i] = g_hypervisor->get_vradio(i)->get_tx_fft() * factor;
    }
 }
 
@@ -84,16 +84,36 @@ hydra_sink::general_work(int noutput_items,
       gr_vector_const_void_star &input_items,
       gr_vector_void_star &output_items)
 {
+
    // forward to hypervisor
-   g_hypervisor->sink_add_samples(noutput_items, ninput_items, input_items);
+   int factor = noutput_items / g_hypervisor->get_tx_fft();
+   for (size_t i = 0; i < ninput_items.size(); i++)
+   {
+      // For each input port
+      // Get the input port buffer
+      // Send the buffer to the correct virtual radio
+      // TRICKY: Im assuming that input port 0 is mapped to Virtual Radio 0
+      //         ........................... 1 .......................... 1
+      //         ........................... 2 .......................... 2
+      //         ........................... N .......................... N
+      g_hypervisor->get_vradio(i)->add_sink_sample((const gr_complex *) input_items[i],
+                                     g_hypervisor->get_vradio(i)->get_tx_fft() * factor);
+      ninput_items[i] = g_hypervisor->get_vradio(i)->get_tx_fft() * factor;
+   }
 
    // Consume the items in the input port i
    for (size_t i = 0; i < ninput_items.size(); ++i)
      consume(i, ninput_items[i]);
 
 	 // Gen output
-   int t = g_hypervisor->sink_outbuf(output_items, noutput_items);
-   produce(0, t);
+   gr_complex *optr = (gr_complex *) output_items[0];
+   size_t ncur_output_items = 0;
+   while (g_hypervisor->tx_window_ready() && ncur_output_items < noutput_items)
+   {
+      size_t n_window = g_hypervisor->get_tx_window(optr + ncur_output_items, n_window);
+      ncur_output_items += n_window;
+   }
+   produce(0, ncur_output_items);
 
    return WORK_CALLED_PRODUCE;
 }

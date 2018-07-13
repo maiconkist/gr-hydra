@@ -33,7 +33,7 @@ namespace gr {
 class HYDRA_API hydra_block: virtual public gr::block
 {
  protected:
-  hypervisor_ptr g_hypervisor;
+  HypervisorPtr g_hypervisor;
   size_t fft_m_len;
 
  public:
@@ -42,7 +42,7 @@ class HYDRA_API hydra_block: virtual public gr::block
               double central_frequency,
               double bandwidth)
     {
-      g_hypervisor = hypervisor_ptr(new Hypervisor(_fft_m_len, central_frequency, bandwidth));
+      g_hypervisor = HypervisorPtr(new Hypervisor(_fft_m_len, central_frequency, bandwidth));
     }
 
   /**

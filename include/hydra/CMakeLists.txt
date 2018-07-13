@@ -28,4 +28,13 @@ install(FILES
     hydra_sink.h
     hydra_async_sink.h
     hydra_source.h
+    hydra_buffer.h
+    hydra_socket.h
+    hydra_stats.h
+    hydra_resource.h
+    hydra_core.h
+    hydra_server.h
+    hydra_client.h
+    hydra_main.h
+    hydra_xvl_wrapper.h
 	 DESTINATION include/hydra)
