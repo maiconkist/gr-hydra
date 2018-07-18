@@ -87,9 +87,6 @@ hydra_async_sink::handle_msg(pmt::pmt_t val, size_t radio_id)
    {
         xv = pmt::c32vector_elements(val);
    }
-
-   g_hypervisor->get_vradio(radio_id)->add_sink_sample(
-      (const gr_complex *) &xv[0], xv.size());
 }
 
 int

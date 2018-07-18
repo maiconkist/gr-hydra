@@ -25,6 +25,27 @@ RxBuffer::RxBuffer(
   buffer_thread = std::make_unique<std::thread>(&RxBuffer::run, this);
 }
 
+
+const window *
+RxBuffer::consume()
+{
+   std::lock_guard<std::mutex> _l(out_mtx);
+
+   if (output_buffer.size())
+   {
+      std::cout << "returning consume data" << std::endl;
+      never_delete = output_buffer.front();
+      output_buffer.pop_front();
+   }
+   else
+   {
+      std::cout << "returning consume nullptr" << std::endl;
+      return nullptr;
+   }
+
+   return &never_delete;
+}
+
 void RxBuffer::run()
 {
   // Thread stop condition
@@ -45,6 +66,7 @@ void RxBuffer::run()
      std::this_thread::sleep_for(std::chrono::nanoseconds(l_threshold));
      // If the destructor has been called
      if (thr_stop){return;}
+
      // Lock access to the buffer
 
      // Windows not being consumed
@@ -114,6 +136,7 @@ void RxBuffer::run()
            out_mtx.unlock();
         }
      } // Too much data check
+
      // std::cout << output_buffer.size() << std::endl;
   } // End of loop
 } // End of method

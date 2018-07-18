@@ -27,6 +27,8 @@
 
 #include <gnuradio/types.h>
 
+typedef std::vector<std::complex<float> > iq_window;
+
 namespace gr {
   namespace hydra {
     class Hypervisor;

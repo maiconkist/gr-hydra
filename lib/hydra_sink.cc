@@ -96,8 +96,7 @@ hydra_sink::general_work(int noutput_items,
       //         ........................... 1 .......................... 1
       //         ........................... 2 .......................... 2
       //         ........................... N .......................... N
-      g_hypervisor->get_vradio(i)->add_sink_sample((const gr_complex *) input_items[i],
-                                     g_hypervisor->get_vradio(i)->get_tx_fft() * factor);
+      //g_hypervisor->get_vradio(i)->add_sink_sample((const gr_complex *) input_items[i], g_hypervisor->get_vradio(i)->get_tx_fft() * factor);
       ninput_items[i] = g_hypervisor->get_vradio(i)->get_tx_fft() * factor;
    }
 
@@ -108,7 +107,7 @@ hydra_sink::general_work(int noutput_items,
 	 // Gen output
    gr_complex *optr = (gr_complex *) output_items[0];
    size_t ncur_output_items = 0;
-   while (g_hypervisor->tx_window_ready() && ncur_output_items < noutput_items)
+   while (ncur_output_items < noutput_items)
    {
       size_t n_window = g_hypervisor->get_tx_window(optr + ncur_output_items, n_window);
       ncur_output_items += n_window;

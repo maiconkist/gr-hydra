@@ -26,6 +26,7 @@
 
 #include <opencv2/opencv.hpp>
 
+
 namespace gr {
    namespace hydra {
 
@@ -40,7 +41,7 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
         tx_fft_len(_fft_m_len),
         g_tx_cf(central_frequency),
         g_tx_bw(bandwidth),
-        g_subcarriers_map(_fft_m_len, -1)
+        g_tx_subcarriers_map(_fft_m_len, -1)
 {
    g_fft_complex  = sfft_complex(new gr::hydra::fft_complex(rx_fft_len));
    g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(tx_fft_len, false));
@@ -55,7 +56,7 @@ Hypervisor::create_vradio(double cf, double bandwidth)
 {
    size_t fft_n = bandwidth / (g_tx_bw / tx_fft_len);
 
-   vradio_ptr vradio(new VirtualRadio(g_vradios.size()));
+   vradio_ptr vradio(new VirtualRadio(g_vradios.size(), this));
    g_vradios.push_back(vradio);
 
    // ID representing the radio;
@@ -65,20 +66,33 @@ Hypervisor::create_vradio(double cf, double bandwidth)
 void
 Hypervisor::attach_virtual_radio(VirtualRadioPtr vradio)
 {
-   for (vradio_vec::const_iterator it = g_vradios.begin(); it != g_vradios.end(); ++it)
-   {
-      if (vradio->get_id() == (*it)->get_id())
-         return;
-   }
+   // Check if VirtualRadio with same id is already attached
+   auto vr = get_vradio(vradio->get_id());
+   if (vr != nullptr)
+      return;
 
    g_vradios.push_back(vradio);
 }
+
+VirtualRadioPtr
+const Hypervisor::get_vradio(size_t id)
+{
+   auto it = std::find_if(g_vradios.begin(), g_vradios.end(),
+                          [id](const VirtualRadioPtr obj) {return obj->get_id() == id;});
+
+   if (it == g_vradios.end())
+      return nullptr;
+
+   return *it;
+}
+
 
 bool
 Hypervisor::detach_virtual_radio(size_t radio_id)
 {
    auto new_end = std::remove_if(g_vradios.begin(), g_vradios.end(),
-                                 [radio_id](const auto & vr) { return vr->get_id() == radio_id; });
+                                 [radio_id](const auto & vr) {
+                                    return vr->get_id() == radio_id; });
 
    g_vradios.erase(new_end, g_vradios.end());
 
@@ -88,7 +102,7 @@ Hypervisor::detach_virtual_radio(size_t radio_id)
 int
 Hypervisor::notify(VirtualRadio &vr)
 {
-   iq_map_vec subcarriers_map = g_subcarriers_map;
+   iq_map_vec subcarriers_map = g_tx_subcarriers_map;
    std::replace(subcarriers_map.begin(),
                 subcarriers_map.end(),
                 vr.get_id(),
@@ -98,7 +112,7 @@ Hypervisor::notify(VirtualRadio &vr)
    if (set_radio_mapping(vr, subcarriers_map ) > 0)
    {
       //LOG(INFO) << "success";
-      g_subcarriers_map = subcarriers_map;
+      g_tx_subcarriers_map = subcarriers_map;
       return 1;
    }
 
@@ -111,7 +125,8 @@ Hypervisor::set_tx_resources(double cf, double bw, size_t fft)
    g_tx_cf = cf;
    g_tx_bw = bw;
    tx_fft_len = fft;
-   g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(tx_fft_len, false));
+   g_tx_subcarriers_map = iq_map_vec(fft, -1);
+   g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(fft, false));
 
    g_tx_thread = std::make_unique<std::thread>(&Hypervisor::tx_run, this);
 }
@@ -119,15 +134,12 @@ Hypervisor::set_tx_resources(double cf, double bw, size_t fft)
 void
 Hypervisor::tx_run()
 {
-   std::cout << "p1" << std::endl;
-
    size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e9 / get_tx_bandwidth());
-   std::cout << get_tx_fft() << std::endl;
 
+#define groupl 10
+#define bufferlen get_tx_fft() * groupl
 
-   gr_complex optr[ get_tx_fft() * 10 ];
-
-   std::cout << "p2" << std::endl;
+   gr_complex optr[bufferlen];
 
    size_t the_shift = 0;
    size_t img_counter = 0;
@@ -135,20 +147,18 @@ Hypervisor::tx_run()
    while (true)
    {
       std::this_thread::sleep_for(std::chrono::nanoseconds(g_tx_sleep_time));
-      std::cout << the_shift << std::endl;
       get_tx_window(&optr[0] + the_shift, get_tx_fft());
       the_shift += get_tx_fft();
 
-#if 0
-      if (the_shift == 300)
+      if (the_shift == bufferlen )
       {
-         cv::Mat img(get_tx_fft(), 300, CV_8UC3, cv::Scalar(0,0,0));
+         cv::Mat img(groupl, get_tx_fft(),  CV_8UC3, cv::Scalar(0,0,0));
          cv::Mat image = img;
          for(int x=0; x< img.cols; x++)
          {
             for(int y=0;y<img.rows;y++)
             {
-               std::complex<float> val = optr[x * 300 + y];
+               std::complex<float> val = optr[x * groupl + y];
                float mag = std::abs(val);
 
                cv::Vec3b color = image.at<cv::Vec3b>(cv::Point(x,y));
@@ -160,9 +170,10 @@ Hypervisor::tx_run()
             }
          }
          the_shift = 0;
-         cv::imwrite(std::string("waterfall_" + std::to_string(img_counter) + ".png"), img);
+
+         cv::imwrite(std::string("./waterfall_" + std::to_string(img_counter) + ".png"), img);
+         img_counter++;
       }
-#endif
    }
 }
 
@@ -190,7 +201,7 @@ Hypervisor::set_radio_mapping()
         std::cout << "setting map for VR " << (*it)->get_id() << std::endl;
         set_radio_mapping(*((*it).get()), subcarriers_map);
      }
-     g_subcarriers_map = subcarriers_map;
+     g_tx_subcarriers_map = subcarriers_map;
 }
 
 int
@@ -215,8 +226,10 @@ Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    iq_map_vec the_map;
    for (; sc < tx_fft_len; sc++)
    {
+
       //LOG_IF(subcarriers_map[sc] != -1, INFO) << "Subcarrier @" <<  sc << " already allocated";
-      if (subcarriers_map[sc] != -1) return -1;
+      if (subcarriers_map[sc] != -1)
+         return -1;
 
       the_map.push_back(sc);
       subcarriers_map[sc] = vr.get_id();
@@ -225,40 +238,26 @@ Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
       if (the_map.size() == fft_n)
          break;
    }
-
    vr.set_tx_fft(fft_n);
    vr.set_iq_mapping(the_map);
 
    return 1;
 }
 
-bool const
-Hypervisor::tx_window_ready()
-{
-   for (vradio_vec::iterator it = g_vradios.begin();
-         it != g_vradios.end();
-         ++it)
-   {
-      if (!(*it)->ready_to_map_iq_samples())
-         return false;
-   }
-
-   return true;
-}
-
 size_t
 Hypervisor::get_tx_window(gr_complex *optr, size_t len)
 {
-   if (!tx_window_ready())
-      return 0;
-
    for (vradio_vec::iterator it = g_vradios.begin();
         it != g_vradios.end();
         ++it)
    {
-      (*it)->map_iq_samples(g_ifft_complex->get_inbuf());
+      std::cout << "ready to map iq samples" << std::endl;
+      (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
+      std::cout << "done bro" << std::endl;
+
    }
    // Transform buffer from FREQ domain to TIME domain using IFFT
+
    g_ifft_complex->execute();
 
    std::copy(g_ifft_complex->get_outbuf(),

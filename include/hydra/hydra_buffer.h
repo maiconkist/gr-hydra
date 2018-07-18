@@ -4,16 +4,18 @@
 #include <queue>
 #include <vector>
 #include <complex>
-
 #include <thread>
 #include <mutex>
 #include <chrono>
 #include <iostream>
 #include <math.h>
 
+#include <hydra/types.h>
+
 typedef std::complex<float> iq_sample;
 typedef std::deque<iq_sample> iq_stream;
-typedef std::deque<std::vector<iq_sample>> window_stream;
+typedef std::vector<iq_sample> window;
+typedef std::deque<window> window_stream;
 
 class RxBuffer
 {
@@ -45,7 +47,7 @@ public:
             std::mutex* in_mtx,
             float sampling_rate,
             unsigned int fft_size,
-            bool pad = false);
+            bool pad);
 
    // DTOR
    ~RxBuffer()
@@ -58,6 +60,9 @@ public:
 
    // Method to receive UDP data and put it into a buffer
    void run();
+
+   window never_delete;
+   const iq_window * consume();
 
    // Returns pointer to the output buffer of windows
    window_stream* windows(){return &output_buffer;};
@@ -74,6 +79,7 @@ public:
             std::mutex* in_mtx,
             double sampling_rate,
             unsigned int fft_size);
+
    // Destructor
    ~TxBuffer()
    {
@@ -90,7 +96,6 @@ public:
    iq_stream* stream(){return &output_buffer;};
    // Returns pointer to the mutex
    std::mutex* mutex() {return &out_mtx;};
-
 
 private:
    // Pointer to the input FFT
@@ -111,7 +116,6 @@ private:
    std::mutex out_mtx;
    // Thread stop condition
    bool thr_stop;
-
 };
 
 typedef std::unique_ptr<RxBuffer> RxBufferPtr;

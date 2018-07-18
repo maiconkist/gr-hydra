@@ -22,12 +22,15 @@
 #include <hydra/hydra_hypervisor.h>
 
 #include <iostream>
+#include <numeric>
+
 
 namespace gr {
    namespace hydra {
 
-VirtualRadio::VirtualRadio(size_t _idx):
+VirtualRadio::VirtualRadio(size_t _idx, Hypervisor *hypervisor):
    g_idx(_idx),
+   p_hypervisor(hypervisor),
    b_receiver(false),
    b_transmitter(false)
 {
@@ -36,9 +39,7 @@ VirtualRadio::VirtualRadio(size_t _idx):
 int
 VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                            double d_rx_freq,
-                           double d_rx_bw,
-                           unsigned int u_rx_fft,
-                           bool b_pad)
+                           double d_rx_bw)
 {
   // If already receiving
   if (b_receiver)
@@ -50,26 +51,32 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   // Set the VR RX UDP port
   u_rx_udp_port = u_rx_udp;
   // Set the VR RX FFT size
-  u_rx_fft_size = u_rx_fft;
+  u_rx_fft_size = 1;
 
-  // Create UDP receiver
-  rx_socket = std::make_unique<RxUDP>("0.0.0.0", std::to_string(u_rx_udp_port));
-  // Create new timed buffer
-  rx_buffer = std::make_unique<RxBuffer>(rx_socket->buffer(),
-                                         rx_socket->mutex(),
+
+  // TODO this must be shared with the hypervisor, or come from it
+  std::mutex * hyp_mutex = new std::mutex;
+  rx_windows = new window_stream;
+  // Create new TX timed buffer
+  rx_buffer = std::make_unique<TxBuffer>(rx_windows,
+                                         hyp_mutex,
                                          d_rx_bw,
-                                         u_rx_fft_size,
-                                         b_pad);
+                                         u_rx_fft_size);
 
-  // Get the pointer to the FFT window array
-  rx_windows = rx_buffer->windows();
+  // Create UDP transmitter
+  rx_socket = std::make_unique<TxUDP>(rx_buffer->stream(),
+                                      rx_buffer->mutex(),
+                                      "0.0.0.0",
+                                      std::to_string(u_rx_udp_port));
+
+
   // Toggle receiving flag
   b_receiver = true;
 
-  g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(u_rx_fft_size, false));
+
 
   // Create reports object
-  rx_report = std::make_unique<xvl_report>(g_idx, rx_socket->buffer());
+  //rx_report = std::make_unique<xvl_report>(g_idx, rx_socket->buffer());
 
   // Successful return
   return 0;
@@ -77,38 +84,46 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
 
 int
 VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
-                           double d_tx_centre_freq,
+                           double d_tx_cf,
                            double d_tx_bw,
-                           unsigned int u_tx_fft)
+                           bool b_pad)
 {
    // If already transmitting
    if (b_transmitter)
-   {
       // Return error
       return 1;
-   }
+
    // Set the VR TX UDP port
    u_tx_udp_port = u_tx_udp;
-   // Set the VR TX FFT size
-   u_tx_fft_size = u_tx_fft;
+   g_tx_bw = d_tx_bw;
+   g_tx_cf = d_tx_cf;
 
-   // TODO this must be shared with the hypervisor, or come from it
-   std::mutex * hyp_mutex = new std::mutex;
-   tx_windows = new window_stream;
-   // Create new TX timed buffer
-   tx_buffer = std::make_unique<TxBuffer>(tx_windows,
-                                          hyp_mutex,
+   u_tx_fft_size = p_hypervisor->get_tx_fft() * (d_tx_bw / p_hypervisor->get_tx_bandwidth());
+   std::cout << "fft size: " << u_tx_fft_size
+             << ", " << p_hypervisor->get_tx_fft()
+             << "d_tx_bw: " << d_tx_bw
+             << "hyp bw: " << p_hypervisor->get_tx_bandwidth()
+             << std::endl;
+
+   // Create UDP receiver
+   tx_socket = std::make_unique<RxUDP>("0.0.0.0", std::to_string(u_tx_udp_port));
+
+   // Create new timed buffer
+   tx_buffer = std::make_unique<RxBuffer>(tx_socket->buffer(),
+                                          tx_socket->mutex(),
                                           d_tx_bw,
-                                          u_tx_fft_size);
+                                          u_tx_fft_size,
+                                          b_pad);
 
-   // Create UDP transmitter
-   tx_socket = std::make_unique<TxUDP>(tx_buffer->stream(),
-                                       tx_buffer->mutex(),
-                                       "0.0.0.0",
-                                       std::to_string(u_tx_udp_port));
+   // create fft object
+   g_fft_complex  = sfft_complex(new fft_complex(u_tx_fft_size));
+
+
 
    // Toggle transmitting flag
    b_transmitter = true;
+   p_hypervisor->notify(*this);
+
 
    // TODO Create TX reports object
    // tx_report = std::make_unique<xvl_report>(u_id, tx_socket->windows());
@@ -123,7 +138,7 @@ VirtualRadio::set_central_frequency(double cf)
    double old_cf = g_tx_cf;
    g_tx_cf = cf;
 
-   int err = g_hypervisor->notify(*this);
+   int err = p_hypervisor->notify(*this);
    if (err < 0)
       g_tx_cf = old_cf;
 
@@ -136,16 +151,9 @@ VirtualRadio::set_bandwidth(double bw)
    double old_bw = g_tx_bw;
    g_tx_bw = bw;
 
-   int err = g_hypervisor->notify(*this);
+   int err = p_hypervisor->notify(*this);
    if (err < 0)
       g_tx_bw = old_bw;
-}
-
-void
-VirtualRadio::add_sink_sample(const gr_complex *samples, size_t len)
-{
-   std::lock_guard<std::mutex> _l(g_mutex);
-   g_tx_samples.insert(g_tx_samples.end(), samples, samples + len);
 }
 
 void
@@ -181,22 +189,32 @@ VirtualRadio::get_source_samples(size_t noutput_items, gr_complex *samples_buff)
 }
 
 bool
-VirtualRadio::map_iq_samples(gr_complex *samples_buf)
+VirtualRadio::map_tx_samples(gr_complex *samples_buf)
 {
    std::lock_guard<std::mutex> _l(g_mutex);
 
-   if (!ready_to_map_iq_samples()) return false;
+   const iq_window * buf = tx_buffer->consume();
+   if (buf == nullptr){
+      return false;
+   }
+
+   const gr_complex *window = reinterpret_cast<const gr_complex*>(buf->data());
+
+   std::cout << "buf data size: " << buf->size() << std::endl;
+   std::cout << "u_tx_fft_size: " << u_tx_fft_size << std::endl;
 
    // Copy samples in TIME domain to FFT buffer, execute FFT
-   std::cout << "Entered VR " << g_idx << std::endl;
-   g_fft_complex->set_data(&g_tx_samples[0], u_rx_fft_size);
-
+   g_fft_complex->set_data(window, u_tx_fft_size);
+   std::cout << "execute " << std::endl;
    g_fft_complex->execute();
+
+   std::cout << "outbuf " << std::endl;
    gr_complex *outbuf = g_fft_complex->get_outbuf();
 
    // map samples in FREQ domain to samples_buff
    // perfors fft shift
    size_t idx = 0;
+   std::cout << "map " << std::endl;
    for (iq_map_vec::iterator it = g_iq_map.begin();
          it != g_iq_map.end();
          ++it, ++idx)
@@ -204,25 +222,8 @@ VirtualRadio::map_iq_samples(gr_complex *samples_buf)
       samples_buf[*it] = outbuf[idx]; 
    }
 
-   // Delete samples from our buffer
-   g_tx_samples.erase(g_tx_samples.begin(), g_tx_samples.begin() + u_tx_fft_size);
-
    std::cout << "Exit VR " << g_idx << std::endl;
    return true;
-}
-
-bool const
-VirtualRadio::ready_to_map_iq_samples()
-{
-   if (g_tx_samples.size() < u_tx_fft_size)
-      return false;
-   return true;
-}
-
-bool const
-VirtualRadio::ready_to_demap_iq_samples()
-{
-   return g_rx_samples.size() > 0;
 }
 
 } /* namespace hydra */

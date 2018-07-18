@@ -9,3 +9,7 @@ target_link_libraries(server gnuradio-hydra)
 # Add the Client executable
 add_executable(client client.cc)
 target_link_libraries(client gnuradio-hydra)
+
+
+add_executable(iq_generator iq_generator.cc)
+target_link_libraries(iq_generator gnuradio-hydra)

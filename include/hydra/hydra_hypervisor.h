@@ -41,6 +41,7 @@ class HYDRA_API Hypervisor
   double g_tx_bw; // Hypervisor bandwidth
   sfft_complex g_ifft_complex;
   std::unique_ptr<std::thread> g_tx_thread;
+  iq_map_vec g_tx_subcarriers_map; // mapping of subcarriers
 
   size_t rx_fft_len; // FFT M length
   double g_rx_cf; // Hypervisor central frequency
@@ -49,7 +50,6 @@ class HYDRA_API Hypervisor
   sfft_complex g_fft_complex;
 
   vradio_vec g_vradios;
-  iq_map_vec g_subcarriers_map; // mapping of subcarriers
 
  public:
   Hypervisor();
@@ -73,7 +73,7 @@ class HYDRA_API Hypervisor
    * @param idx
    * @return vradio_ptr to VR
    */
-  VirtualRadioPtr const get_vradio(size_t idx) { return g_vradios[idx]; };
+  VirtualRadioPtr const get_vradio(size_t idx);
 
   /** Called by Virtual Radio instances to notify changes
    * @param vr
@@ -118,7 +118,6 @@ class HYDRA_API Hypervisor
 
   /**
    */
-  bool const tx_window_ready();
  size_t get_tx_window(gr_complex *optr, size_t len);
 
 

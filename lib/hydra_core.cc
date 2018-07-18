@@ -70,7 +70,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
 
   // Calculate the virtual radio RX FFT size
   unsigned int u_vr_fft_size = p_hypervisor->get_rx_fft() * (d_bandwidth / p_hypervisor->get_rx_bandwidth());
-  vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth, u_vr_fft_size);
+  vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth);
   p_hypervisor->attach_virtual_radio(vr);
 
    // If able to create all of it, return the port number
@@ -80,45 +80,42 @@ HydraCore::request_rx_resources(unsigned int u_id,
 int
 HydraCore::request_tx_resources(unsigned int u_id,
                                 double d_centre_freq,
-                                double d_bandwidth)
+                                double d_bandwidth,
+                                bool bpad)
 {
   // If not configured to transmit
   if (not b_transmitter)
-    {
+  {
       // Return error -- zero is bad
       return 0;
   }
 
   // Tey to find the given VR
   auto vr = p_hypervisor->get_vradio(u_id);
-  if (vr != nullptr)
-    {
-      // If it is not transmitting
-      if(not vr->get_tx_enabled())
-        {
-          // Return error -- zero is bad
-          return 0;
-        }
-    }
+
+  if (vr != nullptr and not vr->get_tx_enabled())
+     // requesting tx resources for a VR already existing 
+     return 0;
 
   // Try to reserve the resource chunks
   if(p_resource_manager->reserve_tx_resources(u_id, d_centre_freq, d_bandwidth))
+     return 0;
+
+  static size_t u_udp_port = 7000;
+  if (vr == nullptr)
   {
-    // Return error -- zero is bad
-    return 0;
+     vr = std::make_shared<gr::hydra::VirtualRadio>(u_id, p_hypervisor.get());
+     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, bpad);
+     p_hypervisor->attach_virtual_radio(vr);
+  }
+  else
+  {
+     vr->set_tx_chain(vr->get_tx_udp_port(), d_centre_freq, d_bandwidth, bpad);
   }
 
-  // Create TX UDP port
-  static size_t u_udp_port = 7000;
-
-  unsigned int u_vr_fft_size = p_hypervisor->get_tx_fft() * (d_bandwidth / p_hypervisor->get_tx_bandwidth());
-  vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, u_vr_fft_size);
-  p_hypervisor->attach_virtual_radio(vr);
-
-   // If able to create all of it, return the port number
+  // If able to create all of it, return the port number
   return u_udp_port++;
 }
-
 
 // Query the virtual radios (and add their UDP port)
 boost::property_tree::ptree

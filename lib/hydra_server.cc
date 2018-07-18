@@ -123,7 +123,7 @@ HydraServer::run()
         else
         {
           // Try to reserve TX resources
-          u_reserved = p_core->request_tx_resources(u_id, d_cf, d_bw);
+          u_reserved = p_core->request_tx_resources(u_id, d_cf, d_bw, true);
         }
 
         // If not able to reserve resources

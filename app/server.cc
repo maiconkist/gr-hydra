@@ -16,7 +16,7 @@ int main()
   // Sampling rate in mega samples per second
   double d_tx_samp_rate = 20e6;
   // FFT size
-  unsigned int u_tx_fft_size = 2000;
+  unsigned int u_tx_fft_size = 2048;
 
   // Control port
   unsigned int u_port = 5000;

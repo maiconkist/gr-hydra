@@ -36,25 +36,22 @@ namespace gr {
 
 typedef std::deque<std::vector<iq_sample>> window_stream;
 
-
 class HYDRA_API VirtualRadio
 {
 public:
   /** CTOR
    * @param _idx
    */
- VirtualRadio(size_t _idx);
+ VirtualRadio(size_t _idx, Hypervisor *hypervisor);
 
  int set_rx_chain(unsigned int u_rx_udp,
                   double d_rx_centre_freq,
-                  double d_rx_bw,
-                  unsigned int u_rx_fft,
-                  bool b_pad = false);
+                  double d_rx_bw);
 
  int set_tx_chain(unsigned int u_tx_udp,
                   double d_tx_centre_freq,
                   double d_tx_bw,
-                  unsigned int u_tx_fft_size);
+                  bool b_pad = false);
 
   /** Return VRadio unique ID
    * @return VRadio ID
@@ -68,7 +65,6 @@ public:
   double const get_tx_bandwidth() {return g_tx_bw;}
 
   size_t const set_tx_fft(size_t n) {return u_tx_fft_size = n;}
-
 
   bool const get_rx_enabled(){ return true; };
   size_t const get_rx_udp_port(){ return u_rx_udp_port; }
@@ -86,13 +82,6 @@ public:
    * @param bw
    */
   void set_bandwidth(double bw);
-
-  /** Added the buff samples to the VR tx queue.
-   *
-   * @param samples The samples  that must be added to the VR tx queue.
-   * @param len samples lenght.
-   */
-  void add_sink_sample(const gr_complex *samples, size_t len);
 
   /**
    * @param iq_map
@@ -114,11 +103,7 @@ public:
   /**
    * @param samples_buf
    */
-  bool map_iq_samples(gr_complex *samples_buf);
-
-  /**
-   */
-  bool const ready_to_map_iq_samples();
+  bool map_tx_samples(gr_complex *samples_buf);
 
   /**
    */
@@ -126,36 +111,34 @@ public:
 
 private:
   size_t u_rx_fft_size; // Subcarriers used by this VRadio
-  window_stream* rx_windows;
   size_t u_rx_udp_port;
   bool b_receiver;
-  RxUDPPtr rx_socket;
-  RxBufferPtr rx_buffer;
   ReportPtr rx_report;
   double g_rx_cf;      // Central frequency
   double g_rx_bw;      // Bandwidth 
+  
   samples_vec g_rx_samples;
   sfft_complex g_ifft_complex;
+  TxUDPPtr rx_socket;
+  TxBufferPtr rx_buffer;
+  window_stream* rx_windows;
 
   size_t u_tx_fft_size; // Subcarriers used by this VRadio
-  window_stream* tx_windows;
   size_t u_tx_udp_port;
   bool b_transmitter;
-  TxUDPPtr tx_socket;
-  TxBufferPtr tx_buffer;
   ReportPtr tx_report;
   double g_tx_cf;      // Central frequency
   double g_tx_bw;      // Bandwidth 
-  samples_vec g_tx_samples;
   sfft_complex g_fft_complex;
-
+  RxBufferPtr tx_buffer;
+  RxUDPPtr tx_socket;
 
   int g_idx;        // Radio unique ID
   iq_map_vec g_iq_map;
   std::mutex g_mutex;
 
   // pointer to this VR hypervisor
-  HypervisorPtr g_hypervisor;
+  Hypervisor *p_hypervisor;
 };
 
 /* TYPEDEFS for this class */
