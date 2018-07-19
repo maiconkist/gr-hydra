@@ -22,8 +22,6 @@
 #include <hydra/hydra_hypervisor.h>
 
 #include <iostream>
-#include <numeric>
-
 
 namespace gr {
    namespace hydra {
@@ -99,11 +97,6 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
    g_tx_cf = d_tx_cf;
 
    u_tx_fft_size = p_hypervisor->get_tx_fft() * (d_tx_bw / p_hypervisor->get_tx_bandwidth());
-   std::cout << "fft size: " << u_tx_fft_size
-             << ", " << p_hypervisor->get_tx_fft()
-             << "d_tx_bw: " << d_tx_bw
-             << "hyp bw: " << p_hypervisor->get_tx_bandwidth()
-             << std::endl;
 
    // Create UDP receiver
    tx_socket = std::make_unique<RxUDP>("0.0.0.0", std::to_string(u_tx_udp_port));
@@ -117,8 +110,6 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
 
    // create fft object
    g_fft_complex  = sfft_complex(new fft_complex(u_tx_fft_size));
-
-
 
    // Toggle transmitting flag
    b_transmitter = true;
@@ -194,27 +185,23 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
    std::lock_guard<std::mutex> _l(g_mutex);
 
    const iq_window * buf = tx_buffer->consume();
+
    if (buf == nullptr){
       return false;
    }
 
-   const gr_complex *window = reinterpret_cast<const gr_complex*>(buf->data());
 
-   std::cout << "buf data size: " << buf->size() << std::endl;
-   std::cout << "u_tx_fft_size: " << u_tx_fft_size << std::endl;
+   const gr_complex *window = reinterpret_cast<const gr_complex*>(buf->data());
 
    // Copy samples in TIME domain to FFT buffer, execute FFT
    g_fft_complex->set_data(window, u_tx_fft_size);
-   std::cout << "execute " << std::endl;
    g_fft_complex->execute();
 
-   std::cout << "outbuf " << std::endl;
    gr_complex *outbuf = g_fft_complex->get_outbuf();
 
    // map samples in FREQ domain to samples_buff
    // perfors fft shift
    size_t idx = 0;
-   std::cout << "map " << std::endl;
    for (iq_map_vec::iterator it = g_iq_map.begin();
          it != g_iq_map.end();
          ++it, ++idx)
@@ -222,7 +209,6 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
       samples_buf[*it] = outbuf[idx]; 
    }
 
-   std::cout << "Exit VR " << g_idx << std::endl;
    return true;
 }
 

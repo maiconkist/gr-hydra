@@ -9,8 +9,6 @@ RxBuffer::RxBuffer(
 {
   // Time threshold - round the division to a long int
   l_threshold = llrint(fft_size * 1e9 / sampling_rate);
-  std::cout << "FFT Size: " << fft_size << "\tSampling Rate: " <<
-     sampling_rate << "\tTime threshold: " << l_threshold << std::endl;
 
   // Number of IQ samples per FFT window
   u_fft_size = fft_size;
@@ -29,17 +27,18 @@ RxBuffer::RxBuffer(
 const window *
 RxBuffer::consume()
 {
+   /* We do an ugly thing here: we have 'never_delete'
+    * storing the data want to be consumed by the hypervisor
+    */
    std::lock_guard<std::mutex> _l(out_mtx);
 
    if (output_buffer.size())
    {
-      std::cout << "returning consume data" << std::endl;
       never_delete = output_buffer.front();
       output_buffer.pop_front();
    }
    else
    {
-      std::cout << "returning consume nullptr" << std::endl;
       return nullptr;
    }
 
@@ -64,11 +63,11 @@ void RxBuffer::run()
   {
      // Wait for "threshold" nanoseconds
      std::this_thread::sleep_for(std::chrono::nanoseconds(l_threshold));
+
      // If the destructor has been called
      if (thr_stop){return;}
 
      // Lock access to the buffer
-
      // Windows not being consumed
      if (output_buffer.size() > 1e3)
      {
@@ -77,7 +76,7 @@ void RxBuffer::run()
      // Plenty of space
      else
      {
-        p_in_mtx->lock();
+        std::lock_guard<std::mutex> _p(*p_in_mtx);
         // Get the current size of the queue
         ll_cur_size = p_input_buffer->size();
         // Check whether the buffer has enough IQ samples
@@ -91,12 +90,8 @@ void RxBuffer::run()
            p_input_buffer->erase(p_input_buffer->begin(),
                                  p_input_buffer->begin() + u_fft_size);
 
-           // Release access to the buffer
-           p_in_mtx->unlock();
-
-           out_mtx.lock();
+           std::lock_guard<std::mutex> _l(out_mtx);
            output_buffer.push_back(window);
-           out_mtx.unlock();
         }
         // Otherwise, the buffer is not ready yet
         else if (b_pad)
@@ -108,36 +103,28 @@ void RxBuffer::run()
            p_input_buffer->erase(p_input_buffer->begin(),
                                  p_input_buffer->begin() + ll_cur_size);
 
-           // Release access to the buffer
-           p_in_mtx->unlock();
-
            // Fill the remainder of the window with complex zeroes
            window.insert(window.begin() + ll_cur_size,
                          u_fft_size - ll_cur_size,
                          empty_iq); // C..F-1
 
            // Add the window to the output buffer
-           out_mtx.lock();
+           std::lock_guard<std::mutex> _l(out_mtx);
            output_buffer.push_back(window);
-           out_mtx.unlock();
         }
         // Without padding, just transmit an empty window and wait for the next one
         else
         {
-           // Release access to the input buffer
-           p_in_mtx->unlock();
-
            // Fill the window with complex zeroes
            window.assign(u_fft_size, empty_iq);
 
            // Add the window to the output buffer
-           out_mtx.lock();
+           std::lock_guard<std::mutex> _l(out_mtx);
            output_buffer.push_back(window);
            out_mtx.unlock();
         }
      } // Too much data check
 
-     // std::cout << output_buffer.size() << std::endl;
   } // End of loop
 } // End of method
 
@@ -150,8 +137,6 @@ TxBuffer::TxBuffer(window_stream* input_buffer,
 {
   // Time threshold - round the division to a long int
   threshold = fft_size * 1e9 / sampling_rate;
-  std::cout << "TX: FFT Size: " << fft_size << "\tSampling Rate: " <<
-    sampling_rate << "\tTime threshold: " << threshold << std::endl;
 
   // Number of IQ samples per FFT window
   u_fft_size = fft_size;

@@ -25,7 +25,7 @@
 #include <iostream>
 
 #include <opencv2/opencv.hpp>
-
+#include <numeric>
 
 namespace gr {
    namespace hydra {
@@ -136,10 +136,10 @@ Hypervisor::tx_run()
 {
    size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e9 / get_tx_bandwidth());
 
-#define groupl 10
+#define groupl 500
 #define bufferlen get_tx_fft() * groupl
 
-   gr_complex optr[bufferlen];
+   gr_complex *optr = new gr_complex [bufferlen];
 
    size_t the_shift = 0;
    size_t img_counter = 0;
@@ -147,32 +147,47 @@ Hypervisor::tx_run()
    while (true)
    {
       std::this_thread::sleep_for(std::chrono::nanoseconds(g_tx_sleep_time));
-      get_tx_window(&optr[0] + the_shift, get_tx_fft());
+      get_tx_window(optr + the_shift, get_tx_fft());
+
       the_shift += get_tx_fft();
-
-      if (the_shift == bufferlen )
+      if (the_shift  == bufferlen )
       {
-         cv::Mat img(groupl, get_tx_fft(),  CV_8UC3, cv::Scalar(0,0,0));
-         cv::Mat image = img;
-         for(int x=0; x< img.cols; x++)
+
+#if 0
+         if (std::accumulate(optr , optr + the_shift, 0.0,
+                             [](double t, const std::complex<float> &f){return t + std::abs(f);}))
          {
-            for(int y=0;y<img.rows;y++)
+            cv::Mat img(groupl, get_tx_fft(),  CV_8UC3, cv::Scalar(0,0,0));
+            cv::Mat image = img;
+
+
+            float max = 0;
+            for(int x=0; x< img.cols; x++)
             {
-               std::complex<float> val = optr[x * groupl + y];
-               float mag = std::abs(val);
-
-               cv::Vec3b color = image.at<cv::Vec3b>(cv::Point(x,y));
-               color.val[0] = uchar(mag * 255.0);
-               color.val[1] = uchar(mag * 255.0);
-               color.val[2] = uchar(mag * 255.0);
-
-               image.at<cv::Vec3b>(cv::Point(x,y)) = color;
+               for(int y=0;y<img.rows;y++)
+               {
+                  float val = std::abs(optr[x * groupl + y]);
+                  if (val > max) max = val;
+               }
             }
-         }
-         the_shift = 0;
 
-         cv::imwrite(std::string("./waterfall_" + std::to_string(img_counter) + ".png"), img);
-         img_counter++;
+            for(int x=0; x< img.cols; x++)
+            {
+               for(int y=0;y<img.rows;y++)
+               {
+                  float val = std::abs(optr[x * groupl + y]);
+                  cv::Vec3b color = image.at<cv::Vec3b>(cv::Point(x,y));
+                  color.val[0] = uchar(val / max * 255.0);
+                  color.val[1] = uchar(val / max * 255.0);
+                  color.val[2] = uchar(val / max * 255.0);
+                  image.at<cv::Vec3b>(cv::Point(x,y)) = color;
+               }
+            }
+            cv::imwrite(std::string("./waterfall_" + std::to_string(img_counter++) + ".png"), img);
+         }
+#endif
+
+         the_shift = 0;
       }
    }
 }
@@ -226,7 +241,6 @@ Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    iq_map_vec the_map;
    for (; sc < tx_fft_len; sc++)
    {
-
       //LOG_IF(subcarriers_map[sc] != -1, INFO) << "Subcarrier @" <<  sc << " already allocated";
       if (subcarriers_map[sc] != -1)
          return -1;
@@ -251,9 +265,7 @@ Hypervisor::get_tx_window(gr_complex *optr, size_t len)
         it != g_vradios.end();
         ++it)
    {
-      std::cout << "ready to map iq samples" << std::endl;
       (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
-      std::cout << "done bro" << std::endl;
 
    }
    // Transform buffer from FREQ domain to TIME domain using IFFT

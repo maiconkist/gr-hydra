@@ -79,31 +79,32 @@ udp_receiver::handle_receive(
       else
       {
         // Lock the mutex
-        out_mtx.lock();
-        // If there is data from a previous transfer
-        if (u_remainder > 0)
-        {
-          // Copy the missing bytes from the input buffer to the remainder buffer
-          std::copy(input_buffer.begin(),
-                    input_buffer.begin() + IQ_SIZE - u_remainder,
-                    remainder_buffer.begin() + u_remainder);
-         // Append this element to the output buffer
-          output_buffer.insert(output_buffer.end(),
-                                remainder_buffer.begin(),
-                                remainder_buffer.begin() + 1);
-          // Clear the remainder
-          u_remainder = 0;
-        }
-        // Calculate the new remainder
-        u_remainder = u_bytes_trans % IQ_SIZE;
+         {
+            std::lock_guard<std::mutex> _l(out_mtx);
+            // If there is data from a previous transfer
+            if (u_remainder > 0)
+            {
+               // Copy the missing bytes from the input buffer to the remainder buffer
+               std::copy(input_buffer.begin(),
+                         input_buffer.begin() + IQ_SIZE - u_remainder,
+                         remainder_buffer.begin() + u_remainder);
+               // Append this element to the output buffer
+               output_buffer.insert(output_buffer.end(),
+                                    remainder_buffer.begin(),
+                                    remainder_buffer.begin() + 1);
+               // Clear the remainder
+               u_remainder = 0;
+            }
+            // Calculate the new remainder
+            u_remainder = u_bytes_trans % IQ_SIZE;
 
-        // Insert new elements in the output buffer
-        output_buffer.insert(output_buffer.end(),
-                              p_reinterpreted_cast,
-                              p_reinterpreted_cast +
-                              (u_bytes_trans - u_remainder)/IQ_SIZE);
-        // Lock the mutex
-        out_mtx.unlock();
+            // Insert new elements in the output buffer
+            output_buffer.insert(output_buffer.end(),
+                                 p_reinterpreted_cast,
+                                 p_reinterpreted_cast +
+                                 (u_bytes_trans - u_remainder)/IQ_SIZE);
+         }
+
 
         // If there is a new remainder
         if (u_remainder > 0)
