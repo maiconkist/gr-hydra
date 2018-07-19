@@ -45,7 +45,7 @@ public:
     long int threshold = lrint(msg.size() / rate);
 
     size_t counter = 0;
-    do 
+    do
     {
       // Sleep and wait for the right time
 

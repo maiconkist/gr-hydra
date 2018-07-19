@@ -190,7 +190,6 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
       return false;
    }
 
-
    const gr_complex *window = reinterpret_cast<const gr_complex*>(buf->data());
 
    // Copy samples in TIME domain to FFT buffer, execute FFT

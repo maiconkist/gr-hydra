@@ -148,25 +148,23 @@ Hypervisor::tx_run()
    {
       std::this_thread::sleep_for(std::chrono::nanoseconds(g_tx_sleep_time));
       get_tx_window(optr + the_shift, get_tx_fft());
-
       the_shift += get_tx_fft();
+
       if (the_shift  == bufferlen )
       {
-
-#if 0
-         if (std::accumulate(optr , optr + the_shift, 0.0,
+#if 1
+         if (std::accumulate(optr, optr+the_shift, 0.0,
                              [](double t, const std::complex<float> &f){return t + std::abs(f);}))
          {
-            cv::Mat img(groupl, get_tx_fft(),  CV_8UC3, cv::Scalar(0,0,0));
+            cv::Mat img(groupl, get_tx_fft(), CV_8UC3, cv::Scalar(0,0,0));
             cv::Mat image = img;
 
-
             float max = 0;
-            for(int x=0; x< img.cols; x++)
+            for(int x=0; x < img.cols; x++)
             {
-               for(int y=0;y<img.rows;y++)
+               for(int y=0;y < img.rows;y++)
                {
-                  float val = std::abs(optr[x * groupl + y]);
+                  float val = std::abs(optr[ x + get_tx_fft() * y]);
                   if (val > max) max = val;
                }
             }
@@ -175,7 +173,7 @@ Hypervisor::tx_run()
             {
                for(int y=0;y<img.rows;y++)
                {
-                  float val = std::abs(optr[x * groupl + y]);
+                  float val = std::abs(optr[ x + get_tx_fft() * y]);
                   cv::Vec3b color = image.at<cv::Vec3b>(cv::Point(x,y));
                   color.val[0] = uchar(val / max * 255.0);
                   color.val[1] = uchar(val / max * 255.0);
@@ -186,7 +184,6 @@ Hypervisor::tx_run()
             cv::imwrite(std::string("./waterfall_" + std::to_string(img_counter++) + ".png"), img);
          }
 #endif
-
          the_shift = 0;
       }
    }
@@ -268,14 +265,18 @@ Hypervisor::get_tx_window(gr_complex *optr, size_t len)
       (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
 
    }
-   // Transform buffer from FREQ domain to TIME domain using IFFT
 
-   g_ifft_complex->execute();
-
-   std::copy(g_ifft_complex->get_outbuf(),
-             g_ifft_complex->get_outbuf() + tx_fft_len,
+   std::copy(g_ifft_complex->get_inbuf(),
+             g_ifft_complex->get_inbuf() + len,
              optr);
 
+   /*
+   // Transform buffer from FREQ domain to TIME domain using IFFT
+   g_ifft_complex->execute();
+   std::copy(g_ifft_complex->get_outbuf(),
+             g_ifft_complex->get_outbuf() + len,
+             optr);
+   */
    return tx_fft_len;
 }
 
