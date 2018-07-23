@@ -24,7 +24,6 @@ cmake_minimum_required(VERSION 2.6)
 project(gr-hydra CXX C)
 enable_testing()
 
-
 set(CMAKE_CXX_STANDARD 14)
 
 #select the release build type by default to get optimization flags
@@ -130,6 +129,7 @@ endif(APPLE)
 find_package(CppUnit)
 find_package(Doxygen)
 find_package(FFTW REQUIRED)
+find_package(UHD REQUIRED)
 
 # SearLibXML++ ch for GNU Radio and its components and versions. Add any
 
@@ -162,6 +162,7 @@ include_directories(
     ${CMAKE_BINARY_DIR}/include
     ${Boost_INCLUDE_DIRS}
     ${CPPUNIT_INCLUDE_DIRS}
+    ${UHD_INCLUDE_DIRS}
     ${PC_ZeroMQ_INCLUDE_DIRS}
     ${GNURADIO_ALL_INCLUDE_DIRS}
 )
@@ -171,6 +172,7 @@ link_directories(
     ${CPPUNIT_LIBRARY_DIRS}
     ${GNURADIO_RUNTIME_LIBRARY_DIRS}
     ${FFTW_LIBRARIES}
+    ${UHD_LIBRARIES}
     ${PC_ZeroMQ_LIBRARY_DIRS}
 )
 
@@ -202,7 +204,7 @@ add_subdirectory(grc)
 #add_subdirectory(apps)
 add_subdirectory(docs)
 
-########################################################################
+########################LIBRARIES################################################
 # Install cmake search helper for this library
 ########################################################################
 if(NOT CMAKE_MODULES_DIR)

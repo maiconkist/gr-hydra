@@ -4,13 +4,13 @@
 #include "hydra/types.h"
 #include "hydra/hydra_resource.h"
 #include "hydra/hydra_hypervisor.h"
+#include "hydra/hydra_uhd_interface.h"
 
 #include <set>
 #include <iostream>
 #include <list>
 
 using namespace std;
-
 
 class HydraCore
 {
@@ -41,7 +41,8 @@ public:
                          unsigned int u_fft_size);
 
    // Set TX resources
-   void set_tx_resources(double d_centre_freq,
+   void set_tx_resources(uhd_hydra_sptr usrp,
+                         double d_centre_freq,
                          double d_bandwidth,
                          unsigned int u_fft_size);
 

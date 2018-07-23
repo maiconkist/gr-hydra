@@ -8,7 +8,6 @@ HydraCore::HydraCore()
    // Initialise the resource manager
    p_resource_manager = std::make_unique<xvl_resource_manager>();
    p_hypervisor = std::make_unique<gr::hydra::Hypervisor>();
-
 }
 
 void
@@ -25,13 +24,14 @@ HydraCore::set_rx_resources(double d_centre_freq,
 }
 
 void
-HydraCore::set_tx_resources(double d_centre_freq,
+HydraCore::set_tx_resources(uhd_hydra_sptr usrp,
+                            double d_centre_freq,
                             double d_bandwidth,
                             unsigned int u_fft_size)
 {
    // Initialise the RX resources
    p_resource_manager->set_tx_resources(d_centre_freq, d_bandwidth);
-   p_hypervisor->set_tx_resources(d_centre_freq, d_bandwidth, u_fft_size);
+   p_hypervisor->set_tx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
    // Toggle flag
    b_transmitter = true;

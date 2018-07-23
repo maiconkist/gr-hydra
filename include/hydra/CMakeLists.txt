@@ -36,5 +36,5 @@ install(FILES
     hydra_server.h
     hydra_client.h
     hydra_main.h
-    hydra_xvl_wrapper.h
+    hydra_uhd_interface.h
 	 DESTINATION include/hydra)

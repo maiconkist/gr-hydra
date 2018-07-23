@@ -29,11 +29,15 @@
 
 typedef std::vector<std::complex<float> > iq_window;
 
+class abstract_device;
+typedef std::shared_ptr<abstract_device> uhd_hydra_sptr;
+
+typedef std::vector<gr_complex> samples_vec;
+
 namespace gr {
   namespace hydra {
     class Hypervisor;
     class VirtualRadio;
-
 
     typedef std::shared_ptr<gr_complex[]> samples_ptr;
     typedef std::vector<gr_complex> samples_vec;

@@ -24,7 +24,8 @@
 #include <functional>
 #include <iostream>
 
-#include <opencv2/opencv.hpp>
+#include "hydra/hydra_uhd_interface.h"
+
 #include <numeric>
 
 namespace gr {
@@ -86,7 +87,6 @@ const Hypervisor::get_vradio(size_t id)
    return *it;
 }
 
-
 bool
 Hypervisor::detach_virtual_radio(size_t radio_id)
 {
@@ -120,8 +120,9 @@ Hypervisor::notify(VirtualRadio &vr)
 }
 
 void
-Hypervisor::set_tx_resources(double cf, double bw, size_t fft)
+Hypervisor::set_tx_resources(uhd_hydra_sptr tx_dev, double cf, double bw, size_t fft)
 {
+   g_tx_dev = tx_dev;
    g_tx_cf = cf;
    g_tx_bw = bw;
    tx_fft_len = fft;
@@ -135,60 +136,18 @@ void
 Hypervisor::tx_run()
 {
    size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e9 / get_tx_bandwidth());
-
-#define groupl 500
-#define bufferlen get_tx_fft() * groupl
-
-   gr_complex *optr = new gr_complex [bufferlen];
-
-   size_t the_shift = 0;
-   size_t img_counter = 0;
+   gr_complex *optr = new gr_complex [get_tx_fft()];
 
    while (true)
    {
       std::this_thread::sleep_for(std::chrono::nanoseconds(g_tx_sleep_time));
-      get_tx_window(optr + the_shift, get_tx_fft());
-      the_shift += get_tx_fft();
 
-      if (the_shift  == bufferlen )
-      {
-#if 1
-         if (std::accumulate(optr, optr+the_shift, 0.0,
-                             [](double t, const std::complex<float> &f){return t + std::abs(f);}))
-         {
-            cv::Mat img(groupl, get_tx_fft(), CV_8UC3, cv::Scalar(0,0,0));
-            cv::Mat image = img;
+      get_tx_window(optr , get_tx_fft());
 
-            float max = 0;
-            for(int x=0; x < img.cols; x++)
-            {
-               for(int y=0;y < img.rows;y++)
-               {
-                  float val = std::abs(optr[ x + get_tx_fft() * y]);
-                  if (val > max) max = val;
-               }
-            }
-
-            for(int x=0; x< img.cols; x++)
-            {
-               for(int y=0;y<img.rows;y++)
-               {
-                  float val = std::abs(optr[ x + get_tx_fft() * y]);
-                  cv::Vec3b color = image.at<cv::Vec3b>(cv::Point(x,y));
-                  color.val[0] = uchar(val / max * 255.0);
-                  color.val[1] = uchar(val / max * 255.0);
-                  color.val[2] = uchar(val / max * 255.0);
-                  image.at<cv::Vec3b>(cv::Point(x,y)) = color;
-               }
-            }
-            cv::imwrite(std::string("./waterfall_" + std::to_string(img_counter++) + ".png"), img);
-         }
-#endif
-         the_shift = 0;
-      }
+      std::cout << "Adding samples to dev" << std::endl;
+      g_tx_dev->send(optr, get_tx_fft());
    }
 }
-
 
 void
 Hypervisor::set_rx_resources(double cf, double bw, size_t fft)
@@ -263,7 +222,6 @@ Hypervisor::get_tx_window(gr_complex *optr, size_t len)
         ++it)
    {
       (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
-
    }
 
    std::copy(g_ifft_complex->get_inbuf(),

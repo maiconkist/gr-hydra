@@ -42,6 +42,7 @@ class HYDRA_API Hypervisor
   sfft_complex g_ifft_complex;
   std::unique_ptr<std::thread> g_tx_thread;
   iq_map_vec g_tx_subcarriers_map; // mapping of subcarriers
+  uhd_hydra_sptr g_tx_dev;
 
   size_t rx_fft_len; // FFT M length
   double g_rx_cf; // Hypervisor central frequency
@@ -81,7 +82,7 @@ class HYDRA_API Hypervisor
    */
   int notify(VirtualRadio &vr);
 
-  void set_tx_resources(double cf, double bw, size_t fft_len);
+  void set_tx_resources(uhd_hydra_sptr tx_dev, double cf, double bw, size_t fft_len);
   void set_tx_bandwidth(double bw){ g_tx_bw = bw; }
   void set_tx_central_frequency(double cf){ g_tx_cf = cf; }
   double const get_tx_central_frequency() { return g_tx_cf; }
@@ -97,7 +98,6 @@ class HYDRA_API Hypervisor
   double const get_rx_bandwidth() { return g_rx_bw; }
   size_t const get_rx_fft() { return rx_fft_len; }
 
-
   /** Map all virtual radios to subcarriers. Reset all mapping.
    */
   void set_radio_mapping();
@@ -106,15 +106,6 @@ class HYDRA_API Hypervisor
    * @return -1 if error, 0 otherwise
    */
   int set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map);
-
-  /**
-   * @param noutput_items
-   * @param ninput_items
-   * @param input_items
-   */
-  void sink_add_samples(int noutput_items,
-                        gr_vector_int &ninput_items,
-                        gr_vector_const_void_star &input_items);
 
   /**
    */

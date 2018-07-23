@@ -6,7 +6,7 @@
 #include "hydra/hydra_server.h"
 #include "hydra/hydra_core.h"
 #include "hydra/hydra_stats.h"
-
+#include "hydra/types.h"
 
 class HydraMain
 {
@@ -25,7 +25,7 @@ public:
    HydraMain(unsigned int u_control_port, unsigned int u_monitor_port = 4996);
 
    void set_rx_config(double d_cf, double d_bw, unsigned int u_fft_size);
-   void set_tx_config(double d_cf, double d_bw, unsigned int u_fft_size);
+   void set_tx_config(uhd_hydra_sptr usrp, double d_cf, double d_bw, unsigned int u_fft_size);
 
    // Run method
    void run();

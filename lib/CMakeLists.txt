@@ -39,7 +39,7 @@ list(APPEND hydra_sources
     hydra_client.cc
     hydra_core.cc
     hydra_main.cc
-    hydra_xvl_wrapper.cc
+    hydra_uhd_interface.cc
 )
 
 set(hydra_sources "${hydra_sources}" PARENT_SCOPE)
@@ -54,6 +54,7 @@ target_link_libraries(gnuradio-hydra
 	${GNURADIO_ALL_LIBRARIES}
 	${FFTW_LIBRARIES}
    ${ZeroMQ_LIBRARY}
+   ${UHD_LIBRARIES}
 	fftw3f
 	fftw3l
    opencv_core
@@ -98,6 +99,7 @@ target_link_libraries(
   ${CPPUNIT_LIBRARIES}
   ${FFTW_LIBRARIES}
   ${ZeroMQ_LIBRARY}
+  ${UHD_LIBRARY}
   fftw3f
   fftw3l
   gnuradio-hydra
