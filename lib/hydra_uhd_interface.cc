@@ -3,6 +3,8 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
+namespace hydra {
+
 device_uhd::device_uhd(double freq,
                      double rate,
                      double gain,
@@ -21,11 +23,10 @@ device_uhd::device_uhd(double freq,
    uhd_tx_metadata_make(&tx_md, false, 0, 0.1, true, false);
 
    // Create other necessary structs
-   uhd_tune_request_t tune_request = {
-      .target_freq = freq,
-      .rf_freq_policy = UHD_TUNE_REQUEST_POLICY_AUTO,
-      .dsp_freq_policy = UHD_TUNE_REQUEST_POLICY_AUTO
-   };
+   uhd_tune_request_t tune_request;
+   tune_request.target_freq = freq;
+   tune_request.rf_freq_policy = UHD_TUNE_REQUEST_POLICY_AUTO;
+   tune_request.dsp_freq_policy = UHD_TUNE_REQUEST_POLICY_AUTO;
    uhd_tune_result_t tune_result;
 
    size_t channel = 0;
@@ -55,11 +56,11 @@ device_uhd::device_uhd(double freq,
    char otw_format[] = "sc16";
    char args[] =  "";
    uhd_stream_args_t stream_args = {
-      .cpu_format = cpu_format,
-      .otw_format = otw_format,
-      .args = args,
-      .channel_list = &channel,
-      .n_channels = 1
+      cpu_format : cpu_format,
+      otw_format : otw_format,
+      args : args,
+      channel_list : &channel,
+      n_channels : 1
    };
 
    stream_args.channel_list = &channel;
@@ -88,12 +89,10 @@ void
 device_uhd::set_frequency(double frequency)
 {
    size_t channel = 0;
-   uhd_tune_request_t tune_request = {
-      .target_freq = frequency,
-      .rf_freq_policy = UHD_TUNE_REQUEST_POLICY_AUTO,
-      .dsp_freq_policy = UHD_TUNE_REQUEST_POLICY_AUTO
-   };
-
+   uhd_tune_request_t tune_request;
+   tune_request.target_freq = frequency;
+   tune_request.rf_freq_policy = UHD_TUNE_REQUEST_POLICY_AUTO;
+   tune_request.dsp_freq_policy = UHD_TUNE_REQUEST_POLICY_AUTO;
    uhd_tune_result_t tune_result;
 
    // Set frequency
@@ -150,7 +149,6 @@ device_image_gen::send(const gr_complex *buf, size_t len)
    static size_t img_counter = 0;
 
    g_iq_samples.insert(g_iq_samples.end(), buf, buf + len);
-   std::cout << "g_iq_samples.size(): " << g_iq_samples.size() << std::endl;
 
    // TODO get fft size and number of rows from somewhere else
    if (g_iq_samples.size() == cols * rows)
@@ -185,3 +183,6 @@ device_image_gen::send(const gr_complex *buf, size_t len)
       g_iq_samples.clear();
    }
 }
+
+
+} // namespace hydra

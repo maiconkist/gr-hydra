@@ -4,6 +4,9 @@
 #include <thread>
 #include <iostream>
 
+
+namespace hydra {
+
 HydraXVL* HydraXVL::pinstance;
 
 HydraXVL::HydraXVL(size_t _fft_m_len,
@@ -64,3 +67,6 @@ HydraXVL::create_virtual_radio(double cf, double bandwidth)
 {
    return get_instance()->hypervisor.create_vradio(cf, bandwidth);
 }
+
+
+} // namespace hydra

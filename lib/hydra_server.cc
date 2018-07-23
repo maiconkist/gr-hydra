@@ -2,6 +2,9 @@
 
 #include <boost/algorithm/string.hpp>
 
+
+namespace hydra {
+
 HydraServer::HydraServer(unsigned int u_port,
                        std::shared_ptr<HydraCore> core)
 {
@@ -211,3 +214,6 @@ HydraServer::run()
   }
   return 0;
 }
+
+
+} // namespace hydra

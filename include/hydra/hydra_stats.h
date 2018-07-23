@@ -10,9 +10,9 @@
 #include <list>
 
 
-// Typedefs
-typedef std::complex<float> iq_sample;
-typedef std::deque<iq_sample> iq_stream;
+#include "hydra/types.h"
+
+namespace hydra {
 
 // Class that creates a monitoring service
 class xvl_monitor
@@ -77,10 +77,8 @@ public:
   void push(iq_stream* buffer);
 };
 
-
-
-
-
 typedef std::unique_ptr<xvl_report> ReportPtr;
+
+} // namespace hydra
 
 #endif

@@ -1,5 +1,8 @@
 #include "hydra/hydra_socket.h"
 
+
+namespace hydra {
+
 udp_receiver::udp_receiver(
   const std::string& s_host,
   const std::string& s_port)
@@ -54,6 +57,9 @@ udp_receiver::handle_receive(
   const boost::system::error_code& error,
   unsigned int u_bytes_trans)
 {
+
+  std::cout << "Received something from the fucking udp. bytes:  " << u_bytes_trans << std::endl;
+
   if (!error)
   {
     // If there isn't enough data for a single element
@@ -270,3 +276,6 @@ test_socket()
   return 0;
 
 }
+
+
+} // namespace hydra

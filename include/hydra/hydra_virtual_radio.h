@@ -31,8 +31,7 @@
 #include <vector>
 #include <mutex>
 
-namespace gr {
-	namespace hydra {
+namespace hydra {
 
 typedef std::deque<std::vector<iq_sample>> window_stream;
 
@@ -145,8 +144,7 @@ private:
 typedef std::shared_ptr<VirtualRadio> vradio_ptr;
 typedef std::vector<vradio_ptr> vradio_vec;
 
-  } /* namespace hydra */
-} /* namespace gr */
+} /* namespace hydra */
 
 
 #endif /* ifndef INCLUDED_HYDRA_VIRTUAL_RADIO_H */

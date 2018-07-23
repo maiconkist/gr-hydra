@@ -25,8 +25,8 @@
 #include <hydra/hydra_source.h>
 #include <gnuradio/io_signature.h>
 
-namespace gr {
-	namespace hydra {
+namespace gr{
+  namespace hydra {
 
 hydra_source::hydra_source_ptr
 hydra_source::make(size_t _n_ports,

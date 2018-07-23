@@ -31,8 +31,7 @@
 #include <gnuradio/types.h>
 #include <boost/shared_ptr.hpp>
 
-namespace gr {
-	namespace hydra {
+namespace hydra {
 
 class HYDRA_API fft_complex 
 {
@@ -69,10 +68,9 @@ class HYDRA_API fft_complex
 };
 
 /* TYPEDEFS for this class */
-typedef boost::shared_ptr<gr::hydra::fft_complex> sfft_complex;
+typedef boost::shared_ptr<hydra::fft_complex> sfft_complex;
 
 
 } /* namespace hydra */
-} /* namespace gr */
 
 #endif /* #ifndef INCLUDED_HYDRA_FFT_H */

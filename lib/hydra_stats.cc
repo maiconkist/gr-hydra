@@ -1,5 +1,8 @@
 #include "hydra/hydra_stats.h"
 
+
+namespace hydra {
+
 xvl_monitor::xvl_monitor(unsigned int u_port)
 {
   // Get the server port
@@ -118,3 +121,6 @@ void xvl_report::push(iq_stream* buffer)
     socket->send(request);
   }
 }
+
+
+} // namespace hydra

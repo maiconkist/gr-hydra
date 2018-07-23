@@ -43,6 +43,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
     #http://gcc.gnu.org/wiki/Visibility
     add_definitions(-fvisibility=hidden)
     add_definitions(-std=gnu++0x)
+    add_definitions(-fPIC)
 endif()
 
 if (APPLE)
@@ -130,6 +131,7 @@ find_package(CppUnit)
 find_package(Doxygen)
 find_package(FFTW REQUIRED)
 find_package(UHD REQUIRED)
+find_package(OpenCV REQUIRED)
 
 # SearLibXML++ ch for GNU Radio and its components and versions. Add any
 

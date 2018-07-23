@@ -2,8 +2,10 @@
 #define INCLUDED_HYDRA_UHD_INTERFACE_H
 
 #include <uhd.h>
-
 #include "hydra/types.h"
+
+
+namespace hydra {
 
 class abstract_device
 {
@@ -58,5 +60,8 @@ public:
 private:
    samples_vec g_iq_samples;
 };
+
+
+} // namespace hydra
 
 #endif

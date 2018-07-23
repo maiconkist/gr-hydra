@@ -25,7 +25,7 @@
 #include <hydra/hydra_block.h>
 
 namespace gr {
-   namespace hydra {
+  namespace hydra {
 
 class HYDRA_API hydra_source: public hydra_block
 {
@@ -67,7 +67,7 @@ class HYDRA_API hydra_source: public hydra_block
 
 };
 
-} // namespace hydra
-} // namespace gr
+  } /* namespace hydra */
+} /* namespace gr */
 
 #endif /* INCLUDED_HYDRA_SOURCE_IMPL_H */

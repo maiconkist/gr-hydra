@@ -1,5 +1,8 @@
 #include "hydra/hydra_client.h"
 
+
+namespace hydra {
+
 xvl_client::xvl_client(const std::string s_host,
                        const unsigned int u_port,
                        const unsigned int u_client_id,
@@ -11,7 +14,8 @@ xvl_client::xvl_client(const std::string s_host,
   b_debug_flag = b_debug;
 }
 
-std::string xvl_client::factory(const std::string &s_message)
+std::string
+xvl_client::factory(const std::string &s_message)
 {
   //  Prepare our context and socket
   zmq::context_t context(1);
@@ -56,7 +60,8 @@ std::string xvl_client::factory(const std::string &s_message)
   return s_response.data();
 }
 
-std::string xvl_client::check_connection(void)
+std::string
+xvl_client::check_connection(void)
 {
   // Set message type
   std::string message = "{\"xvl_syn\":\"\"}";
@@ -64,7 +69,8 @@ std::string xvl_client::check_connection(void)
   return xvl_client::factory(message);
 }
 
-std::string xvl_client::query_resources(void)
+std::string
+xvl_client::query_resources(void)
 {
   // Set message type
   std::string message = "{\"xvl_que\":\"\"}";
@@ -72,7 +78,8 @@ std::string xvl_client::query_resources(void)
   return xvl_client::factory(message);
 }
 
-int xvl_client::request_rx_resources(const double d_centre_freq,
+int
+xvl_client::request_rx_resources(const double d_centre_freq,
                                      const double d_bandwidth)
 {
   // If ill defined one of the parameters
@@ -115,7 +122,8 @@ int xvl_client::request_rx_resources(const double d_centre_freq,
   return 0;
 }
 
-int xvl_client::request_tx_resources(const double d_centre_freq,
+int
+xvl_client::request_tx_resources(const double d_centre_freq,
                                      const double d_bandwidth)
 {
   // If ill defined one of the parameters
@@ -158,10 +166,14 @@ int xvl_client::request_tx_resources(const double d_centre_freq,
   return 0;
 }
 
-std::string xvl_client::free_resources ()
+std::string
+xvl_client::free_resources ()
 {
   // Set message type
   std::string message = "{\"xvl_fre\":{\"id\":" + std::to_string(u_id) + "}}";
   // Send message and return acknowledgement
   return xvl_client::factory(message);
+}
+
+
 }

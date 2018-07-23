@@ -9,6 +9,7 @@
 
 #include "hydra/hydra_core.h"
 
+namespace hydra {
 
 //TODO Perhaps I should use Protobuffers
 struct xvl_info
@@ -49,6 +50,9 @@ public:
    // Run the server
    int run(void);
 };
+
+
+}; // namespace hydra
 
 /* Your function statement here */
 #endif

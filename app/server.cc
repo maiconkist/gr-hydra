@@ -23,7 +23,7 @@ int main()
    unsigned int u_port = 5000;
 
    // Instantiate XVL
-   HydraMain main = HydraMain(u_port);
+   hydra::HydraMain main = hydra::HydraMain(u_port);
 
    // Configure the RX radio
    /*
@@ -33,7 +33,7 @@ int main()
    */
 
    // Configure the TX radio
-   uhd_hydra_sptr usrp = std::make_shared<device_image_gen>(d_tx_centre_freq, d_tx_samp_rate, 0.1);
+   hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_image_gen>(d_tx_centre_freq, d_tx_samp_rate, 0.1);
 
    main.set_tx_config(
       usrp,

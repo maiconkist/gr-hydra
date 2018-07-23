@@ -29,8 +29,7 @@
 #include <thread>
 
 
-namespace gr {
-   namespace hydra {
+namespace hydra {
 
 class HYDRA_API Hypervisor
 {
@@ -131,7 +130,6 @@ class HYDRA_API Hypervisor
   bool const source_ready();
 };
 
-   }; /* namespace hydra */
-}; /* namespace gr */
+}; /* namespace hydra */
 
 #endif /*  INCLUDED_HYDRA_HYPERVISOR_H */

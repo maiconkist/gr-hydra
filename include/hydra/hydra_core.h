@@ -12,12 +12,15 @@
 
 using namespace std;
 
+
+namespace hydra {
+
 class HydraCore
 {
 private:
    // Pointer to the resource manager object
    std::unique_ptr<xvl_resource_manager> p_resource_manager;
-   std::unique_ptr<gr::hydra::Hypervisor> p_hypervisor;
+   std::unique_ptr<Hypervisor> p_hypervisor;
 
    // Save the receiver info
    bool b_receiver;
@@ -65,5 +68,6 @@ public:
 
 };
 
+}; // namespace hydar
 
 #endif

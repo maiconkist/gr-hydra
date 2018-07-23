@@ -8,10 +8,12 @@
 #include "hydra/hydra_stats.h"
 #include "hydra/types.h"
 
+
+namespace hydra {
+
 class HydraMain
 {
 public:
-
    // Pointer to the XVL Server
    std::unique_ptr<HydraServer> server;
    /// Pointer to the XVL Core
@@ -30,5 +32,7 @@ public:
    // Run method
    void run();
 };
+
+}; // namespace hydra
 
 #endif

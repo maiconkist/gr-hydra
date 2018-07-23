@@ -2,12 +2,15 @@
 
 #include <boost/algorithm/string.hpp>
 
+
+namespace hydra {
+
 // Real radio centre frequency, bandwidth; and the hypervisor's sampling rate, FFT size
 HydraCore::HydraCore()
 {
    // Initialise the resource manager
    p_resource_manager = std::make_unique<xvl_resource_manager>();
-   p_hypervisor = std::make_unique<gr::hydra::Hypervisor>();
+   p_hypervisor = std::make_unique<Hypervisor>();
 }
 
 void
@@ -104,7 +107,7 @@ HydraCore::request_tx_resources(unsigned int u_id,
   static size_t u_udp_port = 7000;
   if (vr == nullptr)
   {
-     vr = std::make_shared<gr::hydra::VirtualRadio>(u_id, p_hypervisor.get());
+     vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
      vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, bpad);
      p_hypervisor->attach_virtual_radio(vr);
   }
@@ -138,7 +141,7 @@ HydraCore::query_resources()
       // If the current entry is a valid type
       if (p_chunk->second.get<int>("id"))
       {
-         gr::hydra::VirtualRadioPtr vr = p_hypervisor->get_vradio(p_chunk->second.get<int>("id"));
+         VirtualRadioPtr vr = p_hypervisor->get_vradio(p_chunk->second.get<int>("id"));
 
         // If receiving
          if ((vr != nullptr) and vr->get_rx_enabled())
@@ -194,3 +197,5 @@ HydraCore::free_resources(size_t radio_id)
 
    return 1;
 }
+
+} // namespace hydra

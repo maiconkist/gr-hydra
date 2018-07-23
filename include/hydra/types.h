@@ -27,17 +27,21 @@
 
 #include <gnuradio/types.h>
 
-typedef std::vector<std::complex<float> > iq_window;
 
-class abstract_device;
-typedef std::shared_ptr<abstract_device> uhd_hydra_sptr;
-
-typedef std::vector<gr_complex> samples_vec;
-
-namespace gr {
-  namespace hydra {
+namespace hydra {
+    class abstract_device;
     class Hypervisor;
     class VirtualRadio;
+
+
+  typedef std::complex<float> iq_sample;
+  typedef std::deque<iq_sample> iq_stream;
+  typedef std::vector<iq_sample> window;
+  typedef std::deque<window> window_stream;
+
+    typedef std::vector<std::complex<float> > iq_window;
+    typedef std::shared_ptr<abstract_device> uhd_hydra_sptr;
+
 
     typedef std::shared_ptr<gr_complex[]> samples_ptr;
     typedef std::vector<gr_complex> samples_vec;
@@ -47,10 +51,6 @@ namespace gr {
 
     typedef std::shared_ptr<Hypervisor> HypervisorPtr;
     typedef std::shared_ptr<VirtualRadio> VirtualRadioPtr;
-
-
-  } /* namespace hydra */
-
-} /* namespace gr */
+} /* namespace hydra */
 
 #endif /* ifndef INCLUDED_HYDRA_TYPES_H */

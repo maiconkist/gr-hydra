@@ -7,6 +7,9 @@
 #include <sstream>
 #include <boost/property_tree/json_parser.hpp>
 
+
+namespace hydra {
+
 class xvl_client
 {
   // Server host and port
@@ -46,5 +49,8 @@ private:
   // Base message methods
   std::string factory(const std::string &s_message);
 };
+
+
+}; // namespace hydra
 
 #endif

@@ -10,12 +10,9 @@
 #include <iostream>
 #include <math.h>
 
-#include <hydra/types.h>
+#include "hydra/types.h"
 
-typedef std::complex<float> iq_sample;
-typedef std::deque<iq_sample> iq_stream;
-typedef std::vector<iq_sample> window;
-typedef std::deque<window> window_stream;
+namespace hydra {
 
 class RxBuffer
 {
@@ -120,5 +117,7 @@ private:
 
 typedef std::unique_ptr<RxBuffer> RxBufferPtr;
 typedef std::unique_ptr<TxBuffer> TxBufferPtr;
+
+} // namespace hydra
 
 #endif

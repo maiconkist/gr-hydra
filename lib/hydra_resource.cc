@@ -1,5 +1,8 @@
 #include "hydra/hydra_resource.h"
 
+
+namespace hydra {
+
 // Methods of the resource manager class
 xvl_resource_manager::xvl_resource_manager()
 {
@@ -376,3 +379,5 @@ int test_resource_manager()
 
   return 0;
 }
+
+} // namespace hydra

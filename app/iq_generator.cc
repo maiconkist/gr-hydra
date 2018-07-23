@@ -93,13 +93,13 @@ int main(int argc, char* argv[])
 
   // Request resources
   std::string lalala;
-  xvl_client s1 = xvl_client("127.0.0.1", 5000, 1, true);
+  hydra::xvl_client s1 = hydra::xvl_client("127.0.0.1", 5000, 1, true);
   lalala = s1.request_tx_resources(2e9 + 1e6, std::stof(rate));
   std::cout << lalala << std::endl;
 
   // Initialise the async IO service
   boost::asio::io_service io_service;
-	UDPClient client(io_service, host, "7000");
+  UDPClient client(io_service, host, "7000");
 
   std::cout << "FFT Size: " << p_size << "\tSampling rate: " << rate << "\tThreshold: " << p_size * 1e6 / std::stod(rate) << std::endl;
   // Construct the payload array
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
      fin.read(reinterpret_cast<char*>(&data[0]), num_elements*sizeof(float));
 
      size_t counter = 0;
-     while ( (counter + p_size) < num_elements)
+     while ((counter + p_size) < num_elements)
      {
         std::copy(&data[counter], &data[counter + p_size], payload.begin());
         client.send(payload, std::stod(rate), false);

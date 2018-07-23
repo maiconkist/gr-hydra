@@ -5,6 +5,9 @@
 
 #include "hydra/hydra_hypervisor.h"
 
+
+namespace hydra {
+
 class HydraXVL
 {
 public:
@@ -26,5 +29,7 @@ private:
 
    bool running;
 };
+
+} // namespace hydra
 
 #endif

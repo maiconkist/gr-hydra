@@ -23,8 +23,7 @@
 
 #include <iostream>
 
-namespace gr {
-   namespace hydra {
+namespace hydra {
 
 VirtualRadio::VirtualRadio(size_t _idx, Hypervisor *hypervisor):
    g_idx(_idx),
@@ -212,4 +211,3 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
 }
 
 } /* namespace hydra */
-} /* namespace gr */

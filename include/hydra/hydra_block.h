@@ -27,8 +27,10 @@
 #include <hydra/types.h>
 #include <hydra/hydra_hypervisor.h>
 
+using namespace hydra;
+
 namespace gr {
-   namespace hydra {
+  namespace hydra {
 
 class HYDRA_API hydra_block: virtual public gr::block
 {
@@ -50,7 +52,7 @@ class HYDRA_API hydra_block: virtual public gr::block
    * @param bandwidth Bandwidth
    */
   size_t create_vradio(double cf, double bandwidth) {
-    return  g_hypervisor->create_vradio(cf, bandwidth);  
+    return  g_hypervisor->create_vradio(cf, bandwidth);
   }
 
 
@@ -68,7 +70,7 @@ class HYDRA_API hydra_block: virtual public gr::block
   }
 };
 
-} // namespace hydra
-} // namespace gr
+  } /* namespace hydra */
+} /* namespace gr */
 
 #endif /* INCLUDED_HYDRA_HYDRA_H */

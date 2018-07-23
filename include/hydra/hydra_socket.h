@@ -10,12 +10,14 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
-// Typedefs
-typedef std::complex<float> iq_sample;
-typedef std::deque<iq_sample> iq_stream;
+#include "hydra/types.h"
+
 
 // Using name space UDP
 using boost::asio::ip::udp;
+
+
+namespace hydra {
 
 class udp_receiver
 {
@@ -146,5 +148,7 @@ typedef udp_receiver RxUDP;
 typedef std::unique_ptr<udp_receiver> RxUDPPtr;
 typedef udp_transmitter TxUDP;
 typedef std::unique_ptr<udp_transmitter> TxUDPPtr;
+
+} // namespace hydra
 
 #endif

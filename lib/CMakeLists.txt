@@ -27,10 +27,10 @@ link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND hydra_sources
     hydra_fft.cc
     hydra_virtual_radio.cc
-	 hydra_hypervisor.cc
+    hydra_hypervisor.cc
     hydra_sink.cc
     hydra_async_sink.cc
-	 hydra_source.cc
+    hydra_source.cc
     hydra_buffer.cc
     hydra_socket.cc
     hydra_stats.cc
@@ -55,10 +55,11 @@ target_link_libraries(gnuradio-hydra
 	${FFTW_LIBRARIES}
    ${ZeroMQ_LIBRARY}
    ${UHD_LIBRARIES}
-	fftw3f
-	fftw3l
-   opencv_core
-   opencv_imgcodecs
+   ${OpenCV_LIBRARIES}
+   ${OpenCV_LIBRARY}
+   fftw3f
+   fftw3l
+   pthread
 )
 set_target_properties(gnuradio-hydra PROPERTIES DEFINE_SYMBOL "gnuradio_hydra_EXPORTS")
 
@@ -76,35 +77,3 @@ install(TARGETS gnuradio-hydra
     ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
     RUNTIME DESTINATION bin              # .dll file
 )
-
-########################################################################
-# Build and register unit test
-########################################################################
-include(GrTest)
-
-include_directories(${CPPUNIT_INCLUDE_DIRS})
-
-list(APPEND test_hydra_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_hydra.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_hydra.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_hydra_sink.cc
-)
-
-add_executable(test-hydra ${test_hydra_sources})
-
-target_link_libraries(
-  test-hydra
-  ${GNURADIO_RUNTIME_LIBRARIES}
-  ${Boost_LIBRARIES}
-  ${CPPUNIT_LIBRARIES}
-  ${FFTW_LIBRARIES}
-  ${ZeroMQ_LIBRARY}
-  ${UHD_LIBRARY}
-  fftw3f
-  fftw3l
-  gnuradio-hydra
-  opencv_core
-  opencv_imgcodecs
-)
-
-GR_ADD_TEST(test_hydra test-hydra)

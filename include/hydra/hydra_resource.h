@@ -1,3 +1,7 @@
+#ifndef HYDRA_RESOURCE_INCLUDE_H
+#define HYDRA_RESOURCE_INCLUDE_H
+
+
 #include <iostream>
 #include <list>
 #include <math.h>
@@ -5,8 +9,8 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#ifndef HYDRA_RESOURCE_INCLUDE_H
-#define HYDRA_RESOURCE_INCLUDE_H
+
+namespace hydra {
 
 // Class that represents a spectrum chunk. Free chunks have an ID equal to zero
 class chunk
@@ -111,5 +115,7 @@ public:
    // Method to free chunks of a service
    int free_resources(size_t u_id);
 };
+
+} // namespace hydra
 
 #endif

@@ -20,8 +20,7 @@
 
 #include "hydra/hydra_fft.h"
 
-namespace gr {
-   namespace hydra {
+namespace hydra {
 
 fft_complex::fft_complex(size_t fft_size, bool forward):
    g_fft_size(fft_size),
@@ -80,4 +79,3 @@ fft_complex::execute()
 }
 
 } /* namespace hydra */
-} /* namespace gr */

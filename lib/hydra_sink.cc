@@ -27,8 +27,8 @@
 
 #include <string.h>
 
-namespace gr {
-   namespace hydra {
+namespace gr{
+  namespace hydra {
 
 hydra_sink::hydra_sink_ptr
 hydra_sink::make(size_t _n_ports,

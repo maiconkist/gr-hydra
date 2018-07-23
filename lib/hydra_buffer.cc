@@ -1,5 +1,8 @@
 #include "hydra/hydra_buffer.h"
 
+
+namespace hydra {
+
 RxBuffer::RxBuffer(
    std::deque<std::complex<float>>* input_buffer,
    std::mutex* in_mtx,
@@ -216,3 +219,7 @@ TxBuffer::run()
     } // End overflow
   } // End data check
 }
+
+
+
+} // namespace hydra

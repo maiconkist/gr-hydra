@@ -25,12 +25,9 @@
 #include <iostream>
 
 #include "hydra/hydra_uhd_interface.h"
-
 #include <numeric>
 
-namespace gr {
-   namespace hydra {
-
+namespace hydra {
 
 Hypervisor::Hypervisor()
 {
@@ -44,14 +41,10 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
         g_tx_bw(bandwidth),
         g_tx_subcarriers_map(_fft_m_len, -1)
 {
-   g_fft_complex  = sfft_complex(new gr::hydra::fft_complex(rx_fft_len));
-   g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(tx_fft_len, false));
+   g_fft_complex  = sfft_complex(new fft_complex(rx_fft_len));
+   g_ifft_complex = sfft_complex(new fft_complex(tx_fft_len, false));
 };
 
-/**
- * @param _fft_n_len
- * @return New radio id
- */
 size_t
 Hypervisor::create_vradio(double cf, double bandwidth)
 {
@@ -127,7 +120,7 @@ Hypervisor::set_tx_resources(uhd_hydra_sptr tx_dev, double cf, double bw, size_t
    g_tx_bw = bw;
    tx_fft_len = fft;
    g_tx_subcarriers_map = iq_map_vec(fft, -1);
-   g_ifft_complex = sfft_complex(new gr::hydra::fft_complex(fft, false));
+   g_ifft_complex = sfft_complex(new fft_complex(fft, false));
 
    g_tx_thread = std::make_unique<std::thread>(&Hypervisor::tx_run, this);
 }
@@ -143,8 +136,6 @@ Hypervisor::tx_run()
       std::this_thread::sleep_for(std::chrono::nanoseconds(g_tx_sleep_time));
 
       get_tx_window(optr , get_tx_fft());
-
-      std::cout << "Adding samples to dev" << std::endl;
       g_tx_dev->send(optr, get_tx_fft());
    }
 }
@@ -155,7 +146,7 @@ Hypervisor::set_rx_resources(double cf, double bw, size_t fft)
    g_rx_cf = cf;
    g_rx_bw = bw;
    rx_fft_len = fft;
-   g_fft_complex  = sfft_complex(new gr::hydra::fft_complex(rx_fft_len));
+   g_fft_complex  = sfft_complex(new fft_complex(rx_fft_len));
 }
 
 void
@@ -239,4 +230,3 @@ Hypervisor::get_tx_window(gr_complex *optr, size_t len)
 }
 
 } /* namespace hydra */
-} /* namespace gr */

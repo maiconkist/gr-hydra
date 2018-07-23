@@ -1,5 +1,8 @@
 #include "hydra/hydra_main.h"
 
+
+namespace hydra {
+
 // Real radio centre frequency, bandwidth; control port; hypervisor's sampling rate, FFT size
 HydraMain::HydraMain(unsigned int u_control_port,
                      unsigned int u_monitor_port)
@@ -43,3 +46,6 @@ void HydraMain::run()
    // Run the XVL server
    server->run();
 }
+
+
+} // namespace hydra
