@@ -3,7 +3,7 @@
 
 namespace hydra {
 
-xvl_client::xvl_client(const std::string s_host,
+hydra_client::hydra_client(const std::string s_host,
                        const unsigned int u_port,
                        const unsigned int u_client_id,
                        const bool b_debug)
@@ -15,7 +15,7 @@ xvl_client::xvl_client(const std::string s_host,
 }
 
 std::string
-xvl_client::factory(const std::string &s_message)
+hydra_client::factory(const std::string &s_message)
 {
   //  Prepare our context and socket
   zmq::context_t context(1);
@@ -61,25 +61,25 @@ xvl_client::factory(const std::string &s_message)
 }
 
 std::string
-xvl_client::check_connection(void)
+hydra_client::check_connection(void)
 {
   // Set message type
   std::string message = "{\"xvl_syn\":\"\"}";
   // Send message and return acknowledgement
-  return xvl_client::factory(message);
+  return hydra_client::factory(message);
 }
 
 std::string
-xvl_client::query_resources(void)
+hydra_client::query_resources(void)
 {
   // Set message type
   std::string message = "{\"xvl_que\":\"\"}";
   // Send message and return acknowledgement
-  return xvl_client::factory(message);
+  return hydra_client::factory(message);
 }
 
 int
-xvl_client::request_rx_resources(const double d_centre_freq,
+hydra_client::request_rx_resources(const double d_centre_freq,
                                      const double d_bandwidth)
 {
   // If ill defined one of the parameters
@@ -95,7 +95,7 @@ xvl_client::request_rx_resources(const double d_centre_freq,
 
   std::stringstream ss;
   // Return the result of the request message
-  ss << xvl_client::factory(message);
+  ss << hydra_client::factory(message);
 
   // Property Tree Object
   boost::property_tree::ptree root;
@@ -123,7 +123,7 @@ xvl_client::request_rx_resources(const double d_centre_freq,
 }
 
 int
-xvl_client::request_tx_resources(const double d_centre_freq,
+hydra_client::request_tx_resources(const double d_centre_freq,
                                      const double d_bandwidth)
 {
   // If ill defined one of the parameters
@@ -139,7 +139,7 @@ xvl_client::request_tx_resources(const double d_centre_freq,
 
   // Return the result of the request message
   std::stringstream ss;
-  ss << xvl_client::factory(message);
+  ss << hydra_client::factory(message);
 
   // Property Tree Object
   boost::property_tree::ptree root;
@@ -167,12 +167,12 @@ xvl_client::request_tx_resources(const double d_centre_freq,
 }
 
 std::string
-xvl_client::free_resources ()
+hydra_client::free_resources ()
 {
   // Set message type
   std::string message = "{\"xvl_fre\":{\"id\":" + std::to_string(u_id) + "}}";
   // Send message and return acknowledgement
-  return xvl_client::factory(message);
+  return hydra_client::factory(message);
 }
 
 

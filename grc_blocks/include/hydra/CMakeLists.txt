@@ -24,4 +24,5 @@ install(FILES
    hydra_source.h
    hydra_sink.h
    hydra_async_sink.h
+   hydra_gr_client.h
    DESTINATION include/hydra)

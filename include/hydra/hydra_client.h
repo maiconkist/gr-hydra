@@ -10,7 +10,7 @@
 
 namespace hydra {
 
-class xvl_client
+class hydra_client
 {
   // Server host and port
   std::string s_server_host;
@@ -23,7 +23,7 @@ class xvl_client
 
 public:
     // Constructor
-  xvl_client(std::string s_host = "localhost",
+  hydra_client(std::string s_host = "localhost",
              const unsigned int u_port = 5000,
              const unsigned int u_client_id = 10,
              const bool b_debug = false);

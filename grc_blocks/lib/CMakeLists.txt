@@ -28,6 +28,7 @@ list(APPEND hydra_sources
     hydra_sink.cc
     hydra_async_sink.cc
     hydra_source.cc
+    hydra_gr_client_impl.cc
 )
 
 set(hydra_sources "${hydra_sources}" PARENT_SCOPE)
@@ -41,7 +42,6 @@ target_link_libraries(gnuradio-hydra
 	${Boost_LIBRARIES}
 	${GNURADIO_ALL_LIBRARIES}
    ${UHD_LIBRARIES}
-   pthread
 )
 set_target_properties(gnuradio-hydra PROPERTIES DEFINE_SYMBOL "gnuradio_hydra_EXPORTS")
 
