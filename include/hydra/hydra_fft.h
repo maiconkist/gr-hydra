@@ -25,15 +25,13 @@
 #include "config.h"
 #endif
 
-#include <hydra/api.h>
-
 #include <fftw3.h>
-#include <gnuradio/types.h>
+#include <hydra/types.h>
 #include <boost/shared_ptr.hpp>
 
 namespace hydra {
 
-class HYDRA_API fft_complex 
+class fft_complex 
 {
  private:
   size_t g_fft_size;

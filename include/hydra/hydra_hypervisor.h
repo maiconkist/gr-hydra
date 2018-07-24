@@ -20,7 +20,6 @@
 #ifndef INCLUDED_HYDRA_HYPERVISOR_H
 #define INCLUDED_HYDRA_HYPERVISOR_H
 
-#include <hydra/api.h>
 #include <hydra/types.h>
 #include <hydra/hydra_fft.h>
 #include <hydra/hydra_virtual_radio.h>
@@ -31,7 +30,7 @@
 
 namespace hydra {
 
-class HYDRA_API Hypervisor
+class Hypervisor
 {
  private:
 
@@ -111,6 +110,7 @@ class HYDRA_API Hypervisor
  size_t get_tx_window(gr_complex *optr, size_t len);
 
 
+#if 0
   /**
    * @param noutput_items
    * @param output_items
@@ -120,10 +120,13 @@ class HYDRA_API Hypervisor
                             gr_vector_int &ninput_items,
                             gr_vector_const_void_star &input_items);
 
+
+
   /**
    * @param output_items
    */
   gr_vector_int get_source_outbuf(size_t noutput_items, gr_vector_void_star &output_items);
+#endif
 
   /**
    */

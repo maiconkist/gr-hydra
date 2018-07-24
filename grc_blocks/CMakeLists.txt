@@ -1,11 +1,34 @@
+# Copyright 2011,2012,2014,2016 Free Software Foundation, Inc.
+#
+# This file is part of GNU Radio
+#
+# GNU Radio is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# GNU Radio is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GNU Radio; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 51 Franklin Street,
+# Boston, MA 02110-1301, USA.
+
 ########################################################################
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 2.6)
-project(hydra CXX C)
+project(gr-hydra CXX C)
 enable_testing()
 
-set(CMAKE_CXX_STANDARD 14)
+#install to PyBOMBS target prefix if defined
+if(DEFINED ENV{PYBOMBS_PREFIX})
+    set(CMAKE_INSTALL_PREFIX $ENV{PYBOMBS_PREFIX})
+    message(STATUS "PyBOMBS installed GNU Radio. Setting CMAKE_INSTALL_PREFIX to $ENV{PYBOMBS_PREFIX}")
+endif()
 
 #select the release build type by default to get optimization flags
 if(NOT CMAKE_BUILD_TYPE)
@@ -17,18 +40,33 @@ set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "")
 #make sure our local CMake Modules path comes first
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
+# Set the version information here
+set(VERSION_INFO_MAJOR_VERSION 1)
+set(VERSION_INFO_API_COMPAT    0)
+set(VERSION_INFO_MINOR_VERSION 0)
+set(VERSION_INFO_MAINT_VERSION git)
+
+if(POLICY CMP0026)
+    cmake_policy(SET CMP0026 OLD)
+endif()
+if(POLICY CMP0043)
+    cmake_policy(SET CMP0043 OLD)
+endif()
+if(POLICY CMP0045)
+    cmake_policy(SET CMP0045 OLD)
+endif()
+if(POLICY CMP0046)
+    cmake_policy(SET CMP0046 OLD)
+endif()
+
 ########################################################################
 # Compiler specific setup
 ########################################################################
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
     #http://gcc.gnu.org/wiki/Visibility
     add_definitions(-fvisibility=hidden)
-    add_definitions(-std=gnu++0x)
     add_definitions(-fPIC)
-endif()
-
-if (APPLE)
-	add_definitions(-std=c++11 -stdlib=libc++)
+    set(CMAKE_CXX_FLAGS "-std=c++11")
 endif()
 
 ########################################################################
@@ -52,21 +90,22 @@ if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost required to compile hydra")
 endif()
 
-
-## load in pkg-config support
-find_package(PkgConfig)
-## use pkg-config to get hints for 0mq locations
-pkg_check_modules(PC_ZeroMQ QUIET zmq)
-## use the hint from above to find where 'zmq.hpp' is located
-find_path(ZeroMQ_INCLUDE_DIR
-        NAMES zmq.hpp
-        PATHS ${PC_ZeroMQ_INCLUDE_DIRS}
-        )
-## use the hint from about to find the location of libzmq
-find_library(ZeroMQ_LIBRARY
-        NAMES zmq
-        PATHS ${PC_ZeroMQ_LIBRARY_DIRS}
-        )
+########################################################################
+# Install directories
+########################################################################
+include(GrPlatform) #define LIB_SUFFIX
+set(GR_RUNTIME_DIR      bin)
+set(GR_LIBRARY_DIR      lib${LIB_SUFFIX})
+set(GR_INCLUDE_DIR      include/hydra)
+set(GR_DATA_DIR         share)
+set(GR_PKG_DATA_DIR     ${GR_DATA_DIR}/${CMAKE_PROJECT_NAME})
+set(GR_DOC_DIR          ${GR_DATA_DIR}/doc)
+set(GR_PKG_DOC_DIR      ${GR_DOC_DIR}/${CMAKE_PROJECT_NAME})
+set(GR_CONF_DIR         etc)
+set(GR_PKG_CONF_DIR     ${GR_CONF_DIR}/${CMAKE_PROJECT_NAME}/conf.d)
+set(GR_LIBEXEC_DIR      libexec)
+set(GR_PKG_LIBEXEC_DIR  ${GR_LIBEXEC_DIR}/${CMAKE_PROJECT_NAME})
+set(GRC_BLOCKS_DIR      ${GR_PKG_DATA_DIR}/grc/blocks)
 
 ########################################################################
 # On Apple only, set install name and use rpath correctly, if not already set
@@ -93,10 +132,20 @@ endif(APPLE)
 ########################################################################
 find_package(CppUnit)
 find_package(Doxygen)
-find_package(FFTW REQUIRED)
-find_package(UHD REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(ZMQ REQUIRED)
 
+# Search for GNU Radio and its components and versions. Add any
+# components required to the list of GR_REQUIRED_COMPONENTS (in all
+# caps such as FILTER or FFT) and change the version to the minimum
+# API compatible version required.
+set(GR_REQUIRED_COMPONENTS RUNTIME BLOCKS)
+find_package(Gnuradio "3.7.2" REQUIRED)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake/Modules)
+include(GrVersion)
+
+if(NOT CPPUNIT_FOUND)
+    message(FATAL_ERROR "CppUnit required to compile hydra")
+endif()
 
 ########################################################################
 # Setup doxygen option
@@ -117,20 +166,21 @@ include_directories(
     ${CMAKE_BINARY_DIR}/include
     ${Boost_INCLUDE_DIRS}
     ${CPPUNIT_INCLUDE_DIRS}
-    ${UHD_INCLUDE_DIRS}
-    ${PC_ZeroMQ_INCLUDE_DIRS}
+    ${GNURADIO_RUNTIME_INCLUDE_DIRS}   
+    ${GNURADIO_ALL_INCLUDE_DIRS}
+    ${ZMQ_INCLUDE_DIR}
 )
 
 link_directories(
     ${Boost_LIBRARY_DIRS}
     ${CPPUNIT_LIBRARY_DIRS}
-    ${FFTW_LIBRARIES}
-    ${UHD_LIBRARIES}
-    ${PC_ZeroMQ_LIBRARY_DIRS}
+    ${GNURADIO_RUNTIME_LIBRARY_DIRS}
+    ${ZMQ_LIBRARY}
 )
 
 # Set component parameters
-set(HYDRA_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include CACHE INTERNAL "" FORCE)
+set(GR_XVL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include CACHE INTERNAL "" FORCE)
+set(GR_XVL_SWIG_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/swig CACHE INTERNAL "" FORCE)
 
 ########################################################################
 # Create uninstall target
@@ -148,10 +198,11 @@ add_custom_target(uninstall
 # Add subdirectories
 ########################################################################
 add_subdirectory(include/hydra)
-add_subdirectory(app)
 add_subdirectory(lib)
+add_subdirectory(swig)
+add_subdirectory(grc)
 
-########################LIBRARIES################################################
+########################################################################
 # Install cmake search helper for this library
 ########################################################################
 if(NOT CMAKE_MODULES_DIR)

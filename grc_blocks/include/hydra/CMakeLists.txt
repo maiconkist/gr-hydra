@@ -19,17 +19,9 @@
 # Install public header files
 ########################################################################
 install(FILES
-	 types.h
-	 hydra_fft.h
-	 hydra_virtual_radio.h
-	 hydra_hypervisor.h
-    hydra_buffer.h
-    hydra_socket.h
-    hydra_stats.h
-    hydra_resource.h
-    hydra_core.h
-    hydra_server.h
-    hydra_client.h
-    hydra_main.h
-    hydra_uhd_interface.h
-	 DESTINATION include/hydra)
+   api.h
+   hydra_block.h
+   hydra_source.h
+   hydra_sink.h
+   hydra_async_sink.h
+   DESTINATION include/hydra)

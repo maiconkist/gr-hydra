@@ -21,7 +21,6 @@
 #ifndef INCLUDED_HYDRA_VIRTUAL_RADIO_H
 #define INCLUDED_HYDRA_VIRTUAL_RADIO_H
 
-#include <hydra/api.h>
 #include <hydra/types.h>
 #include <hydra/hydra_fft.h>
 #include <hydra/hydra_socket.h>
@@ -35,7 +34,7 @@ namespace hydra {
 
 typedef std::deque<std::vector<iq_sample>> window_stream;
 
-class HYDRA_API VirtualRadio
+class VirtualRadio
 {
 public:
   /** CTOR
