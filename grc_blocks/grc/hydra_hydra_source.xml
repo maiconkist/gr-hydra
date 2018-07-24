@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <block>
   <name>HyDRA Source</name>
-  <key>hydra_hydra_source</key>
-  <category>hydra</category>
+  <key>hydra_source</key>
+  <category>[HyDRA]</category>
   <import>import hydra</import>
   <make>hydra.hydra_source($num_outputs, $fft_m_size, $central_frequency, $bandwidth,
 	 (($center_freq1(), $samprate1()), 

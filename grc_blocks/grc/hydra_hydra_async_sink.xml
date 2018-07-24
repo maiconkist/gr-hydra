@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <block>
-  <name>hydra_async_sink</name>
-  <key>hydra_hydra_async_sink</key>
-  <category>hydra</category>
+  <name>HyDRA Async Sink</name>
+  <key>hydra_async_sink</key>
+  <category>[HyDRA]</category>
   <import>import hydra</import>
   <make>hydra.hydra_async_sink($num_inputs, $fft_m_size, $central_frequency, $bandwidth, $vradio_config)</make>
 

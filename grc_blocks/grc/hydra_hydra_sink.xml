@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <block>
   <name>HyDRA Sink</name>
-  <key>hydra_hydra_sink</key>
-  <category>hydra</category>
+  <key>hydra_sink</key>
+  <category>[HyDRA]</category>
   <import>import hydra</import>
   <make>hydra.hydra_sink($num_inputs, $fft_m_size, $central_frequency, $bandwidth,
 	 (($center_freq1(), $samprate1()), 
