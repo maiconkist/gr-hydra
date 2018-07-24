@@ -58,7 +58,6 @@ udp_receiver::handle_receive(
   unsigned int u_bytes_trans)
 {
 
-  std::cout << "Received something from the fucking udp. bytes:  " << u_bytes_trans << std::endl;
 
   if (!error)
   {

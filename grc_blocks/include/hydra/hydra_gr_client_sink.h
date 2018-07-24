@@ -11,11 +11,11 @@ namespace gr {
      * \ingroup hydra
      *
      */
-    class HYDRA_API hydra_gr_client : virtual public gr::hier_block2
+    class HYDRA_API hydra_gr_client_sink : virtual public gr::hier_block2
     {
       public:
 
-        typedef boost::shared_ptr<hydra_gr_client> sptr;
+        typedef boost::shared_ptr<hydra_gr_client_sink> sptr;
 
         /*!
          * \brief Return a shared_ptr to a new instance of hydra::hydra_sink.

@@ -74,7 +74,7 @@ void RxBuffer::run()
      // Windows not being consumed
      if (output_buffer.size() > 1e3)
      {
-        std::cerr << "Too many windows!" << std::endl;
+       //std::cerr << "Too many windows!" << std::endl;
      }
      // Plenty of space
      else
@@ -174,7 +174,7 @@ TxBuffer::run()
     // Data not being consumed
     if (output_buffer.size() > 1e8)
     {
-      std::cerr << "Too much data!" << std::endl;
+      //std::cerr << "Too much data!" << std::endl;
     }
     // Plenty of space
     else

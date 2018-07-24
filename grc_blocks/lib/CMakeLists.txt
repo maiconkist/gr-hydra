@@ -28,7 +28,8 @@ list(APPEND hydra_sources
     hydra_sink.cc
     hydra_async_sink.cc
     hydra_source.cc
-    hydra_gr_client_impl.cc
+    hydra_gr_client_sink_impl.cc
+    hydra_gr_server_impl.cc
 )
 
 set(hydra_sources "${hydra_sources}" PARENT_SCOPE)

@@ -179,10 +179,10 @@ device_image_gen::send(const gr_complex *buf, size_t len)
          }
       }
 
+      std::cout << "Saving image: ./watterfall_" << std::to_string(img_counter) << ".png" << std::endl;
       cv::imwrite(std::string("./waterfall_" + std::to_string(img_counter++) + ".png"), img);
       g_iq_samples.clear();
    }
 }
-
 
 } // namespace hydra
