@@ -55,6 +55,11 @@
 #target_link_libraries(hydramain PUBLIC hydracore hydraserver hydrastats)
 #
 #
+
+add_library(hydraclient hydra_client.cc)
+target_link_libraries(hydraclient PUBLIC ${ZeroMQ_LIBRARY})
+
+
 list(APPEND hydra_sources
     hydra_fft.cc
     hydra_virtual_radio.cc
@@ -70,7 +75,7 @@ list(APPEND hydra_sources
     hydra_uhd_interface.cc
 )
 
-add_library(hydra STATIC ${hydra_sources})
+add_library(hydra ${hydra_sources})
 target_link_libraries(hydra
   ${Boost_LIBRARIES}
   ${FFTW_LIBRARIES}

@@ -25,11 +25,9 @@ include(GrPlatform) #define LIB_SUFFIX
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND hydra_sources
-    hydra_sink.cc
-    hydra_async_sink.cc
-    hydra_source.cc
+    hydra_client.cc
     hydra_gr_client_sink_impl.cc
-    hydra_gr_server_impl.cc
+    #hydra_gr_server_impl.cc
 )
 
 set(hydra_sources "${hydra_sources}" PARENT_SCOPE)
@@ -38,11 +36,15 @@ if(NOT hydra_sources)
 	return()
 endif(NOT hydra_sources)
 
-add_library(gnuradio-hydra STATIC ${hydra_sources})
+add_library(hydraclient hydra_client.cc)
+add_library(gnuradio-hydra SHARED ${hydra_sources})
+
 target_link_libraries(gnuradio-hydra
 	${Boost_LIBRARIES}
-	${GNURADIO_ALL_LIBRARIES}
-   ${UHD_LIBRARIES}
+  ${GNURADIO_ALL_LIBRARIES}
+  ${UHD_LIBRARIES}
+  ${ZMQ_LIBRARIES}
+   hydraclient
 )
 set_target_properties(gnuradio-hydra PROPERTIES DEFINE_SYMBOL "gnuradio_hydra_EXPORTS")
 

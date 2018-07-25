@@ -21,7 +21,7 @@
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 2.6)
-project(gr-hydra CXX C)
+project(gnuradio-hydra CXX C)
 enable_testing()
 
 #install to PyBOMBS target prefix if defined
