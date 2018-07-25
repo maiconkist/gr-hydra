@@ -38,7 +38,7 @@ void HydraMain::set_tx_config(uhd_hydra_sptr usrp,
 void HydraMain::run()
 {
    // Initialise the server
-   server = std::make_unique<HydraServer>(u_port, core);
+   server = std::make_shared<HydraServer>(u_port, core);
 
    // Run the statistics reporting server
    monitor->run();

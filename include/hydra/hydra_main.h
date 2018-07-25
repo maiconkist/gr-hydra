@@ -15,7 +15,7 @@ class HydraMain
 {
 public:
    // Pointer to the XVL Server
-   std::unique_ptr<HydraServer> server;
+   std::shared_ptr<HydraServer> server;
    /// Pointer to the XVL Core
    std::shared_ptr<HydraCore> core;
    // Pointer to the XVL Statistics monitor

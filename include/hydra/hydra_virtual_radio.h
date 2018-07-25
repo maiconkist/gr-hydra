@@ -32,8 +32,6 @@
 
 namespace hydra {
 
-typedef std::deque<std::vector<iq_sample>> window_stream;
-
 class VirtualRadio
 {
 public:

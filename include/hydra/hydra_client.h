@@ -1,12 +1,12 @@
 #ifndef HYDRA_CLIENT_INCLUDE_H
 #define HYDRA_CLIENT_INCLUDE_H
 
+
 #include <zmq.hpp>
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <boost/property_tree/json_parser.hpp>
-
 
 namespace hydra {
 
@@ -37,13 +37,13 @@ public:
                            const double d_bandwidth = 0);
 
   // Check whether the hypervisor is alive
-  std::string check_connection(void);
+  std::string check_connection();
 
   // Query the available resources
-  std::string query_resources(void);
+  std::string query_resources();
 
   // Free resources
-  std::string free_resources(void);
+  std::string free_resources();
 
 private:
   // Base message methods

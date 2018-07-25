@@ -21,5 +21,6 @@ install(FILES
     hydra_async_sink.xml
     hydra_source.xml
     hydra_gr_client_sink.xml
+    hydra_gr_server.xml
     DESTINATION share/gnuradio/grc/blocks
 )

@@ -4,7 +4,6 @@
 #include <uhd.h>
 #include "hydra/types.h"
 
-
 namespace hydra {
 
 class abstract_device
@@ -50,6 +49,7 @@ private:
    uhd_tx_metadata_handle tx_md;
    size_t tx_samps_per_buff;
 };
+
 
 class device_image_gen: public abstract_device
 {

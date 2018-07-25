@@ -1,163 +1,45 @@
-########################################################################
-# Project setup
-########################################################################
-cmake_minimum_required(VERSION 2.6)
-project(hydra CXX C)
-enable_testing()
+# Set minimum CMAKE version
+cmake_minimum_required(VERSION 2.8.9)
+# Define project name
+project (HyDRA)
 
-set(CMAKE_CXX_STANDARD 14)
+# Use C++17
+set(CMAKE_CXX_FLAGS "-std=c++17")
+# set(CMAKE_CXX_STANDARD 17)
 
-#select the release build type by default to get optimization flags
-if(NOT CMAKE_BUILD_TYPE)
-   set(CMAKE_BUILD_TYPE "Release")
-   message(STATUS "Build type not specified: defaulting to release.")
-endif(NOT CMAKE_BUILD_TYPE)
-set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "")
+# Find Threads
+find_package(Threads)
 
-#make sure our local CMake Modules path comes first
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake/Modules)
+# Find openCV
+find_package(OpenCV)
 
-########################################################################
-# Compiler specific setup
-########################################################################
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
-    #http://gcc.gnu.org/wiki/Visibility
-    add_definitions(-fvisibility=hidden)
-    add_definitions(-std=gnu++0x)
-    add_definitions(-fPIC)
-endif()
-
-if (APPLE)
-	add_definitions(-std=c++11 -stdlib=libc++)
-endif()
-
-########################################################################
-# Find boost
-########################################################################
-if(UNIX AND EXISTS "/usr/lib64")
-    list(APPEND BOOST_LIBRARYDIR "/usr/lib64") #fedora 64-bit fix
-endif(UNIX AND EXISTS "/usr/lib64")
-set(Boost_ADDITIONAL_VERSIONS
-    "1.35.0" "1.35" "1.36.0" "1.36" "1.37.0" "1.37" "1.38.0" "1.38" "1.39.0" "1.39"
-    "1.40.0" "1.40" "1.41.0" "1.41" "1.42.0" "1.42" "1.43.0" "1.43" "1.44.0" "1.44"
-    "1.45.0" "1.45" "1.46.0" "1.46" "1.47.0" "1.47" "1.48.0" "1.48" "1.49.0" "1.49"
-    "1.50.0" "1.50" "1.51.0" "1.51" "1.52.0" "1.52" "1.53.0" "1.53" "1.54.0" "1.54"
-    "1.55.0" "1.55" "1.56.0" "1.56" "1.57.0" "1.57" "1.58.0" "1.58" "1.59.0" "1.59"
-    "1.60.0" "1.60" "1.61.0" "1.61" "1.62.0" "1.62" "1.63.0" "1.63" "1.64.0" "1.64"
-    "1.65.0" "1.65" "1.66.0" "1.66" "1.67.0" "1.67" "1.68.0" "1.68" "1.69.0" "1.69"
-)
-find_package(Boost "1.35" COMPONENTS filesystem system)
-
-if(NOT Boost_FOUND)
-    message(FATAL_ERROR "Boost required to compile hydra")
-endif()
-
-
-## load in pkg-config support
-find_package(PkgConfig)
-## use pkg-config to get hints for 0mq locations
-pkg_check_modules(PC_ZeroMQ QUIET zmq)
-## use the hint from above to find where 'zmq.hpp' is located
-find_path(ZeroMQ_INCLUDE_DIR
-        NAMES zmq.hpp
-        PATHS ${PC_ZeroMQ_INCLUDE_DIRS}
-        )
-## use the hint from about to find the location of libzmq
-find_library(ZeroMQ_LIBRARY
-        NAMES zmq
-        PATHS ${PC_ZeroMQ_LIBRARY_DIRS}
-        )
-
-########################################################################
-# On Apple only, set install name and use rpath correctly, if not already set
-########################################################################
-if(APPLE)
-    if(NOT CMAKE_INSTALL_NAME_DIR)
-        set(CMAKE_INSTALL_NAME_DIR
-            ${CMAKE_INSTALL_PREFIX}/${GR_LIBRARY_DIR} CACHE
-            PATH "Library Install Name Destination Directory" FORCE)
-    endif(NOT CMAKE_INSTALL_NAME_DIR)
-    if(NOT CMAKE_INSTALL_RPATH)
-        set(CMAKE_INSTALL_RPATH
-            ${CMAKE_INSTALL_PREFIX}/${GR_LIBRARY_DIR} CACHE
-            PATH "Library Install RPath" FORCE)
-    endif(NOT CMAKE_INSTALL_RPATH)
-    if(NOT CMAKE_BUILD_WITH_INSTALL_RPATH)
-        set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE
-            BOOL "Do Build Using Library Install RPath" FORCE)
-    endif(NOT CMAKE_BUILD_WITH_INSTALL_RPATH)
-endif(APPLE)
-
-########################################################################
-# Find gnuradio build dependencies
-########################################################################
-find_package(CppUnit)
-find_package(Doxygen)
-find_package(FFTW REQUIRED)
+# Find UHD
 find_package(UHD REQUIRED)
-find_package(OpenCV REQUIRED)
 
+# FFTW
+find_package(FFTW REQUIRED)
 
-########################################################################
-# Setup doxygen option
-########################################################################
-if(DOXYGEN_FOUND)
-	option(ENABLE_DOXYGEN "Build docs using Doxygen" ON)
-else(DOXYGEN_FOUND)
-	option(ENABLE_DOXYGEN "Build docs using Doxygen" OFF)
-endif(DOXYGEN_FOUND)
+# Find pkg-config
+find_package(PkgConfig)
+# Use pkg-config to get hints for zmq locations
+pkg_check_modules(PC_ZeroMQ QUIET zmq)
 
-########################################################################
-# Setup the include and linker paths
-########################################################################
-include_directories(
-    ${CMAKE_SOURCE_DIR}/lib
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/lib
-    ${CMAKE_BINARY_DIR}/include
-    ${Boost_INCLUDE_DIRS}
-    ${CPPUNIT_INCLUDE_DIRS}
-    ${UHD_INCLUDE_DIRS}
-    ${PC_ZeroMQ_INCLUDE_DIRS}
+# Use the hint from above to find where 'zmq.hpp' is located
+find_path(
+  ZeroMQ_INCLUDE_DIR
+  NAMES zmq.hpp
+  PATHS ${PC_ZeroMQ_INCLUDE_DIRS}
 )
 
-link_directories(
-    ${Boost_LIBRARY_DIRS}
-    ${CPPUNIT_LIBRARY_DIRS}
-    ${FFTW_LIBRARIES}
-    ${UHD_LIBRARIES}
-    ${PC_ZeroMQ_LIBRARY_DIRS}
+## use the hint from about to find the location of libzmq
+find_library(
+  ZeroMQ_LIBRARY
+  NAMES zmq
+  PATHS ${PC_ZeroMQ_LIBRARY_DIRS}
 )
 
-# Set component parameters
-set(HYDRA_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include CACHE INTERNAL "" FORCE)
+# Find Boost
+find_package(Boost "1.58" COMPONENTS system filesystem REQUIRED)
 
-########################################################################
-# Create uninstall target
-########################################################################
-configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
-@ONLY)
-
-add_custom_target(uninstall
-    ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
-)
-
-########################################################################
-# Add subdirectories
-########################################################################
-add_subdirectory(include/hydra)
-add_subdirectory(app)
-add_subdirectory(lib)
-
-########################LIBRARIES################################################
-# Install cmake search helper for this library
-########################################################################
-if(NOT CMAKE_MODULES_DIR)
-  set(CMAKE_MODULES_DIR lib${LIB_SUFFIX}/cmake)
-endif(NOT CMAKE_MODULES_DIR)
-
-install(FILES cmake/Modules/hydraConfig.cmake
-    DESTINATION ${CMAKE_MODULES_DIR}/hydra
-)
+# Include the project's directories
+subdirs(app lib include/hydra)

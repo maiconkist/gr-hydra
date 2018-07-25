@@ -19,17 +19,17 @@
 # Install public header files
 ########################################################################
 install(FILES
-	 types.h
-	 hydra_fft.h
-	 hydra_virtual_radio.h
-	 hydra_hypervisor.h
-    hydra_buffer.h
-    hydra_socket.h
-    hydra_stats.h
-    hydra_resource.h
-    hydra_core.h
-    hydra_server.h
-    hydra_client.h
-    hydra_main.h
-    hydra_uhd_interface.h
-	 DESTINATION include/hydra)
+  types.h
+  hydra_fft.h
+  hydra_virtual_radio.h
+  hydra_hypervisor.h
+  hydra_buffer.h
+  hydra_socket.h
+  hydra_stats.h
+  hydra_resource.h
+  hydra_core.h
+  hydra_server.h
+  hydra_client.h
+  hydra_main.h
+  hydra_uhd_interface.h
+  DESTINATION include/hydra)

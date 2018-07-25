@@ -1,0 +1,30 @@
+<block>
+  <name>HyDRA Server</name>
+  <key>hydra_gr_server</key>
+  <category>[HyDRA]</category>
+  <import>import hydra</import>
+  <make>hydra.hydra_gr_server($port)
+self.$(id).set_tx_config($center_frequency, $samp_rate, $fft_size)
+self.$(id).start_server()
+  </make>
+  <param>
+    <name>Centre Frequency</name>
+    <key>center_frequency</key>
+    <type>real</type>
+  </param>
+  <param>
+    <name>Sampling Rate</name>
+    <key>samp_rate</key>
+    <type>real</type>
+  </param>
+  <param>
+    <name>Server Port</name>
+    <key>port</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>FFT M Size</name>
+    <key>fft_size</key>
+    <type>int</type>
+  </param>
+</block>

@@ -32,7 +32,7 @@ public:
   void start_reception(const std::string s_host,
                        int i_port);
 
-  void stop_reception(void);
+  void stop_reception();
 };
 
   } // namespace hydra
