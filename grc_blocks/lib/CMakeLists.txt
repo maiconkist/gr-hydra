@@ -22,7 +22,7 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIR} ../../include)
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND hydra_sources

@@ -1,6 +1,5 @@
 #include "hydra/hydra_main.h"
 
-
 namespace hydra {
 
 // Real radio centre frequency, bandwidth; control port; hypervisor's sampling rate, FFT size
@@ -29,9 +28,10 @@ void HydraMain::set_tx_config(uhd_hydra_sptr usrp,
                               double d_cf,
                               double d_bw,
                               unsigned int u_fft_size)
+
 {
-   // Configure transmitter resources
-   core->set_tx_resources(usrp, d_cf, d_bw, u_fft_size);
+  // Configure transmitter resources
+  core->set_tx_resources(usrp, d_cf, d_bw, u_fft_size);
 }
 
 // Run server

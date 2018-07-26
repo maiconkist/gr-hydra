@@ -86,3 +86,12 @@ target_link_libraries(hydra
   fftw3l
   pthread
 )
+
+########################################################################
+# Install built library files
+########################################################################
+install(TARGETS hydra
+    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so/.dylib file
+    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
+    RUNTIME DESTINATION bin              # .dll file
+)

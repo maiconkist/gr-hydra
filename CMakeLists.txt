@@ -42,4 +42,33 @@ find_library(
 find_package(Boost "1.58" COMPONENTS system filesystem REQUIRED)
 
 # Include the project's directories
+include_directories(include)
+
+
 subdirs(app lib include/hydra)
+
+
+########################################################################
+# Create uninstall target
+########################################################################
+configure_file(
+    ${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+@ONLY)
+
+add_custom_target(uninstall
+    ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+)
+
+
+
+########################LIBRARIES################################################
+# Install cmake search helper for this library
+########################################################################
+if(NOT CMAKE_MODULES_DIR)
+  set(CMAKE_MODULES_DIR lib${LIB_SUFFIX}/cmake)
+endif(NOT CMAKE_MODULES_DIR)
+
+install(FILES cmake/Modules/hydraConfig.cmake
+    DESTINATION ${CMAKE_MODULES_DIR}/hydra
+)

@@ -61,14 +61,10 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
   }
 }
 
-/*
- * Our virtual destructor.
- */
 hydra_gr_client_sink_impl::~hydra_gr_client_sink_impl()
 {
   // client->free_resources();
 }
-
 
   } /* namespace hydra */
 } /* namespace gr */

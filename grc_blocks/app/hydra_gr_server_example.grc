@@ -116,8 +116,12 @@
       <value>ahydra_gr_server_0</value>
     </param>
     <param>
+      <key>mode</key>
+      <value>"IMG_GEN"</value>
+    </param>
+    <param>
       <key>samp_rate</key>
-      <value>20e6</value>
+      <value>2e6</value>
     </param>
     <param>
       <key>port</key>

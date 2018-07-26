@@ -17,8 +17,9 @@ namespace gr {
         static sptr make(unsigned int u_port);
 
         virtual void set_tx_config(double d_center_frequency,
-                           double d_samp_rate,
-                           size_t d_tx_fft_size) = 0;
+                                   double d_samp_rate,
+                                   size_t d_tx_fft_size,
+                                   std::string mode) = 0;
 
         virtual void start_server() = 0;
     };

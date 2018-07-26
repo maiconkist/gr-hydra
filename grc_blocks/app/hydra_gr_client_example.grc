@@ -334,7 +334,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>2e6</value>
+      <value>200e3</value>
     </param>
     <param>
       <key>u_id</key>

@@ -5,7 +5,7 @@
   <import>import threading</import>
   <import>import hydra</import>
   <make>hydra.hydra_gr_server($port)
-self.$(id).set_tx_config($center_frequency, $samp_rate, $fft_size)
+self.$(id).set_tx_config($center_frequency, $samp_rate, $fft_size, $mode)
 self.$(id)_thread = threading.Thread(target=self.$(id).start_server)
 self.$(id)_thread.daemon = True
 self.$(id)_thread.start()</make>
@@ -28,5 +28,19 @@ self.$(id)_thread.start()</make>
     <name>FFT M Size</name>
     <key>fft_size</key>
     <type>int</type>
+  </param>
+  <param>
+    <name>Mode</name>
+    <key>mode</key>
+    <value>USRP</value>
+    <type>enum</type>
+    <option>
+      <name>USRP</name>
+      <key>"USRP"</key>
+    </option>
+    <option>
+      <name>Image Generation</name>
+      <key>"IMG_GEN"</key>
+    </option>
   </param>
 </block>

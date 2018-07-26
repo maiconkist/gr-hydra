@@ -31,6 +31,11 @@ namespace hydra {
   class Hypervisor;
   class VirtualRadio;
 
+  typedef enum {
+    USRP,
+    IMAGE_GEN,
+  } uhd_mode;
+
   typedef std::complex<float> gr_complex;
   typedef std::complex<float> iq_sample;
   typedef std::deque<iq_sample> iq_stream;
