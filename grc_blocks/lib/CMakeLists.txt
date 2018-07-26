@@ -24,10 +24,22 @@ include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
+
 list(APPEND hydra_sources
-    hydra_client.cc
+    ../../lib/hydra_fft.cc
+    ../../lib/hydra_virtual_radio.cc
+    ../../lib/hydra_hypervisor.cc
+    ../../lib/hydra_buffer.cc
+    ../../lib/hydra_socket.cc
+    ../../lib/hydra_stats.cc
+    ../../lib/hydra_resource.cc
+    ../../lib/hydra_server.cc
+    ../../lib/hydra_client.cc
+    ../../lib/hydra_core.cc
+    ../../lib/hydra_main.cc
+    ../../lib/hydra_uhd_interface.cc
     hydra_gr_client_sink_impl.cc
-    #hydra_gr_server_impl.cc
+    hydra_gr_server_impl.cc
 )
 
 set(hydra_sources "${hydra_sources}" PARENT_SCOPE)
@@ -36,15 +48,17 @@ if(NOT hydra_sources)
 	return()
 endif(NOT hydra_sources)
 
-add_library(hydraclient hydra_client.cc)
-add_library(gnuradio-hydra SHARED ${hydra_sources})
-
+add_library(gnuradio-hydra STATIC ${hydra_sources})
 target_link_libraries(gnuradio-hydra
-	${Boost_LIBRARIES}
+  ${Boost_LIBRARIES}
   ${GNURADIO_ALL_LIBRARIES}
   ${UHD_LIBRARIES}
-  ${ZMQ_LIBRARIES}
-   hydraclient
+  ${OpenCV_LIBRARIES}
+  ${OpenCV_LIBRARY}
+  ${ZMQ_LIBRARY}
+  ${FFTW_LIBRARIES}
+  fftw3f
+  fftw3l
 )
 set_target_properties(gnuradio-hydra PROPERTIES DEFINE_SYMBOL "gnuradio_hydra_EXPORTS")
 

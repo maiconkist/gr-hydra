@@ -66,7 +66,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
     #http://gcc.gnu.org/wiki/Visibility
     add_definitions(-fvisibility=hidden)
     add_definitions(-fPIC)
-    set(CMAKE_CXX_FLAGS "-std=c++11")
+    set(CMAKE_CXX_FLAGS "-std=c++14")
 endif()
 
 ########################################################################
@@ -132,6 +132,8 @@ endif(APPLE)
 ########################################################################
 find_package(CppUnit)
 find_package(Doxygen)
+find_package(OpenCV)
+find_package(FFTW REQUIRED)
 find_package(ZMQ REQUIRED)
 
 # Search for GNU Radio and its components and versions. Add any
@@ -193,6 +195,10 @@ configure_file(
 add_custom_target(uninstall
     ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
 )
+
+
+find_package(UHD REQUIRED)
+
 
 ########################################################################
 # Add subdirectories

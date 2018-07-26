@@ -30,11 +30,12 @@ class hydra_gr_server_impl : public hydra_gr_server
 
   /**
    */
-  void set_tx_config(double d_center_frequency,
+  virtual void set_tx_config(double d_center_frequency,
                      double d_samp_rate,
                      size_t d_tx_fft_size);
 
-  void start_server();
+  virtual void start_server();
+
 };
 
 

@@ -2,8 +2,11 @@
   <name>HyDRA Client Sink</name>
   <key>hydra_gr_sink</key>
   <category>[HyDRA]</category>
+  <import>import threading</import>
   <import>import hydra</import>
-  <make>hydra.hydra_gr_client_sink($center_frequency, $samp_rate, $vr_id, $host, $port, $payload)</make>
+  <make>hydra.hydra_gr_client_sink($u_id, $host, $port)
+self.$(id).start_client($center_frequency, $samp_rate, $payload)
+</make>
   <param>
     <name>Centre Frequency</name>
     <key>center_frequency</key>
@@ -16,7 +19,7 @@
   </param>
   <param>
     <name>Virtual Radio ID</name>
-    <key>vr_id</key>
+    <key>u_id</key>
     <type>int</type>
   </param>
   <param>

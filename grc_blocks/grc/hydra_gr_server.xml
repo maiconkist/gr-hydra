@@ -2,11 +2,13 @@
   <name>HyDRA Server</name>
   <key>hydra_gr_server</key>
   <category>[HyDRA]</category>
+  <import>import threading</import>
   <import>import hydra</import>
   <make>hydra.hydra_gr_server($port)
 self.$(id).set_tx_config($center_frequency, $samp_rate, $fft_size)
-self.$(id).start_server()
-  </make>
+self.$(id)_thread = threading.Thread(target=self.$(id).start_server)
+self.$(id)_thread.daemon = True
+self.$(id)_thread.start()</make>
   <param>
     <name>Centre Frequency</name>
     <key>center_frequency</key>

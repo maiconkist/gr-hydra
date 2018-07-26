@@ -59,7 +59,6 @@
 add_library(hydraclient hydra_client.cc)
 target_link_libraries(hydraclient PUBLIC ${ZeroMQ_LIBRARY})
 
-
 list(APPEND hydra_sources
     hydra_fft.cc
     hydra_virtual_radio.cc

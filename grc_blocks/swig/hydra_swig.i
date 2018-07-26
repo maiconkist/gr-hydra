@@ -15,5 +15,5 @@
 %include "hydra/hydra_gr_client_sink.h"
 GR_SWIG_BLOCK_MAGIC2(hydra, hydra_gr_client_sink);
 
-//%include "hydra/hydra_gr_server.h"
-//GR_SWIG_BLOCK_MAGIC2(hydra, hydra_gr_server);
+%include "hydra/hydra_gr_server.h"
+GR_SWIG_BLOCK_MAGIC2(hydra, hydra_gr_server);
