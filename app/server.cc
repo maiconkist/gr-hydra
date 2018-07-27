@@ -13,9 +13,9 @@ int main()
 
    // Transmitter
    // Centre frequency in Hz
-   double d_tx_centre_freq = 1.9e9;
+   double d_tx_centre_freq = 2.0e9;
    // Sampling rate in mega samples per second
-   double d_tx_samp_rate = 2e6;
+   double d_tx_samp_rate = 1e6;
    // FFT size
    unsigned int u_tx_fft_size = 2048;
 
@@ -33,7 +33,7 @@ int main()
    */
 
    // Configure the TX radio
-   hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>(d_tx_centre_freq, d_tx_samp_rate, 0.1, "serial=30C5414");
+   hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>(d_tx_centre_freq, d_tx_samp_rate, 60.0, "serial=30C5414");
 
    main.set_tx_config(
       usrp,

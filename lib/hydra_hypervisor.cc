@@ -128,7 +128,7 @@ Hypervisor::set_tx_resources(uhd_hydra_sptr tx_dev, double cf, double bw, size_t
 void
 Hypervisor::tx_run()
 {
-   size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e9 / get_tx_bandwidth());
+  size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e9 / get_tx_bandwidth() * 0.8);
 
    window optr(get_tx_fft());
 
@@ -216,17 +216,11 @@ Hypervisor::get_tx_window(window &optr, size_t len)
       (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
    }
 
-
-   optr.assign(g_ifft_complex->get_inbuf(),
-               g_ifft_complex->get_inbuf() + len);
-
-   /*
-   // Transform buffer from FREQ domain to TIME domain using IFFT
    g_ifft_complex->execute();
-   std::copy(g_ifft_complex->get_outbuf(),
-             g_ifft_complex->get_outbuf() + len,
-             optr);
-   */
+
+   optr.assign(g_ifft_complex->get_outbuf(),
+               g_ifft_complex->get_outbuf() + len);
+
    return tx_fft_len;
 }
 

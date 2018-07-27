@@ -24,6 +24,9 @@ cmake_minimum_required(VERSION 2.6)
 project(gnuradio-hydra CXX C)
 enable_testing()
 
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake/Modules/")
+
 #install to PyBOMBS target prefix if defined
 if(DEFINED ENV{PYBOMBS_PREFIX})
     set(CMAKE_INSTALL_PREFIX $ENV{PYBOMBS_PREFIX})
