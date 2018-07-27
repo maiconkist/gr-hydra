@@ -129,7 +129,8 @@ void
 Hypervisor::tx_run()
 {
    size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e9 / get_tx_bandwidth());
-   gr_complex *optr = new gr_complex [get_tx_fft()];
+
+   window optr(get_tx_fft());
 
    while (true)
    {
@@ -206,7 +207,7 @@ Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
 }
 
 size_t
-Hypervisor::get_tx_window(gr_complex *optr, size_t len)
+Hypervisor::get_tx_window(window &optr, size_t len)
 {
    for (vradio_vec::iterator it = g_vradios.begin();
         it != g_vradios.end();
@@ -215,9 +216,9 @@ Hypervisor::get_tx_window(gr_complex *optr, size_t len)
       (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
    }
 
-   std::copy(g_ifft_complex->get_inbuf(),
-             g_ifft_complex->get_inbuf() + len,
-             optr);
+
+   optr.assign(g_ifft_complex->get_inbuf(),
+               g_ifft_complex->get_inbuf() + len);
 
    /*
    // Transform buffer from FREQ domain to TIME domain using IFFT

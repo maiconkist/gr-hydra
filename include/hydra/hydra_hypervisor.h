@@ -107,7 +107,7 @@ class Hypervisor
 
   /**
    */
- size_t get_tx_window(gr_complex *optr, size_t len);
+ size_t get_tx_window(window &optr, size_t len);
 
 
 #if 0
