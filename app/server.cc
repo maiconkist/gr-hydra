@@ -3,21 +3,13 @@
 
 int main()
 {
-   // Receiver
-   // Centre frequency in Hz
-   double d_rx_centre_freq = 2e9;
-   // Sampling rate in mega samples per second
-   double d_rx_samp_rate = 20e6;
-   // FFT size
-   unsigned int u_rx_fft_size = 2000;
-
    // Transmitter
    // Centre frequency in Hz
    double d_tx_centre_freq = 2.0e9;
    // Sampling rate in mega samples per second
-   double d_tx_samp_rate = 1e6;
+   double d_tx_samp_rate = 2e6;
    // FFT size
-   unsigned int u_tx_fft_size = 2048;
+   unsigned int u_tx_fft_size = 1024;
 
    // Control port
    unsigned int u_port = 5000;

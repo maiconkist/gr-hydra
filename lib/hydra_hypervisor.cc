@@ -128,13 +128,14 @@ Hypervisor::set_tx_resources(uhd_hydra_sptr tx_dev, double cf, double bw, size_t
 void
 Hypervisor::tx_run()
 {
-  size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e9 / get_tx_bandwidth() * 0.8);
+  size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e6 / get_tx_bandwidth());
+  std::cout << "sleep: " << g_tx_sleep_time << std::endl;
 
    window optr(get_tx_fft());
 
    while (true)
    {
-      std::this_thread::sleep_for(std::chrono::nanoseconds(g_tx_sleep_time));
+      std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time) * 0.9);
 
       get_tx_window(optr , get_tx_fft());
       g_tx_dev->send(optr, get_tx_fft());
@@ -214,6 +215,12 @@ Hypervisor::get_tx_window(window &optr, size_t len)
         ++it)
    {
       (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
+   }
+
+   for (size_t i = 0; i < g_tx_subcarriers_map.size(); ++i)
+   {
+     if (g_tx_subcarriers_map[i] == -1)
+         g_ifft_complex->get_inbuf()[i] = gr_complex(0, 0);
    }
 
    g_ifft_complex->execute();

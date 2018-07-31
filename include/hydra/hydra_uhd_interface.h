@@ -23,7 +23,7 @@ public:
    double const get_rate() { return g_rate; }
    double const get_gain() { return g_gain; }
 
-private:
+protected:
    double g_freq;
    double g_rate;
    double g_gain;
@@ -54,7 +54,7 @@ private:
 class device_image_gen: public abstract_device
 {
 public:
-   device_image_gen(double freq, double rate, double gain);
+   device_image_gen(double freq, double rate, double gain, std::string device_args = "");
    void send(const window &buf, size_t len);
 
 private:

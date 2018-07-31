@@ -11,7 +11,7 @@ RxBuffer::RxBuffer(
    bool pad)
 {
   // Time threshold - round the division to a long int
-  l_threshold = llrint(fft_size * 1e9 / sampling_rate);
+  l_threshold = llrint(fft_size * 1e6 / sampling_rate);
 
   // Number of IQ samples per FFT window
   u_fft_size = fft_size;
@@ -65,19 +65,20 @@ void RxBuffer::run()
   while(true)
   {
      // Wait for "threshold" nanoseconds
-     std::this_thread::sleep_for(std::chrono::nanoseconds(l_threshold) * 0.8);
+     std::this_thread::sleep_for(std::chrono::microseconds(l_threshold) * 0.9);
 
      // If the destructor has been called
      if (thr_stop){return;}
 
      // Lock access to the buffer
      // Windows not being consumed
-     if (output_buffer.size() > 1e3)
+     if (output_buffer.size() > 100)
      {
+       //std::lock_guard<std::mutex> _l(out_mtx);
+       //output_buffer.pop_front();
        //std::cerr << "Too many windows!" << std::endl;
      }
-     // Plenty of space
-     else
+
      {
         std::lock_guard<std::mutex> _p(*p_in_mtx);
         // Get the current size of the queue

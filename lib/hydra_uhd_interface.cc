@@ -1,14 +1,12 @@
 #include "hydra/hydra_uhd_interface.h"
 
+#include "hydra/hydra_fft.h"
+
 #include <iostream>
+#include <numeric>
 #include <opencv2/opencv.hpp>
 
 namespace hydra {
-
-#define EXECUTE_OR_PRINT(fun)                       \
-  if(fun){                                          \
-    std::cout << "Error in " <<  #fun << std::endl; \
-  }
 
 device_uhd::device_uhd(double freq,
                      double rate,
@@ -38,8 +36,6 @@ device_uhd::device_uhd(double freq,
    std::vector<size_t> channel_nums {0};
    stream_args.channels = channel_nums;
    tx_stream = usrp->get_tx_stream(stream_args);
-
-
 }
 
 device_uhd::~device_uhd()
@@ -53,10 +49,48 @@ device_uhd::~device_uhd()
 void
 device_uhd::send(const window &buf, size_t len)
 {
-  const static uhd::tx_metadata_t md;
-  static size_t num_samps_sent = 0;
+  /*
+  static hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_image_gen>(g_freq, g_rate, g_gain);
+  usrp->send(buf, len);
+  */
 
-  tx_stream->send(&buf.front(), buf.size(), md);
+#if 0
+  uhd::tx_metadata_t md;
+  md.start_of_burst = false;
+  md.end_of_burst = false;
+  md.has_time_spec = false;
+
+  size_t num_tx_samps = usrp->get_device()->send(
+                                                 &buf.front(),
+                                                 buf.size(),
+                                                 md,
+                                                 uhd::io_type_t::COMPLEX_FLOAT32,
+                                                 uhd::device::SEND_MODE_FULL_BUFF);
+
+#endif
+
+#if 1
+  static window big_buf;
+  big_buf.insert(big_buf.end(), buf.begin(), buf.end());
+
+  if (big_buf.size() > get_rate() / 10)
+  {
+    uhd::tx_metadata_t md;
+    md.start_of_burst = false;
+    md.end_of_burst = false;
+    md.has_time_spec = false;
+
+
+    size_t num_tx_samps = usrp->get_device()->send(
+                                                   &big_buf.front(),
+                                                   big_buf.size(),
+                                                   md,
+                                                   uhd::io_type_t::COMPLEX_FLOAT32,
+                                                   uhd::device::SEND_MODE_FULL_BUFF);
+
+    big_buf.clear();
+  }
+#endif
 }
 
 void
@@ -78,7 +112,7 @@ device_uhd::set_gain(double gain)
 }
 
 
-device_image_gen::device_image_gen(double freq, double rate, double gain):
+device_image_gen::device_image_gen(double freq, double rate, double gain, std::string device_args):
    abstract_device(freq, rate, gain)
 {
 }
@@ -88,10 +122,15 @@ void
 device_image_gen::send(const window &buf, size_t len)
 {
    static const size_t cols = len;
+   static sfft_complex g_ifft_complex = sfft_complex(new fft_complex(len));
    const size_t rows = 500;
    static size_t img_counter = 0;
 
-   g_iq_samples.insert(g_iq_samples.end(), buf.begin(), buf.end());
+   g_ifft_complex->set_data(&buf.front(), len);
+   g_ifft_complex->execute();
+   g_iq_samples.insert(g_iq_samples.end(),
+                       g_ifft_complex->get_outbuf(),
+                       g_ifft_complex->get_outbuf() + len);
 
    // TODO get fft size and number of rows from somewhere else
    if (g_iq_samples.size() == cols * rows)

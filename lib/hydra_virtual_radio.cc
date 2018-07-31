@@ -185,7 +185,8 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
 
    const iq_window * buf = tx_buffer->consume();
 
-   if (buf == nullptr){
+   if (buf == nullptr)
+   {
       return false;
    }
 
@@ -204,7 +205,7 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
          it != g_iq_map.end();
          ++it, ++idx)
    {
-      samples_buf[*it] = outbuf[idx]; 
+      samples_buf[*it] = outbuf[idx];
    }
 
    return true;
