@@ -19,9 +19,9 @@ hydra_client::request_rx_resources(const double d_centre_freq,
 {
   // If ill defined one of the parameters
   if (not bool(d_centre_freq) or not bool(d_bandwidth))
-    {
-      std::cerr << "Missing RX information!" << std::endl;
-    }
+  {
+    std::cerr << "Missing RX information!" << std::endl;
+  }
 
   // Set message type
   std::string message = "{\"xvl_rrx\":{\"id\":" + std::to_string(u_id) + "," +
@@ -58,8 +58,9 @@ hydra_client::request_rx_resources(const double d_centre_freq,
 }
 
 int
-hydra_client::request_tx_resources(const double d_centre_freq,
-                                     const double d_bandwidth)
+hydra_client::request_tx_resources(double d_centre_freq,
+                                   double d_bandwidth,
+                                   bool bpad)
 {
   // If ill defined one of the parameters
   if (not bool(d_centre_freq) or not bool(d_bandwidth))
@@ -70,6 +71,7 @@ hydra_client::request_tx_resources(const double d_centre_freq,
   // Set message type
   std::string message = "{\"xvl_rtx\":{\"id\":" + std::to_string(u_id) + "," +
     ("\"centre_freq\":" + std::to_string(d_centre_freq) + ",") +
+    ("\"padding\":" + std::to_string(bpad) + ",") +
     ("\"bandwidth\":" + std::to_string(d_bandwidth) + "}}");
 
   // Return the result of the request message

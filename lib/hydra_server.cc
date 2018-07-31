@@ -21,7 +21,8 @@ HydraServer::HydraServer(unsigned int u_port,
 // Run the server
 int
 HydraServer::run()
-{  //  Prepare our context and socket
+{
+  //  Prepare our context and socket
   zmq::context_t context (1);
   zmq::socket_t socket (context, ZMQ_REP);
   socket.bind (("tcp://0.0.0.0:" + s_server_port).c_str());
@@ -125,8 +126,9 @@ HydraServer::run()
         }
         else
         {
+          bool bpad = root.get(key + ".padding", false);
           // Try to reserve TX resources
-          u_reserved = p_core->request_tx_resources(u_id, d_cf, d_bw, true);
+          u_reserved = p_core->request_tx_resources(u_id, d_cf, d_bw, bpad);
         }
 
         // If not able to reserve resources

@@ -33,8 +33,9 @@ public:
                            const double d_bandwidth = 0);
 
   // Request TX resources
-  int request_tx_resources(const double d_centre_freq = 0,
-                           const double d_bandwidth = 0);
+  int request_tx_resources(double d_centre_freq,
+                           double d_bandwidth,
+                           bool bpad);
 
   // Check whether the hypervisor is alive
   std::string check_connection();

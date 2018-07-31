@@ -40,7 +40,7 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
                                         double d_samp_rate,
                                         size_t u_payload)
 {
-  int i_tx_port = client->request_tx_resources(d_center_frequency, d_samp_rate);
+  int i_tx_port = client->request_tx_resources(d_center_frequency, d_samp_rate, false);
 
   if (i_tx_port)
   {
@@ -49,6 +49,7 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
                                                 i_tx_port,
                                                 u_payload,
                                                 true);
+
     d_udp_sink->connect(g_host, i_tx_port);
 
     connect(self(), 0, d_udp_sink, 0);

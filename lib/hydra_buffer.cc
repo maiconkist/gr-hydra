@@ -65,7 +65,7 @@ void RxBuffer::run()
   while(true)
   {
      // Wait for "threshold" nanoseconds
-     std::this_thread::sleep_for(std::chrono::microseconds(l_threshold) * 0.9);
+     std::this_thread::sleep_for(std::chrono::microseconds(l_threshold));
 
      // If the destructor has been called
      if (thr_stop){return;}

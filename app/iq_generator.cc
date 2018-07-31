@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
   // Request resources
   std::string lalala;
   hydra::hydra_client s1 = hydra::hydra_client("127.0.0.1", 5000, 1, true);
-  lalala = s1.request_tx_resources(2e9 + 1e6, std::stof(rate));
+  lalala = s1.request_tx_resources(2e9 + 1e6, std::stof(rate), false);
   std::cout << lalala << std::endl;
 
   // Initialise the async IO service

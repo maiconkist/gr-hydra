@@ -80,7 +80,6 @@ device_uhd::send(const window &buf, size_t len)
     md.end_of_burst = false;
     md.has_time_spec = false;
 
-
     size_t num_tx_samps = usrp->get_device()->send(
                                                    &big_buf.front(),
                                                    big_buf.size(),
