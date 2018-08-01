@@ -194,9 +194,7 @@ TxBuffer::run()
         // Lock access to the output buffer
         std::lock_guard<std::mutex> _omtx(out_mtx);
         // Insert IQ samples of the oldest window in the output deque
-        output_buffer.insert(output_buffer.end(),
-                                window.begin(),
-                                window.end());
+        output_buffer.insert(output_buffer.end(), window.begin(), window.end());
       }
       // If the queue of windows is empty at the moment
       else
@@ -213,8 +211,7 @@ void
 TxBuffer::produce(const gr_complex *buf, size_t len)
 {
   std::lock_guard<std::mutex> _l(*p_in_mtx);
+  p_input_buffer->push_back(window(buf, buf + len));
 }
-
-
 
 } // namespace hydra
