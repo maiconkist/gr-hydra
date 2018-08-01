@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client Example
-# Generated: Tue Jul 31 18:13:51 2018
+# Generated: Wed Aug  1 18:53:48 2018
 ##################################################
 
 from distutils.version import StrictVersion
@@ -38,7 +38,7 @@ from gnuradio import qtgui
 
 class hydra_gr_client_example(gr.top_block, Qt.QWidget):
 
-    def __init__(self):
+    def __init__(self, freq=2e9 + 200e3, samp_rate=200e3):
         gr.top_block.__init__(self, "Hydra Gr Client Example")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Hydra Gr Client Example")
@@ -65,6 +65,12 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
             self.restoreGeometry(self.settings.value("geometry").toByteArray())
         else:
             self.restoreGeometry(self.settings.value("geometry", type=QtCore.QByteArray))
+
+        ##################################################
+        # Parameters
+        ##################################################
+        self.freq = freq
+        self.samp_rate = samp_rate
 
         ##################################################
         # Variables
@@ -114,7 +120,7 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
         self._qtgui_waterfall_sink_x_0_win = sip.wrapinstance(self.qtgui_waterfall_sink_x_0.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_waterfall_sink_x_0_win)
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '127.0.0.1', 5000)
-        self.hydra_gr_sink_0.start_client(2e9+200e3, 200e3, 1024)
+        self.hydra_gr_sink_0.start_client(freq, samp_rate, 1024)
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
         	  packet_length_tag_key="len",
@@ -124,25 +130,37 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_tuntap_pdu_0 = blocks.tuntap_pdu('tun0', 10000, True)
+        self.blocks_vector_source_x_0 = blocks.vector_source_b([x for x in range(0,250)], True, 1, [])
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, 200e3,True)
-        self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
+        self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((value, ))
 
         ##################################################
         # Connections
         ##################################################
-        self.msg_connect((self.blocks_tuntap_pdu_0, 'pdus'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.qtgui_waterfall_sink_x_0, 0))
-        self.connect((self.blocks_pdu_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
+        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.blocks_multiply_const_vxx_0, 0))
+        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
         self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_throttle_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_example")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
+
+    def get_freq(self):
+        return self.freq
+
+    def set_freq(self, freq):
+        self.freq = freq
+
+    def get_samp_rate(self):
+        return self.samp_rate
+
+    def set_samp_rate(self, samp_rate):
+        self.samp_rate = samp_rate
 
     def get_value(self):
         return self.value
@@ -152,7 +170,14 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
         self.blocks_multiply_const_vxx_0.set_k((self.value, ))
 
 
+def argument_parser():
+    parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
+    return parser
+
+
 def main(top_block_cls=hydra_gr_client_example, options=None):
+    if options is None:
+        options, _ = argument_parser().parse_args()
 
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')

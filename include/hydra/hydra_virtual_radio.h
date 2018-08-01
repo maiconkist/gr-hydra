@@ -55,72 +55,54 @@ public:
   int const get_id() {return g_idx;}
 
   bool const get_tx_enabled(){ return true; };
-  size_t const get_tx_udp_port(){ return u_tx_udp_port; }
-  size_t const get_tx_fft() {return u_rx_fft_size;}
-  double const get_tx_central_frequency() { return g_tx_cf; }
+  size_t const get_tx_udp_port(){ return g_tx_udp_port; }
+  size_t const get_tx_fft() {return g_rx_fft_size;}
+  double const get_tx_freq() { return g_tx_cf; }
   double const get_tx_bandwidth() {return g_tx_bw;}
+  int set_tx_freq(double cf);
+  void set_tx_bandwidth(double bw);
+  void set_tx_mapping(const iq_map_vec &iq_map);
+  size_t const set_tx_fft(size_t n) {return g_tx_fft_size = n;}
+  bool map_tx_samples(gr_complex *samples_buf); // called by the hypervisor
 
-  size_t const set_tx_fft(size_t n) {return u_tx_fft_size = n;}
 
   bool const get_rx_enabled(){ return true; };
-  size_t const get_rx_udp_port(){ return u_rx_udp_port; }
-  size_t const get_rx_fft() {return u_rx_fft_size;}
-  double const get_rx_central_frequency() { return g_rx_cf; }
+  size_t const get_rx_udp_port(){ return g_rx_udp_port; }
+  size_t const get_rx_fft() {return g_rx_fft_size;}
+  double const get_rx_freq() { return g_rx_cf; }
   double const get_rx_bandwidth() {return g_tx_bw;}
+  int set_rx_freq(double cf);
+  void set_rx_bandwidth(double bw);
+  void set_rx_mapping(const iq_map_vec &iq_map);
+  size_t const set_rx_fft(size_t n) {return g_rx_fft_size = n;}
+  void demap_iq_samples(const gr_complex *samples_buf, size_t len); // called by the hypervisor
 
-
-  /**
-   * @param cf Central frequency
-   */
-  int set_central_frequency(double cf);
-
-  /**
-   * @param bw
-   */
-  void set_bandwidth(double bw);
-
-  /**
-   * @param iq_map
-   */
-  void set_iq_mapping(const iq_map_vec &iq_map);
-
-  /** Get samples from samples_buf that are used by this virtual radio
-   * @param samples_buf
-   */
-  void demap_iq_samples(const gr_complex *samples_buf);
-
-  /** Copy rx samples in the buff to samples_buff
-   * @param noutput_items
-   * @param samples_buff
-   * @return Number of samples mapped to samples_buff
-   */
+#if 0
   size_t get_source_samples(size_t noutput_items, gr_complex *samples_buff);
+#endif
 
-  /**
-   * @param samples_buf
-   */
-  bool map_tx_samples(gr_complex *samples_buf);
 
   /**
    */
   bool const ready_to_demap_iq_samples();
 
 private:
-  size_t u_rx_fft_size; // Subcarriers used by this VRadio
-  size_t u_rx_udp_port;
+  iq_map_vec g_rx_map;
+  size_t g_rx_fft_size; // Subcarriers used by this VRadio
+  size_t g_rx_udp_port;
   bool b_receiver;
-  ReportPtr rx_report;
   double g_rx_cf;      // Central frequency
   double g_rx_bw;      // Bandwidth 
-  
   samples_vec g_rx_samples;
   sfft_complex g_ifft_complex;
   TxUDPPtr rx_socket;
   TxBufferPtr rx_buffer;
   window_stream* rx_windows;
+  ReportPtr rx_report;
 
-  size_t u_tx_fft_size; // Subcarriers used by this VRadio
-  size_t u_tx_udp_port;
+  iq_map_vec g_tx_map;
+  size_t g_tx_fft_size; // Subcarriers used by this VRadio
+  size_t g_tx_udp_port;
   bool b_transmitter;
   ReportPtr tx_report;
   double g_tx_cf;      // Central frequency
@@ -130,7 +112,6 @@ private:
   RxUDPPtr tx_socket;
 
   int g_idx;        // Radio unique ID
-  iq_map_vec g_iq_map;
   std::mutex g_mutex;
 
   // pointer to this VR hypervisor

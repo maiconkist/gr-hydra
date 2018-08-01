@@ -181,7 +181,7 @@ TxBuffer::run()
     else
     {
       // Lock access to the buffer
-      p_in_mtx->lock();
+      std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
 
       // Check if there's a valid window ready for transmission
       if (not p_input_buffer->empty())
@@ -191,34 +191,28 @@ TxBuffer::run()
         // Pop the oldest window
         p_input_buffer->pop_front();
 
-        // Release access to the input buffer
-        p_in_mtx->unlock();
-
-
         // Lock access to the output buffer
-        out_mtx.lock();
+        std::lock_guard<std::mutex> _omtx(out_mtx);
         // Insert IQ samples of the oldest window in the output deque
         output_buffer.insert(output_buffer.end(),
                                 window.begin(),
                                 window.end());
-        // Release access to the output buffer
-        out_mtx.unlock();
       }
       // If the queue of windows is empty at the moment
       else
       {
-        // Release access to the buffer
-        p_in_mtx->unlock();
-
-        // Lock access to the output buffer
-        out_mtx.lock();
+        std::lock_guard<std::mutex> _omtx(out_mtx);
         // Stream empty IQ samples that comprise the window duration
         output_buffer.insert(output_buffer.end(), u_fft_size, empty_iq);
-        // Release access to the output buffer
-        out_mtx.unlock();
       } // End padding
     } // End overflow
   } // End data check
+}
+
+void
+TxBuffer::produce(const gr_complex *buf, size_t len)
+{
+  std::lock_guard<std::mutex> _l(*p_in_mtx);
 }
 
 

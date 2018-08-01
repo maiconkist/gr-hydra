@@ -25,7 +25,8 @@ public:
   // CTOR
   HydraMain(unsigned int u_control_port, unsigned int u_monitor_port = 4996);
 
-  void set_rx_config(double d_cf,
+  void set_rx_config(uhd_hydra_sptr usrp,
+                     double d_cf,
                      double d_bw,
                      unsigned int u_fft_size);
 

@@ -86,6 +86,8 @@ public:
       buffer_thread->join();
    };
 
+   void produce(const gr_complex *buf, size_t len);
+
    // Method to transmit UDP data from a buffer
    void run();
 

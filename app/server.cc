@@ -25,7 +25,8 @@ int main()
    */
 
    // Configure the TX radio
-   hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>(d_tx_centre_freq, d_tx_samp_rate, 60.0, "serial=30C5414");
+   hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>();
+   usrp->set_tx_config(d_tx_centre_freq, d_tx_samp_rate, 60.0);
 
    main.set_tx_config(
       usrp,

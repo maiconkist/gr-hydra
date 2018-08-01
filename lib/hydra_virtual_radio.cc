@@ -46,10 +46,8 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   }
 
   // Set the VR RX UDP port
-  u_rx_udp_port = u_rx_udp;
-  // Set the VR RX FFT size
-  u_rx_fft_size = 1;
-
+  g_rx_udp_port = u_rx_udp;
+  g_rx_fft_size = p_hypervisor->get_rx_fft() * (d_rx_bw / p_hypervisor->get_rx_bandwidth());
 
   // TODO this must be shared with the hypervisor, or come from it
   std::mutex * hyp_mutex = new std::mutex;
@@ -58,19 +56,16 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   rx_buffer = std::make_unique<TxBuffer>(rx_windows,
                                          hyp_mutex,
                                          d_rx_bw,
-                                         u_rx_fft_size);
+                                         g_rx_fft_size);
 
   // Create UDP transmitter
   rx_socket = std::make_unique<TxUDP>(rx_buffer->stream(),
                                       rx_buffer->mutex(),
                                       "0.0.0.0",
-                                      std::to_string(u_rx_udp_port));
-
+                                      std::to_string(u_rx_udp));
 
   // Toggle receiving flag
   b_receiver = true;
-
-
 
   // Create reports object
   //rx_report = std::make_unique<xvl_report>(g_idx, rx_socket->buffer());
@@ -91,24 +86,24 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
       return 1;
 
    // Set the VR TX UDP port
-   u_tx_udp_port = u_tx_udp;
+   g_tx_udp_port = u_tx_udp;
    g_tx_bw = d_tx_bw;
    g_tx_cf = d_tx_cf;
 
-   u_tx_fft_size = p_hypervisor->get_tx_fft() * (d_tx_bw / p_hypervisor->get_tx_bandwidth());
+   g_tx_fft_size = p_hypervisor->get_tx_fft() * (d_tx_bw / p_hypervisor->get_tx_bandwidth());
 
    // Create UDP receiver
-   tx_socket = std::make_unique<RxUDP>("0.0.0.0", std::to_string(u_tx_udp_port));
+   tx_socket = std::make_unique<RxUDP>("0.0.0.0", std::to_string(u_tx_udp));
 
    // Create new timed buffer
    tx_buffer = std::make_unique<RxBuffer>(tx_socket->buffer(),
                                           tx_socket->mutex(),
                                           d_tx_bw,
-                                          u_tx_fft_size,
+                                          g_tx_fft_size,
                                           b_pad);
 
    // create fft object
-   g_fft_complex  = sfft_complex(new fft_complex(u_tx_fft_size));
+   g_fft_complex  = sfft_complex(new fft_complex(g_tx_fft_size));
 
    // Toggle transmitting flag
    b_transmitter = true;
@@ -123,7 +118,7 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
 }
 
 int
-VirtualRadio::set_central_frequency(double cf)
+VirtualRadio::set_tx_freq(double cf)
 {
    double old_cf = g_tx_cf;
    g_tx_cf = cf;
@@ -136,7 +131,7 @@ VirtualRadio::set_central_frequency(double cf)
 }
 
 void
-VirtualRadio::set_bandwidth(double bw)
+VirtualRadio::set_tx_bandwidth(double bw)
 {
    double old_bw = g_tx_bw;
    g_tx_bw = bw;
@@ -147,25 +142,88 @@ VirtualRadio::set_bandwidth(double bw)
 }
 
 void
-VirtualRadio::set_iq_mapping(const iq_map_vec &iq_map)
+VirtualRadio::set_tx_mapping(const iq_map_vec &iq_map)
 {
-   g_iq_map = iq_map;
+   g_tx_map = iq_map;
+}
+
+bool
+VirtualRadio::map_tx_samples(gr_complex *samples_buf)
+{
+  std::lock_guard<std::mutex> _l(g_mutex);
+
+  const iq_window * buf = tx_buffer->consume();
+
+  if (buf == nullptr)
+  {
+    return false;
+  }
+
+  const gr_complex *window = reinterpret_cast<const gr_complex*>(buf->data());
+
+  // Copy samples in TIME domain to FFT buffer, execute FFT
+  g_fft_complex->set_data(window, g_tx_fft_size);
+  g_fft_complex->execute();
+
+  gr_complex *outbuf = g_fft_complex->get_outbuf();
+
+  // map samples in FREQ domain to samples_buff
+  // perfors fft shift
+  size_t idx = 0;
+  for (iq_map_vec::iterator it = g_tx_map.begin();
+       it != g_tx_map.end();
+       ++it, ++idx)
+  {
+    samples_buf[*it] = outbuf[idx];
+  }
+
+  return true;
+}
+
+int
+VirtualRadio::set_rx_freq(double cf)
+{
+  double old_cf = g_rx_cf;
+  g_rx_cf = cf;
+
+  int err = p_hypervisor->notify(*this);
+  if (err < 0)
+    g_rx_cf = old_cf;
+
+  return err;
 }
 
 void
-VirtualRadio::demap_iq_samples(const gr_complex *samples_buf)
+VirtualRadio::set_rx_bandwidth(double bw)
+{
+  double old_bw = g_rx_bw;
+  g_rx_bw = bw;
+
+  int err = p_hypervisor->notify(*this);
+  if (err < 0)
+    g_rx_bw = old_bw;
+}
+
+void
+VirtualRadio::set_rx_mapping(const iq_map_vec &iq_map)
+{
+  g_rx_map = iq_map;
+}
+
+void
+VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
 {
    // Copy the samples used by this radio
-   for (size_t idx = 0; idx < u_tx_fft_size; ++idx)
-      g_ifft_complex->get_inbuf()[idx] = samples_buf[g_iq_map[idx]];
+   for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
+      g_ifft_complex->get_inbuf()[idx] = samples_buf[g_rx_map[idx]];
 
    g_ifft_complex->execute();
 
    // Append new samples
-   g_rx_samples.insert(g_rx_samples.end(), g_ifft_complex->get_outbuf(),
-         g_ifft_complex->get_outbuf() + u_tx_fft_size);
+   rx_buffer->produce(g_ifft_complex->get_outbuf(), g_rx_fft_size);
 }
 
+#if 0
 size_t
 VirtualRadio::get_source_samples(size_t noutput_items, gr_complex *samples_buff)
 {
@@ -177,38 +235,6 @@ VirtualRadio::get_source_samples(size_t noutput_items, gr_complex *samples_buff)
 
    return len;
 }
-
-bool
-VirtualRadio::map_tx_samples(gr_complex *samples_buf)
-{
-   std::lock_guard<std::mutex> _l(g_mutex);
-
-   const iq_window * buf = tx_buffer->consume();
-
-   if (buf == nullptr)
-   {
-      return false;
-   }
-
-   const gr_complex *window = reinterpret_cast<const gr_complex*>(buf->data());
-
-   // Copy samples in TIME domain to FFT buffer, execute FFT
-   g_fft_complex->set_data(window, u_tx_fft_size);
-   g_fft_complex->execute();
-
-   gr_complex *outbuf = g_fft_complex->get_outbuf();
-
-   // map samples in FREQ domain to samples_buff
-   // perfors fft shift
-   size_t idx = 0;
-   for (iq_map_vec::iterator it = g_iq_map.begin();
-         it != g_iq_map.end();
-         ++it, ++idx)
-   {
-      samples_buf[*it] = outbuf[idx];
-   }
-
-   return true;
-}
+#endif
 
 } /* namespace hydra */

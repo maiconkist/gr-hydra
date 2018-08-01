@@ -95,6 +95,9 @@ Hypervisor::detach_virtual_radio(size_t radio_id)
 int
 Hypervisor::notify(VirtualRadio &vr)
 {
+
+  if (vr.get_tx_enabled())
+  {
    iq_map_vec subcarriers_map = g_tx_subcarriers_map;
    std::replace(subcarriers_map.begin(),
                 subcarriers_map.end(),
@@ -102,12 +105,28 @@ Hypervisor::notify(VirtualRadio &vr)
                 -1);
 
    // enter 'if' in case of success
-   if (set_radio_mapping(vr, subcarriers_map ) > 0)
+   if (set_tx_mapping(vr, subcarriers_map ) > 0)
    {
       //LOG(INFO) << "success";
       g_tx_subcarriers_map = subcarriers_map;
-      return 1;
    }
+  }
+
+  if (vr.get_rx_enabled())
+  {
+    iq_map_vec subcarriers_map = g_rx_subcarriers_map;
+    std::replace(subcarriers_map.begin(),
+                 subcarriers_map.end(),
+                 vr.get_id(),
+                 -1);
+
+    // enter 'if' in case of success
+    if (set_rx_mapping(vr, subcarriers_map ) > 0)
+      {
+        //LOG(INFO) << "success";
+        g_rx_subcarriers_map = subcarriers_map;
+      }
+  }
 
    return -1;
 }
@@ -143,16 +162,7 @@ Hypervisor::tx_run()
 }
 
 void
-Hypervisor::set_rx_resources(double cf, double bw, size_t fft)
-{
-   g_rx_cf = cf;
-   g_rx_bw = bw;
-   rx_fft_len = fft;
-   g_fft_complex  = sfft_complex(new fft_complex(rx_fft_len));
-}
-
-void
-Hypervisor::set_radio_mapping()
+Hypervisor::set_tx_mapping()
 {
    iq_map_vec subcarriers_map(tx_fft_len, -1);
 
@@ -163,16 +173,16 @@ Hypervisor::set_radio_mapping()
         ++it)
      {
         std::cout << "setting map for VR " << (*it)->get_id() << std::endl;
-        set_radio_mapping(*((*it).get()), subcarriers_map);
+        set_tx_mapping(*((*it).get()), subcarriers_map);
      }
      g_tx_subcarriers_map = subcarriers_map;
 }
 
 int
-Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
+Hypervisor::set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
 {
    double vr_bw = vr.get_tx_bandwidth();
-   double vr_cf = vr.get_tx_central_frequency();
+   double vr_cf = vr.get_tx_freq();
    double offset = (vr_cf - vr_bw/2.0) - (g_tx_cf - g_tx_bw/2.0) ;
 
    // First VR subcarrier
@@ -201,8 +211,9 @@ Hypervisor::set_radio_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
       if (the_map.size() == fft_n)
          break;
    }
+
    vr.set_tx_fft(fft_n);
-   vr.set_iq_mapping(the_map);
+   vr.set_tx_mapping(the_map);
 
    return 1;
 }
@@ -230,5 +241,107 @@ Hypervisor::get_tx_window(window &optr, size_t len)
 
    return tx_fft_len;
 }
+
+void
+Hypervisor::set_rx_resources(uhd_hydra_sptr rx_dev, double cf, double bw, size_t fft_len)
+{
+  g_rx_dev = rx_dev;
+  g_rx_cf = cf;
+  g_rx_bw = bw;
+  rx_fft_len = fft_len;
+  g_rx_subcarriers_map = iq_map_vec(fft_len, -1);
+  g_fft_complex = sfft_complex(new fft_complex(fft_len));
+
+  g_rx_thread = std::make_unique<std::thread>(&Hypervisor::rx_run, this);
+}
+
+void
+Hypervisor::rx_run()
+{
+  size_t g_rx_sleep_time = llrint(get_rx_fft() * 1e6 / get_rx_bandwidth());
+  std::cout << "sleep: " << g_rx_sleep_time << std::endl;
+
+  window optr(get_rx_fft());
+
+  while (true)
+  {
+    std::this_thread::sleep_for(std::chrono::microseconds(g_rx_sleep_time));
+
+    g_rx_dev->receive(optr, get_rx_fft());
+    forward_rx_window(optr, get_rx_fft());
+  }
+}
+
+void
+Hypervisor::set_rx_mapping()
+{
+  iq_map_vec subcarriers_map(tx_fft_len, -1);
+
+  // for each virtual radio, to its mapping to subcarriers
+  // ::TRICKY:: we dont stop if a virtual radio cannot be allocated
+  for (vradio_vec::iterator it = g_vradios.begin();
+       it != g_vradios.end();
+       ++it)
+    {
+      std::cout << "setting map for VR " << (*it)->get_id() << std::endl;
+      set_rx_mapping(*((*it).get()), subcarriers_map);
+    }
+  g_rx_subcarriers_map = subcarriers_map;
+}
+
+int
+Hypervisor::set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
+{
+   double vr_bw = vr.get_rx_bandwidth();
+   double vr_cf = vr.get_rx_freq();
+   double offset = (vr_cf - vr_bw/2.0) - (g_rx_cf - g_rx_bw/2.0) ;
+
+   // First VR subcarrier
+   int sc = offset / (g_rx_bw / rx_fft_len);
+   size_t fft_n = vr_bw /(g_rx_bw /rx_fft_len);
+
+   if (sc < 0 || sc > rx_fft_len) {
+      std::cout << "Cannot allocate subcarriers for VR " << vr.get_id() << std::endl;
+      return -1;
+   }
+
+   std::cout << "VR " << vr.get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + fft_n << std::endl;
+
+   // Allocate subcarriers sequentially from sc
+   iq_map_vec the_map;
+   for (; sc < rx_fft_len; sc++)
+   {
+      //LOG_IF(subcarriers_map[sc] != -1, INFO) << "Subcarrier @" <<  sc << " already allocated";
+      if (subcarriers_map[sc] != -1)
+         return -1;
+
+      the_map.push_back(sc);
+      subcarriers_map[sc] = vr.get_id();
+
+      // break when we allocated enough subcarriers
+      if (the_map.size() == fft_n)
+         break;
+   }
+
+   vr.set_rx_fft(fft_n);
+   vr.set_rx_mapping(the_map);
+
+   return 1;
+}
+
+void
+Hypervisor::forward_rx_window(window &buf, size_t len)
+{
+  g_fft_complex->set_data(&buf.front(), len);
+  g_fft_complex->execute();
+
+  for (vradio_vec::iterator it = g_vradios.begin();
+       it != g_vradios.end();
+       ++it)
+  {
+    (*it)->demap_iq_samples(g_fft_complex->get_outbuf(), get_rx_fft());
+  }
+}
+
 
 } /* namespace hydra */

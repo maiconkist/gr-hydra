@@ -14,13 +14,14 @@ HydraCore::HydraCore()
 }
 
 void
-HydraCore::set_rx_resources(double d_centre_freq,
+HydraCore::set_rx_resources(uhd_hydra_sptr usrp,
+                            double d_centre_freq,
                             double d_bandwidth,
                             unsigned int u_fft_size)
 {
    // Initialise the RX resources
    p_resource_manager->set_rx_resources(d_centre_freq, d_bandwidth);
-   p_hypervisor->set_rx_resources(d_centre_freq, d_bandwidth, u_fft_size);
+   p_hypervisor->set_rx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
    // Toggle flag
    b_receiver = true;
@@ -70,11 +71,16 @@ HydraCore::request_rx_resources(unsigned int u_id,
 
   // Create RX UDP port
   static size_t u_udp_port = 6000;
-
-  // Calculate the virtual radio RX FFT size
-  unsigned int u_vr_fft_size = p_hypervisor->get_rx_fft() * (d_bandwidth / p_hypervisor->get_rx_bandwidth());
-  vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth);
-  p_hypervisor->attach_virtual_radio(vr);
+  if (vr == nullptr)
+  {
+      vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
+      vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth);
+      p_hypervisor->attach_virtual_radio(vr);
+  }
+  else
+  {
+      vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth);
+  }
 
    // If able to create all of it, return the port number
   return u_udp_port++;
@@ -113,7 +119,7 @@ HydraCore::request_tx_resources(unsigned int u_id,
   }
   else
   {
-     vr->set_tx_chain(vr->get_tx_udp_port(), d_centre_freq, d_bandwidth, bpad);
+     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, bpad);
   }
 
   // If able to create all of it, return the port number

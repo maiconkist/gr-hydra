@@ -16,12 +16,13 @@ HydraMain::HydraMain(unsigned int u_control_port,
 }
 
 void
-HydraMain::set_rx_config(double d_cf,
+HydraMain::set_rx_config(uhd_hydra_sptr usrp,
+                         double d_cf,
                          double d_bw,
                          unsigned int u_fft_size)
 {
-   // Configure receiver resources
-   core->set_rx_resources(d_cf, d_bw, u_fft_size);
+  // Configure receiver resources
+  core->set_rx_resources(usrp, d_cf, d_bw, u_fft_size);
 }
 
 void HydraMain::set_tx_config(uhd_hydra_sptr usrp,

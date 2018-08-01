@@ -39,7 +39,8 @@ public:
    ~HydraCore(){};
 
    // Set RX resources
-   void set_rx_resources(double d_centre_freq,
+   void set_rx_resources(uhd_hydra_sptr usrp,
+                         double d_centre_freq,
                          double d_bandwidth,
                          unsigned int u_fft_size);
 
