@@ -19,12 +19,14 @@ HydraCore::set_rx_resources(uhd_hydra_sptr usrp,
                             double d_bandwidth,
                             unsigned int u_fft_size)
 {
-   // Initialise the RX resources
-   p_resource_manager->set_rx_resources(d_centre_freq, d_bandwidth);
-   p_hypervisor->set_rx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
+  // Initialise the RX resources
+  p_resource_manager->set_rx_resources(d_centre_freq, d_bandwidth);
 
-   // Toggle flag
-   b_receiver = true;
+  usrp->set_rx_config(d_centre_freq, d_bandwidth, 60.0);
+  p_hypervisor->set_rx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
+
+  // Toggle flag
+  b_receiver = true;
 }
 
 void
@@ -35,6 +37,9 @@ HydraCore::set_tx_resources(uhd_hydra_sptr usrp,
 {
    // Initialise the RX resources
    p_resource_manager->set_tx_resources(d_centre_freq, d_bandwidth);
+
+
+   usrp->set_tx_config(d_centre_freq, d_bandwidth, 60.0);
    p_hypervisor->set_tx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
    // Toggle flag

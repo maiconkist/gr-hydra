@@ -39,6 +39,7 @@ list(APPEND hydra_sources
     ../../lib/hydra_main.cc
     ../../lib/hydra_uhd_interface.cc
     hydra_gr_client_sink_impl.cc
+    hydra_gr_client_source_impl.cc
     hydra_gr_server_impl.cc
 )
 

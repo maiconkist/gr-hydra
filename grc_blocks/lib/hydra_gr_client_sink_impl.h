@@ -35,4 +35,4 @@ private:
   } // namespace hydra
 } // namespace gr
 
-#endif /* INCLUDED_HYDRA_CLIENT_SINK_IMPL_H */
+#endif /* INCLUDED_HYDRA_GR_CLIENT_SINK_IMPL_H */

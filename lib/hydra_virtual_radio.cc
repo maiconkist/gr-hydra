@@ -47,7 +47,11 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
 
   // Set the VR RX UDP port
   g_rx_udp_port = u_rx_udp;
+  g_rx_cf = d_rx_freq;
+  g_rx_bw = d_rx_bw;
+
   g_rx_fft_size = p_hypervisor->get_rx_fft() * (d_rx_bw / p_hypervisor->get_rx_bandwidth());
+  g_ifft_complex  = sfft_complex(new fft_complex(g_rx_fft_size, false));
 
   // TODO this must be shared with the hypervisor, or come from it
   std::mutex * hyp_mutex = new std::mutex;
@@ -66,6 +70,10 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
 
   // Toggle receiving flag
   b_receiver = true;
+
+
+  // Always in the end.
+  p_hypervisor->notify(*this);
 
   // Create reports object
   //rx_report = std::make_unique<xvl_report>(g_idx, rx_socket->buffer());
@@ -150,8 +158,9 @@ VirtualRadio::set_tx_mapping(const iq_map_vec &iq_map)
 bool
 VirtualRadio::map_tx_samples(gr_complex *samples_buf)
 {
-  std::lock_guard<std::mutex> _l(g_mutex);
+  if (!b_transmitter) return false;
 
+  std::lock_guard<std::mutex> _l(g_mutex);
   const iq_window * buf = tx_buffer->consume();
 
   if (buf == nullptr)
@@ -213,6 +222,8 @@ VirtualRadio::set_rx_mapping(const iq_map_vec &iq_map)
 void
 VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
 {
+  if (!b_receiver) return;
+
    // Copy the samples used by this radio
    for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
       g_ifft_complex->get_inbuf()[idx] = samples_buf[g_rx_map[idx]];

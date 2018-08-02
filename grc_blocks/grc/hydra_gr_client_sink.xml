@@ -1,5 +1,6 @@
 <block>
   <name>HyDRA Client Sink</name>
+
   <key>hydra_gr_sink</key>
   <category>[HyDRA]</category>
   <import>import threading</import>

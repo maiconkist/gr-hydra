@@ -172,13 +172,6 @@ TxBuffer::run()
     // If the destructor has been called
     if (thr_stop){return;}
 
-    // Data not being consumed
-    if (output_buffer.size() > 1e8)
-    {
-      //std::cerr << "Too much data!" << std::endl;
-    }
-    // Plenty of space
-    else
     {
       // Lock access to the buffer
       std::lock_guard<std::mutex> _inmtx(*p_in_mtx);

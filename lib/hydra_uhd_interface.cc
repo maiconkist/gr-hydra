@@ -50,15 +50,15 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
   usrp->set_rx_freq(freq);
   std::cout << "Actual RX freq: " << usrp->get_rx_freq()/1e6 << " MHz" << std::endl;
 
-
-  uhd::stream_args_t stream_args("fc32"); //complex floats
+  uhd::stream_args_t stream_args("fc32", "sc16"); //complex floats
   rx_stream = usrp->get_rx_stream(stream_args);
 
   //setup streaming
-  uhd::stream_cmd_t stream_cmd(uhd::stream_cmd_t::STREAM_MODE_NUM_SAMPS_AND_MORE);
-  stream_cmd.num_samps = 1024;
+  uhd::stream_cmd_t stream_cmd(uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS);
+  stream_cmd.num_samps = 0; // continuous
   stream_cmd.stream_now = true;
-  rx_stream->issue_stream_cmd(stream_cmd);
+  stream_cmd.time_spec = uhd::time_spec_t();
+  usrp->issue_stream_cmd(stream_cmd);
 }
 
 
@@ -90,10 +90,13 @@ device_uhd::send(const window &buf, size_t len)
   }
 }
 
-void device_uhd::receive(window &buf, size_t len)
+void
+device_uhd::receive(window &buf, size_t len)
 {
+  if (rx_stream.get() == nullptr) return;
+
   uhd::rx_metadata_t md;
-  size_t num_rx_samps = rx_stream->recv(&buf.front(), buf.size(), md, 3.0);
+  size_t num_rx_samps = rx_stream->recv(&buf.front(), len, md);
 
   //handle the error codes
   switch(md.error_code)
@@ -102,15 +105,16 @@ void device_uhd::receive(window &buf, size_t len)
       break;
 
     case uhd::rx_metadata_t::ERROR_CODE_TIMEOUT:
-      std::cout << "Got timeout before all samples received, possible packet loss, exiting loop..." << std::endl;
+      std::cout << "u" << std::endl;
       break;
 
     default:
-      std::cout <<"Got error code 0x%x, exiting loop..." << md.error_code << std::endl;
+      std::cout <<"Got error code " << md.error_code << " from USRP..." << std::endl;
       break;
   }
-}
 
+
+}
 
 device_image_gen::device_image_gen(std::string device_args)
 {

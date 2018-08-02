@@ -158,6 +158,7 @@ Hypervisor::tx_run()
 
       get_tx_window(optr , get_tx_fft());
       g_tx_dev->send(optr, get_tx_fft());
+
    }
 }
 
@@ -259,14 +260,11 @@ void
 Hypervisor::rx_run()
 {
   size_t g_rx_sleep_time = llrint(get_rx_fft() * 1e6 / get_rx_bandwidth());
-  std::cout << "sleep: " << g_rx_sleep_time << std::endl;
-
   window optr(get_rx_fft());
 
   while (true)
   {
     std::this_thread::sleep_for(std::chrono::microseconds(g_rx_sleep_time));
-
     g_rx_dev->receive(optr, get_rx_fft());
     forward_rx_window(optr, get_rx_fft());
   }
@@ -275,7 +273,7 @@ Hypervisor::rx_run()
 void
 Hypervisor::set_rx_mapping()
 {
-  iq_map_vec subcarriers_map(tx_fft_len, -1);
+  iq_map_vec subcarriers_map(rx_fft_len, -1);
 
   // for each virtual radio, to its mapping to subcarriers
   // ::TRICKY:: we dont stop if a virtual radio cannot be allocated
@@ -300,6 +298,8 @@ Hypervisor::set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    int sc = offset / (g_rx_bw / rx_fft_len);
    size_t fft_n = vr_bw /(g_rx_bw /rx_fft_len);
 
+   std::cout << "vr_bw: " << vr_bw << ", vr_cf: "  << vr_cf << std::endl;
+   std::cout << "sc: " << sc << ", rx_fft_len: "  << rx_fft_len << std::endl;
    if (sc < 0 || sc > rx_fft_len) {
       std::cout << "Cannot allocate subcarriers for VR " << vr.get_id() << std::endl;
       return -1;

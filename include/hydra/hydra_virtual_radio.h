@@ -70,7 +70,7 @@ public:
   size_t const get_rx_udp_port(){ return g_rx_udp_port; }
   size_t const get_rx_fft() {return g_rx_fft_size;}
   double const get_rx_freq() { return g_rx_cf; }
-  double const get_rx_bandwidth() {return g_tx_bw;}
+  double const get_rx_bandwidth() {return g_rx_bw;}
   int set_rx_freq(double cf);
   void set_rx_bandwidth(double bw);
   void set_rx_mapping(const iq_map_vec &iq_map);

@@ -2,10 +2,10 @@
 
 namespace hydra {
 
-hydra_client::hydra_client(const std::string s_host,
-                       const unsigned int u_port,
-                       const unsigned int u_client_id,
-                       const bool b_debug)
+hydra_client::hydra_client(std::string s_host,
+                           unsigned int u_port,
+                           unsigned int u_client_id,
+                           bool b_debug)
 {
   s_server_host = s_host;
   s_server_port = std::to_string(u_port);
@@ -14,8 +14,9 @@ hydra_client::hydra_client(const std::string s_host,
 }
 
 int
-hydra_client::request_rx_resources(const double d_centre_freq,
-                                     const double d_bandwidth)
+hydra_client::request_rx_resources(double d_centre_freq,
+                                   double d_bandwidth,
+                                   bool bpad)
 {
   // If ill defined one of the parameters
   if (not bool(d_centre_freq) or not bool(d_bandwidth))
@@ -26,6 +27,7 @@ hydra_client::request_rx_resources(const double d_centre_freq,
   // Set message type
   std::string message = "{\"xvl_rrx\":{\"id\":" + std::to_string(u_id) + "," +
     ("\"centre_freq\":" + std::to_string(d_centre_freq) + ",") +
+    ("\"padding\":" + std::to_string(bpad) + ",") +
     ("\"bandwidth\":" + std::to_string(d_bandwidth) + "}}");
 
   std::stringstream ss;
@@ -52,8 +54,6 @@ hydra_client::request_rx_resources(const double d_centre_freq,
   {
     return root.get("xvl_rep.udp_port", 0);
   }
-
-
   return 0;
 }
 

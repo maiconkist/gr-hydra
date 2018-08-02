@@ -38,7 +38,8 @@ hydra_gr_server_impl::set_tx_config(double d_center_frequency,
 {
   if (mode == "USRP")
   {
-    uhd_hydra_sptr usrp = std::make_shared<device_uhd>(d_center_frequency, d_samp_rate, 0.1);
+    uhd_hydra_sptr usrp = std::make_shared<device_uhd>();
+    usrp->set_tx_config(d_center_frequency, d_samp_rate, 0.1);
     main->set_tx_config(usrp,
                         d_center_frequency,
                         d_samp_rate,
@@ -46,7 +47,7 @@ hydra_gr_server_impl::set_tx_config(double d_center_frequency,
   }
   else if (mode == "IMG_GEN")
   {
-    uhd_hydra_sptr usrp = std::make_shared<device_image_gen>(d_center_frequency, d_samp_rate, 0.1);
+    uhd_hydra_sptr usrp = std::make_shared<device_image_gen>();
     main->set_tx_config(usrp,
                         d_center_frequency,
                         d_samp_rate,
@@ -54,8 +55,6 @@ hydra_gr_server_impl::set_tx_config(double d_center_frequency,
   }
   else
     std::cerr << "Unknown mode" << std::endl;
-
-
 }
 
 void

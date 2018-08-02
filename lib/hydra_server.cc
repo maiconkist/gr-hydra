@@ -97,6 +97,7 @@ HydraServer::run()
              boost::iequals(key, "xvl_rtx"))
     {
       std::cout << "XVL Request Message" << std::endl;
+      std::cout << key << std::endl;
 
       // Extract the request arguments
       double d_cf = root.get(key + ".centre_freq", 0.0);
@@ -122,6 +123,7 @@ HydraServer::run()
         if (boost::iequals(key, "xvl_rrx"))
         {
           // Try to reserve RX resources
+          bool bpad = root.get(key + ".padding", false);
           u_reserved = p_core->request_rx_resources(u_id, d_cf, d_bw);
         }
         else

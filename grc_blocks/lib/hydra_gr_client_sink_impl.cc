@@ -28,7 +28,6 @@ hydra_gr_client_sink_impl::hydra_gr_client_sink_impl(
   :gr::hier_block2("gr_client_sink",
                    gr::io_signature::make(1, 1, sizeof(gr_complex)),
                    gr::io_signature::make(0, 0, 0))
-
 {
   g_host = s_host;
   client = new hydra_client(s_host, u_port, u_id, true);

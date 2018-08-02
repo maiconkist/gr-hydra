@@ -159,8 +159,12 @@ udp_transmitter::udp_transmitter(
   p_socket->set_option(roption);
 
   // Create a thread to transmit the data
-  tx_udp_thread = std::make_unique<std::thread>(&udp_transmitter::transmit,
-                                                this);
+  tx_udp_thread = std::make_unique<std::thread>(&udp_transmitter::transmit, this);
+
+  std::cout << "waiting:"
+            << s_host << ", "
+            << s_port
+            << std::endl;
 }
 
   // Assign the handle receive callback when a datagram is received
@@ -211,17 +215,15 @@ udp_transmitter::transmit()
       // Try to transmit
       try
       {
+
         // Send the output buffer through the socket
-        p_socket->send_to(
-          boost::asio::buffer(output_buffer.begin(), u_trans_bytes),
-          endpoint);
+        p_socket->send_to(boost::asio::buffer(output_buffer.begin(), u_trans_bytes), endpoint);
+
         // If there is a remainder
         if (u_remainder > 0)
         {
           // Send the remainder buffer through the socket
-          p_socket->send_to(
-            boost::asio::buffer(remainder_buffer.begin(), u_remainder),
-            endpoint);
+          p_socket->send_to(boost::asio::buffer(remainder_buffer.begin(), u_remainder), endpoint);
         }
       }
       // Not much we can do now :/

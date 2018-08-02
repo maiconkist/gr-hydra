@@ -24,13 +24,14 @@ class hydra_client
 public:
     // Constructor
   hydra_client(std::string s_host = "localhost",
-             const unsigned int u_port = 5000,
-             const unsigned int u_client_id = 10,
-             const bool b_debug = false);
+             unsigned int u_port = 5000,
+             unsigned int u_client_id = 10,
+             bool b_debug = false);
 
   // Request RX resources
-  int request_rx_resources(const double d_centre_freq = 0,
-                           const double d_bandwidth = 0);
+  int request_rx_resources(double d_centre_freq,
+                           double d_bandwidth,
+                           bool bpad);
 
   // Request TX resources
   int request_tx_resources(double d_centre_freq,

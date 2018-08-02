@@ -43,8 +43,6 @@ private:
   uhd::usrp::multi_usrp::sptr usrp;
   uhd::rx_streamer::sptr rx_stream;
 
-  //uhd_tx_metadata_handle tx_md;
-  uhd::tx_streamer::sptr tx_stream;
   size_t tx_samps_per_buff;
 };
 
