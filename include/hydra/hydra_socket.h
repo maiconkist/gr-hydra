@@ -16,22 +16,21 @@
 // Using name space UDP
 using boost::asio::ip::udp;
 
-
 namespace hydra {
 
 class udp_receiver
 {
 private:
    // Default UDP buffer size
-   const static unsigned int BUFFER_SIZE = 1024;
+   const static size_t BUFFER_SIZE = 1024;
    // Default IQ samples size
-   const static unsigned int IQ_SIZE = sizeof(iq_sample);
+   const static size_t IQ_SIZE = sizeof(iq_sample);
    // Async IO services
    boost::asio::io_service io_service;
    // Socket object
    boost::asio::ip::udp::socket *p_socket;
    // Connection endpoint
-   boost::asio::ip::udp::endpoint endpoint;
+   boost::asio::ip::udp::endpoint endpoint_;
    // Received endpoint
    boost::asio::ip::udp::endpoint endpoint_rcvd;
 
@@ -89,33 +88,33 @@ private:
 class udp_transmitter
 {
 private:
-   // Default UDP buffer size
-   const static unsigned int BUFFER_SIZE = 1024;
-   // Default IQ samples size
-   const static unsigned int IQ_SIZE = sizeof(iq_sample);
-   // Async IO services
-   boost::asio::io_service io_service;
-   // Socket object
-   boost::asio::ip::udp::socket *p_socket;
-   // Connection endpoint
-   boost::asio::ip::udp::endpoint endpoint;
+  // Default UDP buffer size
+  const static unsigned  BUFFER_SIZE = 1024;
+  // Default IQ samples size
+  const static size_t IQ_SIZE = sizeof(iq_sample);
+  // Async IO services
+  boost::asio::io_service io_service;
+  // Socket object
+  std::unique_ptr<boost::asio::ip::udp::socket> p_socket;
+  // Connection endpoint
+  boost::asio::ip::udp::endpoint endpoint_;
 
-   // UDP thread to handle the transmitting datagrams
-   std::unique_ptr<std::thread> tx_udp_thread;
+  // UDP thread to handle the transmitting datagrams
+  std::unique_ptr<std::thread> tx_udp_thread;
 
-   // Pointer to output buffer
-   iq_stream* p_input_buffer;
+  // Pointer to output buffer
+  iq_stream* p_input_buffer;
 
-   // Create input buffer and the remainder buffers
-   std::array<char, BUFFER_SIZE> output_buffer;
-   std::array<char, IQ_SIZE> remainder_buffer;
+  // Create input buffer and the remainder buffers
+  std::array<char, BUFFER_SIZE> output_buffer;
+  std::array<char, IQ_SIZE> remainder_buffer;
 
-   // Counter of bytes remaining from a previous reception
-   unsigned int u_remainder;
-   // Reinterpreted pointer to the input buffer
-   char* p_reinterpreted_cast;
-   // Pointer to the input buffer mutex
-   std::mutex* p_in_mtx;
+  // Counter of bytes remaining from a previous reception
+  unsigned int u_remainder;
+  // Reinterpreted pointer to the input buffer
+  char* p_reinterpreted_cast;
+  // Pointer to the input buffer mutex
+  std::mutex* p_in_mtx;
 public:
 
    // Constructor
@@ -136,8 +135,6 @@ public:
 
       // Close the socket
       p_socket->close();
-      // Then delete it
-      delete p_socket;
    };
 
    // Assign the handle receive callback when a datagram is received
@@ -148,7 +145,6 @@ typedef udp_receiver RxUDP;
 typedef std::unique_ptr<udp_receiver> RxUDPPtr;
 typedef udp_transmitter TxUDP;
 typedef std::unique_ptr<udp_transmitter> TxUDPPtr;
-
 } // namespace hydra
 
 #endif

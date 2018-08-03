@@ -173,7 +173,7 @@ Hypervisor::set_tx_mapping()
         it != g_vradios.end();
         ++it)
      {
-        std::cout << "setting map for VR " << (*it)->get_id() << std::endl;
+        std::cout << "TX setting map for VR " << (*it)->get_id() << std::endl;
         set_tx_mapping(*((*it).get()), subcarriers_map);
      }
      g_tx_subcarriers_map = subcarriers_map;
@@ -191,7 +191,6 @@ Hypervisor::set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    size_t fft_n = vr_bw /(g_tx_bw /tx_fft_len);
 
    if (sc < 0 || sc > tx_fft_len) {
-      std::cout << "Cannot allocate subcarriers for VR " << vr.get_id() << std::endl;
       return -1;
    }
 
@@ -281,7 +280,7 @@ Hypervisor::set_rx_mapping()
        it != g_vradios.end();
        ++it)
     {
-      std::cout << "setting map for VR " << (*it)->get_id() << std::endl;
+      std::cout << "RX setting map for VR " << (*it)->get_id() << std::endl;
       set_rx_mapping(*((*it).get()), subcarriers_map);
     }
   g_rx_subcarriers_map = subcarriers_map;
@@ -300,12 +299,12 @@ Hypervisor::set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
 
    std::cout << "vr_bw: " << vr_bw << ", vr_cf: "  << vr_cf << std::endl;
    std::cout << "sc: " << sc << ", rx_fft_len: "  << rx_fft_len << std::endl;
+
    if (sc < 0 || sc > rx_fft_len) {
-      std::cout << "Cannot allocate subcarriers for VR " << vr.get_id() << std::endl;
       return -1;
    }
 
-   std::cout << "VR " << vr.get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + fft_n << std::endl;
+   std::cout << "RX VR " << vr.get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + fft_n << std::endl;
 
    // Allocate subcarriers sequentially from sc
    iq_map_vec the_map;

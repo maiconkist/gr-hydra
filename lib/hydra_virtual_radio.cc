@@ -65,7 +65,7 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   // Create UDP transmitter
   rx_socket = std::make_unique<TxUDP>(rx_buffer->stream(),
                                       rx_buffer->mutex(),
-                                      "0.0.0.0",
+                                      "127.0.0.1",
                                       std::to_string(u_rx_udp));
 
   // Toggle receiving flag

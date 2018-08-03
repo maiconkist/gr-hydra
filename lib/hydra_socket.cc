@@ -1,4 +1,5 @@
 #include "hydra/hydra_socket.h"
+#include <numeric>
 
 
 namespace hydra {
@@ -19,24 +20,23 @@ udp_receiver::udp_receiver(
       s_host, s_port, boost::asio::ip::resolver_query_base::passive);
 
     // Resolve the address
-    endpoint = *resolver.resolve(query);
+    endpoint_ = *resolver.resolve(query);
 
     // Create the socket
     p_socket = new boost::asio::ip::udp::socket(io_service);
     // Open the socket
-    p_socket->open(endpoint.protocol());
+    p_socket->open(endpoint_.protocol());
 
     // Reuse the address and bind the port
     boost::asio::socket_base::reuse_address roption(true);
     p_socket->set_option(roption);
-    p_socket->bind(endpoint);
+    p_socket->bind(endpoint_);
 
     // Start the receive method
     receive();
 
     // Create a thread to receive the data
-    rx_udp_thread = std::make_unique<std::thread>(&udp_receiver::run_io_service,
-                                                  this);
+    rx_udp_thread = std::make_unique<std::thread>(&udp_receiver::run_io_service, this);
 }
 
   // Assign the handle receive callback when a datagram is received
@@ -57,8 +57,6 @@ udp_receiver::handle_receive(
   const boost::system::error_code& error,
   unsigned int u_bytes_trans)
 {
-
-
   if (!error)
   {
     // If there isn't enough data for a single element
@@ -140,104 +138,63 @@ udp_transmitter::udp_transmitter(
   // Get the mutex
   p_in_mtx = in_mtx;
 
-  // Create an IP resolver
   boost::asio::ip::udp::resolver resolver(io_service);
-  // Query routes to the host
-  boost::asio::ip::udp::resolver::query query(
-    s_host, s_port, boost::asio::ip::resolver_query_base::passive);
+  boost::asio::ip::udp::resolver::query query(s_host, s_port);
+  endpoint_ = *resolver.resolve(query);
 
-  // Resolve the address
-  endpoint = *resolver.resolve(query);
+  p_socket = std::make_unique<boost::asio::ip::udp::socket>(io_service);
+  p_socket->open(endpoint_.protocol());
 
-  // Create the socket
-  p_socket = new boost::asio::ip::udp::socket(io_service);
-  // Open the socket
-  p_socket->open(endpoint.protocol());
-
-  // Reuse the address
-  boost::asio::socket_base::reuse_address roption(true);
-  p_socket->set_option(roption);
-
-  // Create a thread to transmit the data
   tx_udp_thread = std::make_unique<std::thread>(&udp_transmitter::transmit, this);
-
-  std::cout << "waiting:"
-            << s_host << ", "
-            << s_port
-            << std::endl;
 }
 
-  // Assign the handle receive callback when a datagram is received
+
+// Assign the handle receive callback when a datagram is received
 void
 udp_transmitter::transmit()
 {
   // Variables to keep track of the buffer size and the transferable bytes
-  long long int ll_cur_size_bytes;
-  unsigned int u_trans_bytes;
+  size_t total_size_bytes;
+  size_t u_trans_bytes;
+
+
+
 
   while (true)
   {
-    // Lock access to the input buffer
-    p_in_mtx->lock();
     // Get the current size of the queue in bytes
-    ll_cur_size_bytes = p_input_buffer->size() * IQ_SIZE;
+    total_size_bytes = p_input_buffer->size() * IQ_SIZE;
 
     // If there is anything to transmit
-    if (ll_cur_size_bytes > 0)
+    if (total_size_bytes > 0)
     {
-      // Get the minimum amount of data that we can transfer now
-      u_trans_bytes = std::min((long long int) BUFFER_SIZE, ll_cur_size_bytes);
-      // Copy this amount of bytes to the output buffer
-      std::copy(p_reinterpreted_cast,
-                p_reinterpreted_cast + u_trans_bytes,
-                output_buffer.begin());
-
-      // Number of bytes that couldn't be transferred but are still part of a single IQ sample
-      u_remainder = u_trans_bytes % IQ_SIZE;
-
-      // If there is a remainder
-      if (u_remainder > 0)
       {
-        // Add this amount of bytes to the remainder buffer
-        std::copy(p_reinterpreted_cast + u_trans_bytes,
-                  p_reinterpreted_cast + u_trans_bytes + IQ_SIZE - u_remainder,
-                  remainder_buffer.begin());
+        std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
+        iq_stream output_buffer = *p_input_buffer;
+        p_input_buffer->clear();
       }
 
-      // Remove the number of transferred elements from the input buffer
-      p_input_buffer->erase(
-        p_input_buffer->begin(),
-        p_input_buffer->begin() +
-          (u_trans_bytes + IQ_SIZE - u_remainder) / IQ_SIZE);
-      // Unlock access to the input buffer
-      p_in_mtx->unlock();
-
-      // Try to transmit
-      try
+      size_t bytes_sent = 0;
+      size_t r = 0;
+      while (bytes_sent <  total_size_bytes)
       {
+        size_t bytes_to_send = std::min((size_t)BUFFER_SIZE, (total_size_bytes - bytes_sent));
 
-        // Send the output buffer through the socket
-        p_socket->send_to(boost::asio::buffer(output_buffer.begin(), u_trans_bytes), endpoint);
-
-        // If there is a remainder
-        if (u_remainder > 0)
-        {
-          // Send the remainder buffer through the socket
-          p_socket->send_to(boost::asio::buffer(remainder_buffer.begin(), u_remainder), endpoint);
+        try {
+          std::cout << "sending " << bytes_to_send << " bytes" << std::endl;
+          r = p_socket->send_to(boost::asio::buffer(&output_buffer.front()+bytes_sent, bytes_to_send),
+                                endpoint_);
         }
-      }
-      // Not much we can do now :/
-      catch(std::exception& e)
-      {
-        std::cerr << "Wops, could't send datagram :(" << std::endl;
-      }
-    } // End of check for data
+        catch (std::exception &e) {
+          std::cout << "error sending udp packet: " << e.what() << std::endl;
+        }
 
+        bytes_sent += r;
+      }
+    }
     // If there isn't any data in the buffer yet
     else
     {
-      // Unlock access to the input buffer
-      p_in_mtx->unlock();
       // Sleep for a bit
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
@@ -275,7 +232,6 @@ test_socket()
     }
 
   return 0;
-
 }
 
 

@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client Example
-# Generated: Thu Aug  2 19:08:30 2018
+# Generated: Fri Aug  3 17:03:37 2018
 ##################################################
 
 from distutils.version import StrictVersion
@@ -20,6 +20,7 @@ if __name__ == '__main__':
 
 from PyQt5 import Qt
 from PyQt5 import Qt, QtCore
+from gnuradio import blocks
 from gnuradio import eng_notation
 from gnuradio import gr
 from gnuradio import qtgui
@@ -116,14 +117,17 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
 
         self._qtgui_waterfall_sink_x_1_win = sip.wrapinstance(self.qtgui_waterfall_sink_x_1.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_waterfall_sink_x_1_win)
-        self.hydra_gr__source_0 = hydra.hydra_gr_client_source(1, '0.0.0.0', 5000)
-        self.hydra_gr__source_0.start_client(freq, samp_rate, 1024)
+        self.hydra_gr__source_0 = hydra.hydra_gr_client_source(1, '127.0.0.1', 5000)
+        self.hydra_gr__source_0.start_client(freq, samp_rate, 10000)
 
+        self.blocks_udp_source_0 = blocks.udp_source(gr.sizeof_gr_complex*1, '127.0.0.1', 6000, 10000, True)
+        self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_gr_complex*1)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.hydra_gr__source_0, 0), (self.qtgui_waterfall_sink_x_1, 0))
+        self.connect((self.blocks_udp_source_0, 0), (self.qtgui_waterfall_sink_x_1, 0))
+        self.connect((self.hydra_gr__source_0, 0), (self.blocks_null_sink_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_example")
