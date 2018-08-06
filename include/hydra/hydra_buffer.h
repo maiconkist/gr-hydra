@@ -92,7 +92,8 @@ public:
    void run();
 
    // Returns pointer to the output buffer, a stream of IQ samples
-   iq_stream* stream(){return &output_buffer;};
+   iq_stream *stream(){return &output_buffer;};
+
    // Returns pointer to the mutex
    std::mutex* mutex() {return &out_mtx;};
 
@@ -117,8 +118,8 @@ private:
    bool thr_stop;
 };
 
-typedef std::unique_ptr<RxBuffer> RxBufferPtr;
-typedef std::unique_ptr<TxBuffer> TxBufferPtr;
+typedef std::shared_ptr<RxBuffer> RxBufferPtr;
+typedef std::shared_ptr<TxBuffer> TxBufferPtr;
 
 } // namespace hydra
 

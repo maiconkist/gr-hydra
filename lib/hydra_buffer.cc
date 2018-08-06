@@ -1,6 +1,9 @@
 #include "hydra/hydra_buffer.h"
 
 
+#include <numeric>
+
+
 namespace hydra {
 
 RxBuffer::RxBuffer(
@@ -171,7 +174,6 @@ TxBuffer::run()
     std::this_thread::sleep_for(std::chrono::nanoseconds(threshold));
     // If the destructor has been called
     if (thr_stop){return;}
-
     {
       // Lock access to the buffer
       std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
@@ -179,22 +181,25 @@ TxBuffer::run()
       // Check if there's a valid window ready for transmission
       if (not p_input_buffer->empty())
       {
-        // Copy the first window from the input buffer
         window = p_input_buffer->front();
+        // Copy the first window from the input buffer
         // Pop the oldest window
         p_input_buffer->pop_front();
 
         // Lock access to the output buffer
         std::lock_guard<std::mutex> _omtx(out_mtx);
         // Insert IQ samples of the oldest window in the output deque
-        output_buffer.insert(output_buffer.end(), window.begin(), window.end());
+        std::cout << "window sum: " << std::accumulate(window.begin(), window.end(), 0.0, [](float total, gr_complex ctx){ return total += std::abs(ctx);}) << std::endl;
+        output_buffer.insert(output_buffer.begin(), window.begin(), window.end());
+        std::cout << "w: " << output_buffer[0] << std::endl;
       }
       // If the queue of windows is empty at the moment
       else
       {
+        # if 0
         std::lock_guard<std::mutex> _omtx(out_mtx);
-        // Stream empty IQ samples that comprise the window duration
-        output_buffer.insert(output_buffer.end(), u_fft_size, empty_iq);
+        output_buffer.insert(output_buffer.end(), u_fft_size, empty_iq); // Stream empty IQ samples that comprise the window duration
+        #endif
       } // End padding
     } // End overflow
   } // End data check
@@ -204,6 +209,7 @@ void
 TxBuffer::produce(const gr_complex *buf, size_t len)
 {
   std::lock_guard<std::mutex> _l(*p_in_mtx);
+  std::cout << "added len: " << len << std::endl;
   p_input_buffer->push_back(window(buf, buf + len));
 }
 

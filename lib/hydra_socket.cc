@@ -1,5 +1,7 @@
 #include "hydra/hydra_socket.h"
+
 #include <numeric>
+#include <complex>
 
 
 namespace hydra {
@@ -57,6 +59,7 @@ udp_receiver::handle_receive(
   const boost::system::error_code& error,
   unsigned int u_bytes_trans)
 {
+
   if (!error)
   {
     // If there isn't enough data for a single element
@@ -126,15 +129,12 @@ udp_receiver::handle_receive(
 
 
 udp_transmitter::udp_transmitter(
-  iq_stream* input_buffer,
+  iq_stream *input_buffer,
   std::mutex* in_mtx,
   const std::string& s_host,
-  const std::string& s_port)
+  const std::string& s_port):
+  g_input_buffer(input_buffer)
 {
-  // Get pointer to the input buffer
-  p_input_buffer = input_buffer;
-  // Reinterpret the cast to the input buffer to pass it to the output buffer
-  p_reinterpreted_cast = reinterpret_cast<char*>(p_input_buffer);
   // Get the mutex
   p_in_mtx = in_mtx;
 
@@ -157,38 +157,37 @@ udp_transmitter::transmit()
   size_t total_size_bytes;
   size_t u_trans_bytes;
 
-
-
-
   while (true)
   {
     // Get the current size of the queue in bytes
-    total_size_bytes = p_input_buffer->size() * IQ_SIZE;
+    total_size_bytes = g_input_buffer->size() * IQ_SIZE;
+
+    {
+      std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
 
     // If there is anything to transmit
     if (total_size_bytes > 0)
     {
-      {
-        std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
-        iq_stream output_buffer = *p_input_buffer;
-        p_input_buffer->clear();
-      }
+        iq_stream output_buffer = *g_input_buffer;
+        g_input_buffer->clear();
 
       size_t bytes_sent = 0;
       size_t r = 0;
-      while (bytes_sent <  total_size_bytes)
+      while (bytes_sent < total_size_bytes)
       {
-        size_t bytes_to_send = std::min((size_t)BUFFER_SIZE, (total_size_bytes - bytes_sent));
+        size_t bytes_to_send = std::min((size_t)BUFFER_SIZE * IQ_SIZE, (total_size_bytes - bytes_sent));
 
-        try {
-          std::cout << "sending " << bytes_to_send << " bytes" << std::endl;
-          r = p_socket->send_to(boost::asio::buffer(&output_buffer.front()+bytes_sent, bytes_to_send),
-                                endpoint_);
+        std::cout << "r: " << (gr_complex)output_buffer[0] << std::endl;
+        try
+        {
+          r = p_socket->send_to(
+            boost::asio::buffer((char*)&output_buffer.front()+bytes_sent, bytes_to_send),
+            endpoint_);
         }
-        catch (std::exception &e) {
-          std::cout << "error sending udp packet: " << e.what() << std::endl;
+        catch (std::exception &e)
+        {
+          //std::cout << "error sending udp packet: " << e.what() << std::endl;
         }
-
         bytes_sent += r;
       }
     }
@@ -196,8 +195,13 @@ udp_transmitter::transmit()
     else
     {
       // Sleep for a bit
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      //std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
+    }
+
+
+
+
   } // End of loop
 } // End of method
 

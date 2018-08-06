@@ -52,9 +52,11 @@ class device_image_gen: public abstract_device
 public:
    device_image_gen(std::string device_args = "");
    void send(const window &buf, size_t len);
+   void receive(window &buf, size_t len);
 
 private:
    samples_vec g_iq_samples;
+   std::string file_read;
 };
 
 

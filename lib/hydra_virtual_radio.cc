@@ -21,6 +21,8 @@
 #include <hydra/hydra_virtual_radio.h>
 #include <hydra/hydra_hypervisor.h>
 
+#include <hydra/hydra_uhd_interface.h>
+
 #include <iostream>
 
 namespace hydra {
@@ -57,7 +59,7 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   std::mutex * hyp_mutex = new std::mutex;
   rx_windows = new window_stream;
   // Create new TX timed buffer
-  rx_buffer = std::make_unique<TxBuffer>(rx_windows,
+  rx_buffer = std::make_shared<TxBuffer>(rx_windows,
                                          hyp_mutex,
                                          d_rx_bw,
                                          g_rx_fft_size);
@@ -65,7 +67,7 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   // Create UDP transmitter
   rx_socket = std::make_unique<TxUDP>(rx_buffer->stream(),
                                       rx_buffer->mutex(),
-                                      "127.0.0.1",
+                                      "0.0.0.0",
                                       std::to_string(u_rx_udp));
 
   // Toggle receiving flag
@@ -104,7 +106,7 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
    tx_socket = std::make_unique<RxUDP>("0.0.0.0", std::to_string(u_tx_udp));
 
    // Create new timed buffer
-   tx_buffer = std::make_unique<RxBuffer>(tx_socket->buffer(),
+   tx_buffer = std::make_shared<RxBuffer>(tx_socket->buffer(),
                                           tx_socket->mutex(),
                                           d_tx_bw,
                                           g_tx_fft_size,
@@ -232,6 +234,13 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
 
    // Append new samples
    rx_buffer->produce(g_ifft_complex->get_outbuf(), g_rx_fft_size);
+
+   #if 0
+   static uhd_hydra_sptr usrp = std::make_shared<device_image_gen>();
+   std::vector<gr_complex> w;
+   w.assign(g_ifft_complex->get_outbuf(), g_ifft_complex->get_outbuf() + g_rx_fft_size);
+   usrp->send(w, g_rx_fft_size);
+   #endif
 }
 
 #if 0

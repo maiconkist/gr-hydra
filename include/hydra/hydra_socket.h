@@ -87,34 +87,6 @@ private:
 
 class udp_transmitter
 {
-private:
-  // Default UDP buffer size
-  const static unsigned  BUFFER_SIZE = 1024;
-  // Default IQ samples size
-  const static size_t IQ_SIZE = sizeof(iq_sample);
-  // Async IO services
-  boost::asio::io_service io_service;
-  // Socket object
-  std::unique_ptr<boost::asio::ip::udp::socket> p_socket;
-  // Connection endpoint
-  boost::asio::ip::udp::endpoint endpoint_;
-
-  // UDP thread to handle the transmitting datagrams
-  std::unique_ptr<std::thread> tx_udp_thread;
-
-  // Pointer to output buffer
-  iq_stream* p_input_buffer;
-
-  // Create input buffer and the remainder buffers
-  std::array<char, BUFFER_SIZE> output_buffer;
-  std::array<char, IQ_SIZE> remainder_buffer;
-
-  // Counter of bytes remaining from a previous reception
-  unsigned int u_remainder;
-  // Reinterpreted pointer to the input buffer
-  char* p_reinterpreted_cast;
-  // Pointer to the input buffer mutex
-  std::mutex* p_in_mtx;
 public:
 
    // Constructor
@@ -139,6 +111,26 @@ public:
 
    // Assign the handle receive callback when a datagram is received
    void transmit();
+
+ private:
+   // Default UDP buffer size
+   const static unsigned  BUFFER_SIZE = 1024;
+   // Default IQ samples size
+   const static size_t IQ_SIZE = sizeof(iq_sample);
+
+
+   boost::asio::io_service io_service;
+   std::unique_ptr<boost::asio::ip::udp::socket> p_socket;
+   boost::asio::ip::udp::endpoint endpoint_;
+
+   // UDP thread to handle the transmitting datagrams
+   std::unique_ptr<std::thread> tx_udp_thread;
+
+   // Pointer to output buffer
+   iq_stream* g_input_buffer;
+
+   // Pointer to the input buffer mutex
+   std::mutex* p_in_mtx;
 };
 
 typedef udp_receiver RxUDP;

@@ -116,6 +116,7 @@ device_uhd::receive(window &buf, size_t len)
 
 }
 
+
 device_image_gen::device_image_gen(std::string device_args)
 {
 }
@@ -169,5 +170,32 @@ device_image_gen::send(const window &buf, size_t len)
       g_iq_samples.clear();
    }
 }
+
+
+void
+device_image_gen::receive(window &buf, size_t len)
+{
+  static const char *str_read = "/home/connect/ofdm.bin";
+  static std::ifstream infile(str_read, std::ifstream::binary);
+
+  if (not infile.eof())
+  {
+    infile.read((char*)&buf.front(), len * sizeof(gr_complex));
+
+#if 0
+    double sum = 0;
+    for (auto &n: buf ) sum += std::abs(n);
+    std::cout << "sum of " << len <<  ". total: " << sum << std::endl;
+#endif
+  }
+  else
+  {
+    std::cout << "resetting file" << std::endl;
+    infile.clear();
+    infile.seekg(0);
+    infile.read((char*)&buf.front(), len * sizeof(gr_complex));
+  }
+}
+
 
 } // namespace hydra
