@@ -338,9 +338,11 @@ Hypervisor::forward_rx_window(window &buf, size_t len)
        it != g_vradios.end();
        ++it)
   {
-    (*it)->demap_iq_samples(g_fft_complex->get_outbuf(), get_rx_fft());
+    if ((*it)->get_rx_enabled())
+    {
+      (*it)->demap_iq_samples(g_fft_complex->get_outbuf(), get_rx_fft());
+    }
   }
 }
-
 
 } /* namespace hydra */

@@ -95,7 +95,7 @@ private:
   double g_rx_bw;      // Bandwidth 
   samples_vec g_rx_samples;
   sfft_complex g_ifft_complex;
-  TxUDPPtr rx_socket;
+  udp_sink_ptr rx_socket;
   TxBufferPtr rx_buffer;
   window_stream* rx_windows;
   ReportPtr rx_report;
@@ -109,7 +109,7 @@ private:
   double g_tx_bw;      // Bandwidth 
   sfft_complex g_fft_complex;
   RxBufferPtr tx_buffer;
-  RxUDPPtr tx_socket;
+  udp_source_ptr tx_socket;
 
   int g_idx;        // Radio unique ID
   std::mutex g_mutex;

@@ -52,7 +52,7 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
     //d_udp_sink->connect(g_host, i_tx_port);
 
     connect(self(), 0, d_udp_sink, 0);
-    std::cout << "Client initialized successfully." << std::endl;
+    std::cout << "Client Sink initialized successfully." << std::endl;
   }
   else
   {

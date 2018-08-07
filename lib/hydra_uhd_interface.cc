@@ -80,11 +80,11 @@ device_uhd::send(const window &buf, size_t len)
     md.has_time_spec = false;
 
     size_t num_tx_samps = usrp->get_device()->send(
-                                                   &big_buf.front(),
-                                                   big_buf.size(),
-                                                   md,
-                                                   uhd::io_type_t::COMPLEX_FLOAT32,
-                                                   uhd::device::SEND_MODE_FULL_BUFF);
+      &big_buf.front(),
+      big_buf.size(),
+      md,
+      uhd::io_type_t::COMPLEX_FLOAT32,
+      uhd::device::SEND_MODE_FULL_BUFF);
 
     big_buf.clear();
   }
@@ -105,15 +105,13 @@ device_uhd::receive(window &buf, size_t len)
       break;
 
     case uhd::rx_metadata_t::ERROR_CODE_TIMEOUT:
-      std::cout << "u" << std::endl;
+      std::cout << "U" << std::endl;
       break;
 
     default:
-      std::cout <<"Got error code " << md.error_code << " from USRP..." << std::endl;
+      std::cout <<"E" << std::endl;
       break;
   }
-
-
 }
 
 
@@ -171,7 +169,6 @@ device_image_gen::send(const window &buf, size_t len)
    }
 }
 
-
 void
 device_image_gen::receive(window &buf, size_t len)
 {
@@ -181,20 +178,16 @@ device_image_gen::receive(window &buf, size_t len)
   if (not infile.eof())
   {
     infile.read((char*)&buf.front(), len * sizeof(gr_complex));
-
-#if 0
-    double sum = 0;
-    for (auto &n: buf ) sum += std::abs(n);
-    std::cout << "sum of " << len <<  ". total: " << sum << std::endl;
-#endif
   }
   else
   {
-    std::cout << "resetting file" << std::endl;
+    std::cout << "Reseting file" << std::endl;
     infile.clear();
     infile.seekg(0);
     infile.read((char*)&buf.front(), len * sizeof(gr_complex));
   }
+
+  std::cout << "power_rec: " << std::accumulate(buf.begin(), buf.end(), 0.0, [](float total, gr_complex t){ return total += std::abs(t); }) / buf.size() << std::endl;
 }
 
 

@@ -6,7 +6,7 @@
 
 namespace hydra {
 
-udp_receiver::udp_receiver(
+udp_source::udp_source(
   const std::string& s_host,
   const std::string& s_port)
 {
@@ -38,24 +38,24 @@ udp_receiver::udp_receiver(
     receive();
 
     // Create a thread to receive the data
-    rx_udp_thread = std::make_unique<std::thread>(&udp_receiver::run_io_service, this);
+    rx_udp_thread = std::make_unique<std::thread>(&udp_source::run_io_service, this);
 }
 
   // Assign the handle receive callback when a datagram is received
 void
-udp_receiver::receive()
+udp_source::receive()
 {
   p_socket->async_receive_from(
     boost::asio::buffer(input_buffer, BUFFER_SIZE),
     endpoint_rcvd,
-    boost::bind(&udp_receiver::handle_receive, this,
+    boost::bind(&udp_source::handle_receive, this,
                 boost::asio::placeholders::error,
                 boost::asio::placeholders::bytes_transferred)
     );
 }
 
 void
-udp_receiver::handle_receive(
+udp_source::handle_receive(
   const boost::system::error_code& error,
   unsigned int u_bytes_trans)
 {
@@ -128,7 +128,7 @@ udp_receiver::handle_receive(
 }
 
 
-udp_transmitter::udp_transmitter(
+udp_sink::udp_sink(
   iq_stream *input_buffer,
   std::mutex* in_mtx,
   const std::string& s_host,
@@ -145,65 +145,61 @@ udp_transmitter::udp_transmitter(
   p_socket = std::make_unique<boost::asio::ip::udp::socket>(io_service);
   p_socket->open(endpoint_.protocol());
 
-  tx_udp_thread = std::make_unique<std::thread>(&udp_transmitter::transmit, this);
+  tx_udp_thread = std::make_unique<std::thread>(&udp_sink::transmit, this);
 }
-
 
 // Assign the handle receive callback when a datagram is received
 void
-udp_transmitter::transmit()
+udp_sink::transmit()
 {
-  // Variables to keep track of the buffer size and the transferable bytes
-  size_t total_size_bytes;
-  size_t u_trans_bytes;
+  iq_stream output_buffer;
 
   while (true)
   {
-    // Get the current size of the queue in bytes
-    total_size_bytes = g_input_buffer->size() * IQ_SIZE;
-
-    {
-      std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
-
     // If there is anything to transmit
-    if (total_size_bytes > 0)
+    if (g_input_buffer->size() > 0)
     {
-        iq_stream output_buffer = *g_input_buffer;
-        g_input_buffer->clear();
+      // Local scope lock
+      {
+        std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
 
+        // Copy everything to output_buffer. Clear input
+        output_buffer = *g_input_buffer;
+        g_input_buffer->clear();
+      }
+
+      // Get the current size of the queue in bytes
+      size_t total_size_bytes = output_buffer.size() * IQ_SIZE;
       size_t bytes_sent = 0;
       size_t r = 0;
+
+      // Send from output_buffer
       while (bytes_sent < total_size_bytes)
       {
         size_t bytes_to_send = std::min((size_t)BUFFER_SIZE * IQ_SIZE, (total_size_bytes - bytes_sent));
 
-        std::cout << "r: " << (gr_complex)output_buffer[0] << std::endl;
         try
         {
           r = p_socket->send_to(
             boost::asio::buffer((char*)&output_buffer.front()+bytes_sent, bytes_to_send),
             endpoint_);
+
+          bytes_sent += r;
         }
         catch (std::exception &e)
         {
-          //std::cout << "error sending udp packet: " << e.what() << std::endl;
+          std::cerr << "error sending udp packet: " << e.what() << std::endl;
         }
-        bytes_sent += r;
       }
     }
     // If there isn't any data in the buffer yet
     else
     {
       // Sleep for a bit
-      //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    }
-
-
-
-
-  } // End of loop
-} // End of method
+  } // while
+}
 
 
 // Test module
@@ -215,7 +211,7 @@ test_socket()
   std::string port = "5000";
 
   // Initialise the UDP client
-	udp_receiver server(host, port);
+	udp_source server(host, port);
 
   iq_stream* buffer = server.buffer();
 

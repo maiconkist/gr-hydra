@@ -65,10 +65,10 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                                          g_rx_fft_size);
 
   // Create UDP transmitter
-  rx_socket = std::make_unique<TxUDP>(rx_buffer->stream(),
-                                      rx_buffer->mutex(),
-                                      "0.0.0.0",
-                                      std::to_string(u_rx_udp));
+  rx_socket = udp_sink::make(rx_buffer->stream(),
+                             rx_buffer->mutex(),
+                             "0.0.0.0",
+                             std::to_string(u_rx_udp));
 
   // Toggle receiving flag
   b_receiver = true;
@@ -103,7 +103,7 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
    g_tx_fft_size = p_hypervisor->get_tx_fft() * (d_tx_bw / p_hypervisor->get_tx_bandwidth());
 
    // Create UDP receiver
-   tx_socket = std::make_unique<RxUDP>("0.0.0.0", std::to_string(u_tx_udp));
+   tx_socket = udp_source::make("0.0.0.0", std::to_string(u_tx_udp));
 
    // Create new timed buffer
    tx_buffer = std::make_shared<RxBuffer>(tx_socket->buffer(),
@@ -226,35 +226,14 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
 {
   if (!b_receiver) return;
 
-   // Copy the samples used by this radio
-   for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
-      g_ifft_complex->get_inbuf()[idx] = samples_buf[g_rx_map[idx]];
+  /* Copy the samples used by this radio */
+  for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
+    g_ifft_complex->get_inbuf()[idx] = samples_buf[g_rx_map[idx]];
 
-   g_ifft_complex->execute();
+  g_ifft_complex->execute();
 
-   // Append new samples
-   rx_buffer->produce(g_ifft_complex->get_outbuf(), g_rx_fft_size);
-
-   #if 0
-   static uhd_hydra_sptr usrp = std::make_shared<device_image_gen>();
-   std::vector<gr_complex> w;
-   w.assign(g_ifft_complex->get_outbuf(), g_ifft_complex->get_outbuf() + g_rx_fft_size);
-   usrp->send(w, g_rx_fft_size);
-   #endif
+  // Append new samples
+  rx_buffer->produce(g_ifft_complex->get_outbuf(), g_rx_fft_size);
 }
-
-#if 0
-size_t
-VirtualRadio::get_source_samples(size_t noutput_items, gr_complex *samples_buff)
-{
-   if (g_rx_samples.size() == 0) return 0;
-
-   size_t len = std::min(g_rx_samples.size(), noutput_items);
-   std::copy(g_rx_samples.begin(), g_rx_samples.begin() + len, samples_buff);
-   g_rx_samples.erase(g_rx_samples.begin(), g_rx_samples.begin() + len);
-
-   return len;
-}
-#endif
 
 } /* namespace hydra */
