@@ -4,7 +4,6 @@
 #include <numeric>
 #include <boost/format.hpp>
 
-
 namespace hydra {
 
 RxBuffer::RxBuffer(

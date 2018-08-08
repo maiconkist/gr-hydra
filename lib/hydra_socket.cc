@@ -2,6 +2,7 @@
 
 #include <numeric>
 #include <complex>
+#include <boost/format.hpp>
 
 
 namespace hydra {
@@ -161,17 +162,15 @@ udp_sink::transmit()
     {
       // Local scope lock
       {
-        std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
-
         // Copy everything to output_buffer. Clear input
+        std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
         output_buffer = *g_input_buffer;
         g_input_buffer->clear();
       }
 
       // Get the current size of the queue in bytes
-      size_t total_size_bytes = output_buffer.size() * IQ_SIZE;
       size_t bytes_sent = 0;
-      size_t r = 0;
+      size_t total_size_bytes = output_buffer.size() * IQ_SIZE;
 
       // Send from output_buffer
       while (bytes_sent < total_size_bytes)
@@ -180,9 +179,9 @@ udp_sink::transmit()
 
         try
         {
-          r = p_socket->send_to(
-            boost::asio::buffer((char*)&output_buffer.front()+bytes_sent, bytes_to_send),
-            endpoint_);
+          size_t r = p_socket->send_to(
+            boost::asio::buffer(reinterpret_cast<char *>(&output_buffer.front()) + bytes_sent,
+                                bytes_to_send), endpoint_);
 
           bytes_sent += r;
         }
@@ -192,10 +191,8 @@ udp_sink::transmit()
         }
       }
     }
-    // If there isn't any data in the buffer yet
     else
     {
-      // Sleep for a bit
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
   } // while

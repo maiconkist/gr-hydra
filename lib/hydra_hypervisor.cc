@@ -29,6 +29,10 @@
 
 namespace hydra {
 
+
+bool flag = false;
+
+
 Hypervisor::Hypervisor()
 {
 }
@@ -98,18 +102,18 @@ Hypervisor::notify(VirtualRadio &vr)
 
   if (vr.get_tx_enabled())
   {
-   iq_map_vec subcarriers_map = g_tx_subcarriers_map;
-   std::replace(subcarriers_map.begin(),
-                subcarriers_map.end(),
-                vr.get_id(),
-                -1);
+    iq_map_vec subcarriers_map = g_tx_subcarriers_map;
+    std::replace(subcarriers_map.begin(),
+                 subcarriers_map.end(),
+                 vr.get_id(),
+                 -1);
 
-   // enter 'if' in case of success
-   if (set_tx_mapping(vr, subcarriers_map ) > 0)
-   {
+    // enter 'if' in case of success
+    if (set_tx_mapping(vr, subcarriers_map ) > 0)
+    {
       //LOG(INFO) << "success";
       g_tx_subcarriers_map = subcarriers_map;
-   }
+    }
   }
 
   if (vr.get_rx_enabled())
@@ -122,13 +126,14 @@ Hypervisor::notify(VirtualRadio &vr)
 
     // enter 'if' in case of success
     if (set_rx_mapping(vr, subcarriers_map ) > 0)
-      {
-        //LOG(INFO) << "success";
-        g_rx_subcarriers_map = subcarriers_map;
-      }
+    {
+      //LOG(INFO) << "success";
+      g_rx_subcarriers_map = subcarriers_map;
+    }
   }
 
-   return -1;
+  flag = true;
+  return -1;
 }
 
 void
@@ -148,18 +153,17 @@ void
 Hypervisor::tx_run()
 {
   size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e6 / get_tx_bandwidth());
-  std::cout << "sleep: " << g_tx_sleep_time << std::endl;
 
-   window optr(get_tx_fft());
+  window optr(get_tx_fft());
 
-   while (true)
-   {
-      std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
+  while (true)
+  {
+    std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
 
-      get_tx_window(optr , get_tx_fft());
-      g_tx_dev->send(optr, get_tx_fft());
+    get_tx_window(optr , get_tx_fft());
+    g_tx_dev->send(optr, get_tx_fft());
 
-   }
+  }
 }
 
 void
@@ -258,14 +262,18 @@ Hypervisor::set_rx_resources(uhd_hydra_sptr rx_dev, double cf, double bw, size_t
 void
 Hypervisor::rx_run()
 {
-  size_t g_rx_sleep_time = llrint(get_rx_fft() * 1e6 / get_rx_bandwidth());
+  size_t g_rx_sleep_time = llrint(get_rx_fft() * 1e9 / get_rx_bandwidth());
   window optr(get_rx_fft());
 
   while (true)
   {
-    std::this_thread::sleep_for(std::chrono::microseconds(g_rx_sleep_time));
-    g_rx_dev->receive(optr, get_rx_fft());
-    forward_rx_window(optr, get_rx_fft());
+    std::this_thread::sleep_for(std::chrono::nanoseconds(g_rx_sleep_time));
+    if (flag)
+    {
+      g_rx_dev->receive(optr, get_rx_fft());
+      forward_rx_window(optr, get_rx_fft());
+    }
+
   }
 }
 
@@ -331,6 +339,8 @@ Hypervisor::set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
 void
 Hypervisor::forward_rx_window(window &buf, size_t len)
 {
+  if (g_vradios.size() == 0) return;
+
   g_fft_complex->set_data(&buf.front(), len);
   g_fft_complex->execute();
 

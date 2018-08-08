@@ -186,8 +186,6 @@ device_image_gen::receive(window &buf, size_t len)
     infile.seekg(0);
     infile.read((char*)&buf.front(), len * sizeof(gr_complex));
   }
-
-  std::cout << "power_rec: " << std::accumulate(buf.begin(), buf.end(), 0.0, [](float total, gr_complex t){ return total += std::abs(t); }) / buf.size() << std::endl;
 }
 
 

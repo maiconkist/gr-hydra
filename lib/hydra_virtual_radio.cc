@@ -24,6 +24,7 @@
 #include <hydra/hydra_uhd_interface.h>
 
 #include <iostream>
+#include <numeric>
 
 namespace hydra {
 
@@ -72,7 +73,6 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
 
   // Toggle receiving flag
   b_receiver = true;
-
 
   // Always in the end.
   p_hypervisor->notify(*this);

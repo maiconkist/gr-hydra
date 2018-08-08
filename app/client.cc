@@ -19,7 +19,7 @@ int main()
 
   hydra::hydra_client s3 = hydra::hydra_client("127.0.0.1", 5000, 1, true);
   // Request resources
-  lalala = s3.request_rx_resources(2e9 - 10e3, 100e3, false);
+  lalala = s3.request_rx_resources(2e9 + 200e3, 200e3, false);
   std::cout << lalala << std::endl;
 
 #if 0

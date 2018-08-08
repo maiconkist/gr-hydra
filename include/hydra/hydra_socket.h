@@ -51,7 +51,7 @@ class udp_source
 
  private:
   // Default UDP buffer size
-  const static size_t BUFFER_SIZE = 1024;
+  const static size_t BUFFER_SIZE = 2048;
   // Default IQ samples size
   const static size_t IQ_SIZE = sizeof(iq_sample);
   // Async IO services
@@ -118,9 +118,9 @@ public:
   }
 
 
-    private:
-    // Default UDP buffer size
-    const static unsigned  BUFFER_SIZE = 1024;
+ private:
+  // Default UDP buffer size
+  const static unsigned  BUFFER_SIZE = 2048;
   // Default IQ samples size
   const static size_t IQ_SIZE = sizeof(iq_sample);
 

@@ -11,7 +11,7 @@ int main()
    /* RECEIVER */
    double d_rx_centre_freq = 2.0e9 + 200e3;
    double d_rx_samp_rate   = 200e3;
-   unsigned int u_rx_fft_size = 64;
+   unsigned int u_rx_fft_size = 512;
 
    /* Control port */
    unsigned int u_port = 5000;
