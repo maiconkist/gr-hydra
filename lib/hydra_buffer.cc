@@ -189,7 +189,7 @@ TxBuffer::run()
 
         // Lock access to the output buffer
         std::lock_guard<std::mutex> _omtx(out_mtx);
-        output_buffer.insert(output_buffer.begin(), window.begin(), window.end());
+        output_buffer.insert(output_buffer.end(), window.begin(), window.end());
       }
       // If the queue of windows is empty at the moment
       else

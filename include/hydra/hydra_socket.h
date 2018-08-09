@@ -120,9 +120,9 @@ public:
 
  private:
   // Default UDP buffer size
-  const static unsigned  BUFFER_SIZE = 2048;
+  const size_t BUFFER_SIZE = 2048;
   // Default IQ samples size
-  const static size_t IQ_SIZE = sizeof(iq_sample);
+  const size_t IQ_SIZE = sizeof(iq_sample);
 
   boost::asio::io_service io_service;
   std::unique_ptr<boost::asio::ip::udp::socket> p_socket;

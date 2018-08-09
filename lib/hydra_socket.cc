@@ -153,7 +153,7 @@ udp_sink::udp_sink(
 void
 udp_sink::transmit()
 {
-  iq_stream output_buffer;
+  gr_complex output_buffer[BUFFER_SIZE];
 
   while (true)
   {
@@ -164,13 +164,19 @@ udp_sink::transmit()
       {
         // Copy everything to output_buffer. Clear input
         std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
-        output_buffer = *g_input_buffer;
-        g_input_buffer->clear();
+
+        size_t n = std::min(g_input_buffer->size(), BUFFER_SIZE);
+
+        for (size_t i = 0; i < n; ++i)
+          output_buffer[i] = (*g_input_buffer)[i];
+
+        g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->begin() + n);
       }
 
       // Get the current size of the queue in bytes
       size_t bytes_sent = 0;
-      size_t total_size_bytes = output_buffer.size() * IQ_SIZE;
+      //size_t total_size_bytes = output_buffer.size() * IQ_SIZE;
+      size_t total_size_bytes = 512 * IQ_SIZE;
 
       // Send from output_buffer
       while (bytes_sent < total_size_bytes)
@@ -180,8 +186,11 @@ udp_sink::transmit()
         try
         {
           size_t r = p_socket->send_to(
-            boost::asio::buffer(reinterpret_cast<char *>(&output_buffer.front()) + bytes_sent,
+            boost::asio::buffer(reinterpret_cast<char *>(&output_buffer[0]) + bytes_sent,
                                 bytes_to_send), endpoint_);
+
+          if (r != total_size_bytes)
+            std::cout << "looping to send more" << std::endl;
 
           bytes_sent += r;
         }
