@@ -133,7 +133,7 @@
     </param>
     <param>
       <key>stop</key>
-      <value>100</value>
+      <value>1</value>
     </param>
     <param>
       <key>rangeType</key>
@@ -454,7 +454,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -792,69 +792,6 @@
     </param>
   </block>
   <block>
-    <key>blocks_udp_source</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(918, 299)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_udp_source_0</value>
-    </param>
-    <param>
-      <key>ipaddr</key>
-      <value>127.0.0.1</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>eof</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>psize</key>
-      <value>10000</value>
-    </param>
-    <param>
-      <key>port</key>
-      <value>6000</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
     <key>blocks_vector_source_x</key>
     <param>
       <key>alias</key>
@@ -1131,7 +1068,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2e9  + 200e3</value>
+      <value>949.5e6</value>
     </param>
   </block>
   <block>
@@ -1154,7 +1091,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -1183,6 +1120,69 @@
     <param>
       <key>payload</key>
       <value>1472</value>
+    </param>
+    <param>
+      <key>port</key>
+      <value>5000</value>
+    </param>
+    <param>
+      <key>samp_rate</key>
+      <value>samp_rate</value>
+    </param>
+    <param>
+      <key>u_id</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>hydra_gr__source</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>center_frequency</key>
+      <value>freq</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1110, 403)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>180</value>
+    </param>
+    <param>
+      <key>host</key>
+      <value>127.0.0.1</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>hydra_gr__source_0_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>payload</key>
+      <value>10000</value>
     </param>
     <param>
       <key>port</key>
@@ -1292,7 +1292,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>fftsize</key>
@@ -1496,7 +1496,7 @@
     </param>
     <param>
       <key>nconnections</key>
-      <value>2</value>
+      <value>1</value>
     </param>
     <param>
       <key>showports</key>
@@ -2209,7 +2209,7 @@
     <key>qtgui_histogram_sink_x</key>
     <param>
       <key>accum</key>
-      <value>False</value>
+      <value>True</value>
     </param>
     <param>
       <key>autoscale</key>
@@ -2501,15 +2501,15 @@
     </param>
     <param>
       <key>xmax</key>
-      <value>50</value>
+      <value>1000</value>
     </param>
     <param>
       <key>xmin</key>
-      <value>-10</value>
+      <value>-1</value>
     </param>
     <param>
       <key>name</key>
-      <value>"Client Source"</value>
+      <value>"Data Rcv"</value>
     </param>
     <param>
       <key>bins</key>
@@ -3269,12 +3269,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_file_source_0</source_block_id>
-    <sink_block_id>qtgui_freq_sink_x_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>1</sink_key>
-  </connection>
-  <connection>
     <source_block_id>blocks_multiply_const_vxx_0</source_block_id>
     <sink_block_id>hydra_gr_sink_0</sink_block_id>
     <source_key>0</source_key>
@@ -3347,12 +3341,6 @@
     <sink_key>pdus</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_udp_source_0</source_block_id>
-    <sink_block_id>blocks_multiply_const_vxx_1</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>blocks_vector_source_x_0</source_block_id>
     <sink_block_id>blocks_stream_to_tagged_stream_0</sink_block_id>
     <source_key>0</source_key>
@@ -3385,6 +3373,12 @@
   <connection>
     <source_block_id>hydra_gr__source_0</source_block_id>
     <sink_block_id>blocks_null_sink_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>hydra_gr__source_0_0</source_block_id>
+    <sink_block_id>blocks_multiply_const_vxx_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

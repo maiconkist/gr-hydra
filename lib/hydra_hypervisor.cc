@@ -30,9 +30,6 @@
 namespace hydra {
 
 
-bool flag = false;
-
-
 Hypervisor::Hypervisor()
 {
 }
@@ -132,7 +129,6 @@ Hypervisor::notify(VirtualRadio &vr)
     }
   }
 
-  flag = true;
   return -1;
 }
 
@@ -158,11 +154,9 @@ Hypervisor::tx_run()
 
   while (true)
   {
-    std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
-
+    //std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
     get_tx_window(optr , get_tx_fft());
     g_tx_dev->send(optr, get_tx_fft());
-
   }
 }
 
@@ -267,13 +261,9 @@ Hypervisor::rx_run()
 
   while (true)
   {
-    std::this_thread::sleep_for(std::chrono::nanoseconds(g_rx_sleep_time));
-    if (flag)
-    {
-      g_rx_dev->receive(optr, get_rx_fft());
-      forward_rx_window(optr, get_rx_fft());
-    }
-
+    //std::this_thread::sleep_for(std::chrono::nanoseconds(g_rx_sleep_time));
+    g_rx_dev->receive(optr, get_rx_fft());
+    forward_rx_window(optr, get_rx_fft());
   }
 }
 
@@ -305,14 +295,17 @@ Hypervisor::set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    int sc = offset / (g_rx_bw / rx_fft_len);
    size_t fft_n = vr_bw /(g_rx_bw /rx_fft_len);
 
-   std::cout << "vr_bw: " << vr_bw << ", vr_cf: "  << vr_cf << std::endl;
-   std::cout << "sc: " << sc << ", rx_fft_len: "  << rx_fft_len << std::endl;
 
-   if (sc < 0 || sc > rx_fft_len) {
+   if (sc < 0 || sc > rx_fft_len)
+   {
       return -1;
    }
 
-   std::cout << "RX VR " << vr.get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + fft_n << std::endl;
+   double c_bw = fft_n*g_rx_bw/rx_fft_len;
+   double c_cf = g_rx_cf - g_rx_bw/2 + (g_rx_bw/rx_fft_len) * (sc + (fft_n/2));
+
+   std::cout << boost::format("RX Request VR BW: %1%, CF: %2% ") % vr_bw % vr_cf << std::endl;
+   std::cout << boost::format("RX Actual  VR BW: %1%, CF: %2% ") % c_bw % c_cf << std::endl;
 
    // Allocate subcarriers sequentially from sc
    iq_map_vec the_map;
@@ -349,9 +342,7 @@ Hypervisor::forward_rx_window(window &buf, size_t len)
        ++it)
   {
     if ((*it)->get_rx_enabled())
-    {
       (*it)->demap_iq_samples(g_fft_complex->get_outbuf(), get_rx_fft());
-    }
   }
 }
 

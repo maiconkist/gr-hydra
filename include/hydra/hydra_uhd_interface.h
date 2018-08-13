@@ -41,7 +41,6 @@ public:
 
 private:
   uhd::usrp::multi_usrp::sptr usrp;
-  uhd::rx_streamer::sptr rx_stream;
 
   size_t tx_samps_per_buff;
 };

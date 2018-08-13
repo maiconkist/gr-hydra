@@ -60,7 +60,6 @@ udp_source::handle_receive(
   const boost::system::error_code& error,
   unsigned int u_bytes_trans)
 {
-
   if (!error)
   {
     // If there isn't enough data for a single element
@@ -160,23 +159,25 @@ udp_sink::transmit()
     // If there is anything to transmit
     if (g_input_buffer->size() > 0)
     {
+      size_t n_elemns;
+
       // Local scope lock
       {
         // Copy everything to output_buffer. Clear input
         std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
 
-        size_t n = std::min(g_input_buffer->size(), BUFFER_SIZE);
+        n_elemns = std::min(g_input_buffer->size(), BUFFER_SIZE);
 
-        for (size_t i = 0; i < n; ++i)
+        for (size_t i = 0; i < n_elemns; ++i)
           output_buffer[i] = (*g_input_buffer)[i];
 
-        g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->begin() + n);
+        g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->begin() + n_elemns);
       }
 
       // Get the current size of the queue in bytes
       size_t bytes_sent = 0;
       //size_t total_size_bytes = output_buffer.size() * IQ_SIZE;
-      size_t total_size_bytes = 512 * IQ_SIZE;
+      size_t total_size_bytes =  n_elemns * IQ_SIZE;
 
       // Send from output_buffer
       while (bytes_sent < total_size_bytes)
@@ -188,9 +189,6 @@ udp_sink::transmit()
           size_t r = p_socket->send_to(
             boost::asio::buffer(reinterpret_cast<char *>(&output_buffer[0]) + bytes_sent,
                                 bytes_to_send), endpoint_);
-
-          if (r != total_size_bytes)
-            std::cout << "looping to send more" << std::endl;
 
           bytes_sent += r;
         }
@@ -239,6 +237,5 @@ test_socket()
 
   return 0;
 }
-
 
 } // namespace hydra

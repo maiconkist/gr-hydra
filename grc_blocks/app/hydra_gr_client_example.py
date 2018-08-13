@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client Example
-# Generated: Thu Aug  9 11:16:27 2018
+# Generated: Mon Aug 13 13:54:34 2018
 ##################################################
 
 from distutils.version import StrictVersion
@@ -37,7 +37,7 @@ from gnuradio import qtgui
 
 class hydra_gr_client_example(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freq=2e9  + 200e3, samp_rate=200e3):
+    def __init__(self, freq=949.5e6, samp_rate=200e3):
         gr.top_block.__init__(self, "Hydra Gr Client Example")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Hydra Gr Client Example")
@@ -79,7 +79,7 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self._value_range = Range(0, 100, 0.1, 0.1, 200)
+        self._value_range = Range(0, 1, 0.1, 0.1, 200)
         self._value_win = RangeWidget(self._value_range, self.set_value, 'value', "counter_slider", float)
         self.top_layout.addWidget(self._value_win)
         self.qtgui_waterfall_sink_x_2 = qtgui.waterfall_sink_c(
@@ -121,15 +121,15 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
         self.qtgui_histogram_sink_x_0_1 = qtgui.histogram_sink_f(
         	1024,
         	100,
-                -10,
-                50,
-        	"Client Source",
+                -1,
+                1000,
+        	"Data Rcv",
         	1
         )
 
         self.qtgui_histogram_sink_x_0_1.set_update_time(0.10)
         self.qtgui_histogram_sink_x_0_1.enable_autoscale(True)
-        self.qtgui_histogram_sink_x_0_1.enable_accumulate(False)
+        self.qtgui_histogram_sink_x_0_1.enable_accumulate(True)
         self.qtgui_histogram_sink_x_0_1.enable_grid(False)
         self.qtgui_histogram_sink_x_0_1.enable_axis_labels(True)
 
@@ -204,8 +204,51 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
 
         self._qtgui_histogram_sink_x_0_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_histogram_sink_x_0_win)
-        self.hydra_gr__source_0 = hydra.hydra_gr_client_source(1, '127.0.0.1', 5000)
-        self.hydra_gr__source_0.start_client(freq, samp_rate, 1472)
+        self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(
+        	1024, #size
+        	firdes.WIN_BLACKMAN_hARRIS, #wintype
+        	0, #fc
+        	100, #bw
+        	"", #name
+        	1 #number of inputs
+        )
+        self.qtgui_freq_sink_x_0.set_update_time(0.10)
+        self.qtgui_freq_sink_x_0.set_y_axis(-140, 10)
+        self.qtgui_freq_sink_x_0.set_y_label('Relative Gain', 'dB')
+        self.qtgui_freq_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, 0.0, 0, "")
+        self.qtgui_freq_sink_x_0.enable_autoscale(False)
+        self.qtgui_freq_sink_x_0.enable_grid(False)
+        self.qtgui_freq_sink_x_0.set_fft_average(1.0)
+        self.qtgui_freq_sink_x_0.enable_axis_labels(True)
+        self.qtgui_freq_sink_x_0.enable_control_panel(False)
+
+        if not True:
+          self.qtgui_freq_sink_x_0.disable_legend()
+
+        if "complex" == "float" or "complex" == "msg_float":
+          self.qtgui_freq_sink_x_0.set_plot_pos_half(not True)
+
+        labels = ['', '', '', '', '',
+                  '', '', '', '', '']
+        widths = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        colors = ["blue", "red", "green", "black", "cyan",
+                  "magenta", "yellow", "dark red", "dark green", "dark blue"]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0]
+        for i in xrange(1):
+            if len(labels[i]) == 0:
+                self.qtgui_freq_sink_x_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_freq_sink_x_0.set_line_label(i, labels[i])
+            self.qtgui_freq_sink_x_0.set_line_width(i, widths[i])
+            self.qtgui_freq_sink_x_0.set_line_color(i, colors[i])
+            self.qtgui_freq_sink_x_0.set_line_alpha(i, alphas[i])
+
+        self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.pyqwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '127.0.0.1', 5000)
+        self.hydra_gr__source_0_0.start_client(freq, samp_rate, 10000)
 
         self.digital_ofdm_rx_0 = digital.ofdm_rx(
         	  fft_len=64, cp_len=16,
@@ -216,9 +259,7 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_udp_source_0 = blocks.udp_source(gr.sizeof_gr_complex*1, '127.0.0.1', 6000, 10000, True)
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, '', ""); self.blocks_tag_debug_0.set_display(True)
-        self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_gr_complex*1)
         self.blocks_complex_to_mag_0 = blocks.complex_to_mag(1)
         self.blocks_char_to_float_0 = blocks.char_to_float(1, 1)
 
@@ -227,12 +268,12 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
         ##################################################
         self.connect((self.blocks_char_to_float_0, 0), (self.qtgui_histogram_sink_x_0_1, 0))
         self.connect((self.blocks_complex_to_mag_0, 0), (self.qtgui_histogram_sink_x_0, 0))
-        self.connect((self.blocks_udp_source_0, 0), (self.blocks_complex_to_mag_0, 0))
-        self.connect((self.blocks_udp_source_0, 0), (self.digital_ofdm_rx_0, 0))
-        self.connect((self.blocks_udp_source_0, 0), (self.qtgui_waterfall_sink_x_2, 0))
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_char_to_float_0, 0))
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
-        self.connect((self.hydra_gr__source_0, 0), (self.blocks_null_sink_0, 0))
+        self.connect((self.hydra_gr__source_0_0, 0), (self.blocks_complex_to_mag_0, 0))
+        self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
+        self.connect((self.hydra_gr__source_0_0, 0), (self.qtgui_freq_sink_x_0, 0))
+        self.connect((self.hydra_gr__source_0_0, 0), (self.qtgui_waterfall_sink_x_2, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_example")

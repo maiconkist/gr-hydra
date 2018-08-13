@@ -228,11 +228,13 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
 
   /* Copy the samples used by this radio */
   for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
+  {
     g_ifft_complex->get_inbuf()[idx] = samples_buf[g_rx_map[idx]];
+  }
 
   g_ifft_complex->execute();
 
-  // Append new samples
+  /* Append new samples */
   rx_buffer->produce(g_ifft_complex->get_outbuf(), g_rx_fft_size);
 }
 

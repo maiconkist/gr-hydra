@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <numeric>
+#include <uhd/usrp/usrp.h>
 #include <opencv2/opencv.hpp>
 
 namespace hydra {
@@ -42,23 +43,15 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
   usrp->set_rx_rate(rate);
   std::cout << "Actual RX Rate: " << usrp->get_rx_rate() << std::endl;
 
+  // no gain for reception. 
   std::cout << "Setting RX Gain: " << gain << std::endl;
-  usrp->set_rx_gain(gain);
+  usrp->set_rx_gain(0.0);
   std::cout << "Actual RX Gain: " << usrp->get_rx_gain() << std::endl;
 
   std::cout << "Setting RX freq: " << freq / 1e6 << " MHz" << std::endl;
   usrp->set_rx_freq(freq);
   std::cout << "Actual RX freq: " << usrp->get_rx_freq()/1e6 << " MHz" << std::endl;
 
-  uhd::stream_args_t stream_args("fc32", "sc16"); //complex floats
-  rx_stream = usrp->get_rx_stream(stream_args);
-
-  //setup streaming
-  uhd::stream_cmd_t stream_cmd(uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS);
-  stream_cmd.num_samps = 0; // continuous
-  stream_cmd.stream_now = true;
-  stream_cmd.time_spec = uhd::time_spec_t();
-  usrp->issue_stream_cmd(stream_cmd);
 }
 
 
@@ -93,10 +86,19 @@ device_uhd::send(const window &buf, size_t len)
 void
 device_uhd::receive(window &buf, size_t len)
 {
-  if (rx_stream.get() == nullptr) return;
+  /* setup streaming */
+  uhd::stream_cmd_t stream_cmd = uhd::stream_cmd_t(uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS);
+  stream_cmd.num_samps = 0;
+  stream_cmd.stream_now = true;
+  stream_cmd.time_spec = uhd::time_spec_t();
+  usrp->issue_stream_cmd(stream_cmd);
 
   uhd::rx_metadata_t md;
-  size_t num_rx_samps = rx_stream->recv(&buf.front(), len, md);
+  size_t num_samps = usrp->get_device()->recv(&buf.front(),
+                                              buf.size(),
+                                              md,
+                                              uhd::io_type_t::COMPLEX_FLOAT32,
+                                              uhd::device::RECV_MODE_FULL_BUFF);
 
   //handle the error codes
   switch(md.error_code)
@@ -109,9 +111,10 @@ device_uhd::receive(window &buf, size_t len)
       break;
 
     default:
-      std::cout <<"E" << std::endl;
+      std::cout << "D" << std::endl;
       break;
   }
+
 }
 
 

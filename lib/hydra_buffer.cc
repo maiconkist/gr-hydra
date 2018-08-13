@@ -153,9 +153,7 @@ TxBuffer::TxBuffer(window_stream* input_buffer,
   p_in_mtx = in_mtx;
 
   // Create a thread to receive the data
-#if 0
   buffer_thread = std::make_unique<std::thread>(&TxBuffer::run, this);
-#endif
 }
 
 void
@@ -174,8 +172,10 @@ TxBuffer::run()
   {
     // Wait for "threshold" nanoseconds
     std::this_thread::sleep_for(std::chrono::nanoseconds(threshold));
+
     // If the destructor has been called
-    if (thr_stop){return;}
+    if (thr_stop){ return; }
+
     {
       // Lock access to the buffer
       std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
@@ -194,11 +194,9 @@ TxBuffer::run()
       // If the queue of windows is empty at the moment
       else
       {
-# if 0
         // Stream empty IQ samples that comprise the window duration
         std::lock_guard<std::mutex> _omtx(out_mtx);
         output_buffer.insert(output_buffer.end(), u_fft_size, empty_iq);
-#endif
       } // End padding
     } // End overflow
   } // End data check
@@ -207,13 +205,13 @@ TxBuffer::run()
 void
 TxBuffer::produce(const gr_complex *buf, size_t len)
 {
-#if 0
   std::lock_guard<std::mutex> _l(*p_in_mtx);
   p_input_buffer->push_back(window(buf, buf + len));
-#endif
 
-  std::lock_guard<std::mutex> _omtx(out_mtx);
-  output_buffer.insert(output_buffer.begin(), buf, buf + len);
+#if 0
+  std::lock_guard<std::mutex> _l(out_mtx);
+  output_buffer.insert(output_buffer.end(), buf, buf + len);
+#endif
 }
 
 } // namespace hydra
