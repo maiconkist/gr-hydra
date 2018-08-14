@@ -4,7 +4,7 @@
 int main()
 {
    /* TRANSMITTER */
-   double d_tx_centre_freq = 2.0e9;
+   double d_tx_centre_freq = 950e6;
    double d_tx_samp_rate   = 2e6;
    unsigned int u_tx_fft_size = 1024;
 
@@ -22,13 +22,11 @@ int main()
    /* Configure the TX radio */
    hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>();
 
-#if 0
    main.set_tx_config(
      usrp,
      d_tx_centre_freq,
      d_tx_samp_rate,
      u_tx_fft_size);
-#endif
 
    main.set_rx_config(
      usrp,

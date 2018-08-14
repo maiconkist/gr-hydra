@@ -161,7 +161,7 @@ udp_sink::transmit()
     {
       size_t n_elemns;
 
-      // Local scope lock
+      /* Local scope lock */
       {
         // Copy everything to output_buffer. Clear input
         std::lock_guard<std::mutex> _inmtx(*p_in_mtx);

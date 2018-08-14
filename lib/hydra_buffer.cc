@@ -73,7 +73,7 @@ void RxBuffer::run()
      // If the destructor has been called
      if (thr_stop){return;}
 
-     // Lock access to the buffer
+#if 0
      // Windows not being consumed
      if (output_buffer.size() > 100)
      {
@@ -81,6 +81,7 @@ void RxBuffer::run()
        //output_buffer.pop_front();
        //std::cerr << "Too many windows!" << std::endl;
      }
+#endif
 
      {
         std::lock_guard<std::mutex> _p(*p_in_mtx);
@@ -170,36 +171,37 @@ TxBuffer::run()
   // Produce indefinitely
   while(true)
   {
-    // Wait for "threshold" nanoseconds
-    std::this_thread::sleep_for(std::chrono::nanoseconds(threshold));
-
     // If the destructor has been called
     if (thr_stop){ return; }
 
+    // Check if there's a valid window ready for transmission
+    if (not p_input_buffer->empty())
     {
       // Lock access to the buffer
       std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
 
-      // Check if there's a valid window ready for transmission
-      if (not p_input_buffer->empty())
-      {
-        // Copy the first window from the input buffer and pop it
-        window = p_input_buffer->front();
-        p_input_buffer->pop_front();
+      // Copy the first window from the input buffer and pop it
+      window = p_input_buffer->front();
+      p_input_buffer->pop_front();
 
-        // Lock access to the output buffer
-        std::lock_guard<std::mutex> _omtx(out_mtx);
-        output_buffer.insert(output_buffer.end(), window.begin(), window.end());
-      }
-      // If the queue of windows is empty at the moment
-      else
-      {
-        // Stream empty IQ samples that comprise the window duration
-        std::lock_guard<std::mutex> _omtx(out_mtx);
-        output_buffer.insert(output_buffer.end(), u_fft_size, empty_iq);
-      } // End padding
-    } // End overflow
-  } // End data check
+      // Lock access to the output buffer
+      std::lock_guard<std::mutex> _omtx(out_mtx);
+      output_buffer.insert(output_buffer.end(), window.begin(), window.end());
+    }
+    /* If the queue of windows is empty at the moment */
+    else
+    {
+#if 0
+      /* Stream empty IQ samples that comprise the window duration */
+      std::lock_guard<std::mutex> _omtx(out_mtx);
+      output_buffer.insert(output_buffer.end(), u_fft_size, empty_iq);
+#endif
+
+      /* Wait for "threshold" nanoseconds */
+      std::this_thread::sleep_for(std::chrono::nanoseconds(threshold));
+
+    } // End padding
+  }
 }
 
 void
