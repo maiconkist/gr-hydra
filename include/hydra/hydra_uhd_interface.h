@@ -17,6 +17,8 @@ class abstract_device
   virtual void set_tx_config(double freq, double rate, double gain){ g_tx_freq = freq; g_tx_rate = rate; g_tx_gain = gain;};
   virtual void set_rx_config(double freq, double rate, double gain){ g_rx_freq = freq; g_rx_rate = rate; g_rx_gain = gain;};
 
+  virtual void release() {};
+
  protected:
   double g_tx_freq;
   double g_tx_rate;
@@ -39,10 +41,14 @@ public:
   void set_tx_config(double freq, double rate, double gain);
   void set_rx_config(double freq, double rate, double gain);
 
+  virtual void release();
+
 private:
   uhd::usrp::multi_usrp::sptr usrp;
 
-  size_t tx_samps_per_buff;
+  uhd::rx_streamer::sptr rx_stream;
+  uhd::tx_streamer::sptr tx_stream;
+
 };
 
 

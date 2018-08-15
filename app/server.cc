@@ -1,8 +1,24 @@
 #include "hydra/hydra_main.h"
 #include "hydra/hydra_uhd_interface.h"
 
+/* Configure the TX radio */
+hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>();
+
+void
+signal_handler(int signum)
+{
+  std::cout << "FODA-SE" << std::endl;
+  usrp->release();
+}
+
+
 int main()
 {
+   signal(SIGINT, signal_handler);
+   signal(SIGQUIT, signal_handler);
+   signal(SIGABRT, signal_handler);
+   signal(SIGHUP, signal_handler);
+
    /* TRANSMITTER */
    double d_tx_centre_freq = 950e6;
    double d_tx_samp_rate   = 2e6;
@@ -19,8 +35,6 @@ int main()
    /* Instantiate XVL */
    hydra::HydraMain main = hydra::HydraMain(u_port);
 
-   /* Configure the TX radio */
-   hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>();
 
    main.set_tx_config(
      usrp,

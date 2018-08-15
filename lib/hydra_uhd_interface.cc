@@ -6,6 +6,7 @@
 #include <numeric>
 #include <uhd/usrp/usrp.h>
 #include <opencv2/opencv.hpp>
+#include <csignal>
 
 namespace hydra {
 
@@ -13,6 +14,29 @@ device_uhd::device_uhd(std::string device_args)
 {
    std::cout <<  "Creating USRP with args \"" <<  device_args << "\"" << std::endl;
    usrp = uhd::usrp::multi_usrp::make(device_args);
+}
+
+
+void
+device_uhd::release()
+{
+  if (rx_stream != nullptr)
+  {
+    uhd::stream_cmd_t stream_cmd = uhd::stream_cmd_t(uhd::stream_cmd_t::STREAM_MODE_STOP_CONTINUOUS);
+    rx_stream->issue_stream_cmd(stream_cmd);
+  }
+
+  if (tx_stream != nullptr)
+  {
+    uhd::tx_metadata_t md;
+    md.end_of_burst = true;
+    tx_stream->send("", 0, md);
+  }
+}
+
+
+device_uhd::~device_uhd()
+{
 }
 
 
@@ -32,6 +56,11 @@ device_uhd::set_tx_config(double freq, double rate, double gain)
   std::cout << "Setting TX freq: " << freq / 1e6 << " MHz" << std::endl;
   usrp->set_tx_freq(freq);
   std::cout << "Actual TX freq: " << usrp->get_tx_freq()/1e6 << " MHz" << std::endl;
+
+
+
+  uhd::stream_args_t stream_args("fc32", "sc16");
+  tx_stream = usrp->get_tx_stream(stream_args);
 }
 
 void
@@ -52,12 +81,22 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
   usrp->set_rx_freq(freq);
   std::cout << "Actual RX freq: " << usrp->get_rx_freq()/1e6 << " MHz" << std::endl;
 
+
+  std::cout << "--------- 1" << std::endl;
+  uhd::stream_args_t stream_args("fc32"); //complex floats
+  rx_stream = usrp->get_rx_stream(stream_args);
+  std::cout << "--------- 2" << std::endl;
+
+  /* setup streaming */
+  uhd::stream_cmd_t stream_cmd = uhd::stream_cmd_t(uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS);
+  stream_cmd.num_samps = 0;
+  stream_cmd.stream_now = true;
+  stream_cmd.time_spec = uhd::time_spec_t();
+  std::cout << "--------- 3" << std::endl;
+  rx_stream->issue_stream_cmd(stream_cmd);
+  std::cout << "--------- 4" << std::endl;
 }
 
-
-device_uhd::~device_uhd()
-{
-}
 
 void
 device_uhd::send(const window &buf, size_t len)
@@ -67,6 +106,7 @@ device_uhd::send(const window &buf, size_t len)
 
   if (big_buf.size() > g_tx_rate / 10)
   {
+#ifdef USE_USRP_STREAM_API
     uhd::tx_metadata_t md;
     md.start_of_burst = false;
     md.end_of_burst = false;
@@ -78,6 +118,13 @@ device_uhd::send(const window &buf, size_t len)
       md,
       uhd::io_type_t::COMPLEX_FLOAT32,
       uhd::device::SEND_MODE_FULL_BUFF);
+#else
+    uhd::tx_metadata_t md;
+    md.start_of_burst = false;
+    md.end_of_burst = false;
+    md.has_time_spec = false;
+    tx_stream->send(&big_buf.front(), big_buf.size(), md);
+#endif
 
     big_buf.clear();
   }
@@ -86,6 +133,9 @@ device_uhd::send(const window &buf, size_t len)
 void
 device_uhd::receive(window &buf, size_t len)
 {
+  uhd::rx_metadata_t md;
+
+#ifdef USE_USRP_STREAM_API
   /* setup streaming */
   uhd::stream_cmd_t stream_cmd = uhd::stream_cmd_t(uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS);
   stream_cmd.num_samps = 0;
@@ -93,7 +143,7 @@ device_uhd::receive(window &buf, size_t len)
   stream_cmd.time_spec = uhd::time_spec_t();
   usrp->issue_stream_cmd(stream_cmd);
 
-  uhd::rx_metadata_t md;
+
   size_t num_samps = usrp->get_device()->recv(&buf.front(),
                                               buf.size(),
                                               md,
@@ -114,6 +164,10 @@ device_uhd::receive(window &buf, size_t len)
       std::cout << "D" << std::endl;
       break;
   }
+#else
+
+  size_t num_rx_samps = rx_stream->recv(&buf.front(), buf.size(), md, 0.1);
+#endif
 
 }
 
