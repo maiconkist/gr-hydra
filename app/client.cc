@@ -3,9 +3,12 @@
 #include <signal.h>
 
 
+hydra::hydra_client s1, s2, s3;
+
 void my_handler(int s)
 {
   printf("Caught signal %d\n",s);
+  s3.free_resources();
   exit(1);
 }
 
@@ -20,15 +23,18 @@ int main()
 
   std::string lalala;
   // Request resources
-  hydra::hydra_client s1 = hydra::hydra_client("127.0.0.1", 5000, 90, true);
+  std::cout << boost::format("------------- Requesting %1%, %2%") % (cf+200e3) % 200e3 << std::endl;
+  s1 = hydra::hydra_client("127.0.0.1", 5000, 90, true);
   std::cout << s1.query_resources() << std::endl;
   std::cout << s1.request_rx_resources(cf + 200e3, 200e3, false) << std::endl;
 
   // Request resources
-  hydra::hydra_client s2 = hydra::hydra_client("127.0.0.1", 5000, 91, true);
+  std::cout << boost::format("------------- Requesting %1%, %2%") % (cf-200e3) % 100e3 << std::endl;
+  s2 = hydra::hydra_client("127.0.0.1", 5000, 91, true);
   std::cout << s2.request_rx_resources(cf - 200e3, 100e3, false) << std::endl;
 
-  hydra::hydra_client s3 = hydra::hydra_client("127.0.0.1", 5000, 93, true);
+  std::cout << boost::format("------------- Requesting %1%, %2%") % (cf) % 100e3 << std::endl;
+  s3 = hydra::hydra_client("127.0.0.1", 5000, 93, true);
   std::cout << s3.request_rx_resources(cf, 100e3, false) << std::endl;
 
   // Free resources from a given service
