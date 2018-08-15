@@ -3,8 +3,9 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Server Example
-# Generated: Fri Jul 27 10:09:06 2018
+# Generated: Tue Aug 14 14:38:57 2018
 ##################################################
+
 
 from gnuradio import eng_notation
 from gnuradio import gr
@@ -24,7 +25,8 @@ class hydra_gr_server_example(gr.top_block):
         # Blocks
         ##################################################
         self.ahydra_gr_server_0 = hydra.hydra_gr_server(5000)
-        self.ahydra_gr_server_0.set_tx_config(2e9, 2e6, 2048, "IMG_GEN")
+        self.ahydra_gr_server_0.set_tx_config(950e6, 2e6, 1024, "USRP")
+        self.ahydra_gr_server_0.set_rx_config(950e6, 2e6, 1024, "USRP")
         self.ahydra_gr_server_0_thread = threading.Thread(target=self.ahydra_gr_server_0.start_server)
         self.ahydra_gr_server_0_thread.daemon = True
         self.ahydra_gr_server_0_thread.start()

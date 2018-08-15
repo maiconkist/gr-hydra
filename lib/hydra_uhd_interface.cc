@@ -126,6 +126,7 @@ device_image_gen::device_image_gen(std::string device_args)
 void
 device_image_gen::send(const window &buf, size_t len)
 {
+   return;
    static const size_t cols = len;
    static sfft_complex g_ifft_complex = sfft_complex(new fft_complex(len));
    const size_t rows = 500;

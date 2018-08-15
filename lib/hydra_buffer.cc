@@ -160,6 +160,8 @@ TxBuffer::TxBuffer(window_stream* input_buffer,
 void
 TxBuffer::run()
 {
+  return;
+
   // Thread stop condition
   thr_stop = false;
   // Empty IQ sample, as zeroes
@@ -168,12 +170,9 @@ TxBuffer::run()
   std::vector<iq_sample> window;
   window.reserve(u_fft_size);
 
-  // Produce indefinitely
-  while(true)
+  /* Produce indefinitely */
+  while(not thr_stop)
   {
-    // If the destructor has been called
-    if (thr_stop){ return; }
-
     // Check if there's a valid window ready for transmission
     if (not p_input_buffer->empty())
     {
@@ -195,11 +194,9 @@ TxBuffer::run()
       /* Stream empty IQ samples that comprise the window duration */
       std::lock_guard<std::mutex> _omtx(out_mtx);
       output_buffer.insert(output_buffer.end(), u_fft_size, empty_iq);
-#endif
-
       /* Wait for "threshold" nanoseconds */
       std::this_thread::sleep_for(std::chrono::nanoseconds(threshold));
-
+#endif
     } // End padding
   }
 }
@@ -207,13 +204,13 @@ TxBuffer::run()
 void
 TxBuffer::produce(const gr_complex *buf, size_t len)
 {
+#if 0
   std::lock_guard<std::mutex> _l(*p_in_mtx);
   p_input_buffer->push_back(window(buf, buf + len));
+#endif
 
-#if 0
   std::lock_guard<std::mutex> _l(out_mtx);
   output_buffer.insert(output_buffer.end(), buf, buf + len);
-#endif
 }
 
 } // namespace hydra

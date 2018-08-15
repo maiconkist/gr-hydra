@@ -21,19 +21,21 @@ namespace hydra {
 class udp_source
 {
  public:
-  // CTOR
+  /* CTOR
+   */
   udp_source(const std::string& host, const std::string& port);
 
-  // DTOR
+  /* DTOR
+   */
   ~udp_source()
     {
       io_service.reset();
       io_service.stop();
       rx_udp_thread->join();
+
       p_socket->close();
       delete p_socket;
     };
-
 
   static std::unique_ptr<udp_source> make(const std::string& host, const std::string& port)
   {
@@ -91,20 +93,24 @@ class udp_sink
 {
 public:
 
-  // CTOR
+  /* CTOR
+   */
   udp_sink(iq_stream* p_input_buffer,
            std::mutex* in_mtx,
            const std::string &s_host,
            const std::string &s_port);
 
-  // DTOR
+  /* DTOR
+   */
   ~udp_sink()
-    {
-      io_service.reset();
-      io_service.stop();
-      tx_udp_thread->join();
-      p_socket->close();
-    };
+  {
+    g_th_run = false;
+    tx_udp_thread->join();
+
+    io_service.reset();
+    io_service.stop();
+    p_socket->close();
+  };
 
   // Assign the handle receive callback when a datagram is received
   void transmit();
@@ -127,6 +133,8 @@ public:
   boost::asio::io_service io_service;
   std::unique_ptr<boost::asio::ip::udp::socket> p_socket;
   boost::asio::ip::udp::endpoint endpoint_;
+
+  bool g_th_run;
 
   // UDP thread to handle the transmitting datagrams
   std::unique_ptr<std::thread> tx_udp_thread;

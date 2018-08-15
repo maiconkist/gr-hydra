@@ -31,30 +31,47 @@ hydra_gr_server_impl::~hydra_gr_server_impl()
 }
 
 void
+hydra_gr_server_impl::init_usrp(std::string mode)
+{
+  if (g_usrp.get() == nullptr)
+  {
+    if (mode == "USRP")
+      g_usrp = std::make_shared<device_uhd>();
+    else if (mode == "IMG_GEN")
+      g_usrp = std::make_shared<device_image_gen>();
+    else
+      std::cout << "Unknown device type: " << __PRETTY_FUNCTION__ << std::endl;
+  }
+}
+
+
+void
 hydra_gr_server_impl::set_tx_config(double d_center_frequency,
                                     double d_samp_rate,
-                                    size_t d_tx_fft_size,
+                                    size_t d_fft_size,
                                     std::string mode)
 {
-  if (mode == "USRP")
-  {
-    uhd_hydra_sptr usrp = std::make_shared<device_uhd>();
-    usrp->set_tx_config(d_center_frequency, d_samp_rate, 0.1);
-    main->set_tx_config(usrp,
-                        d_center_frequency,
-                        d_samp_rate,
-                        d_tx_fft_size);
-  }
-  else if (mode == "IMG_GEN")
-  {
-    uhd_hydra_sptr usrp = std::make_shared<device_image_gen>();
-    main->set_tx_config(usrp,
-                        d_center_frequency,
-                        d_samp_rate,
-                        d_tx_fft_size);
-  }
-  else
-    std::cerr << "Unknown mode" << std::endl;
+  init_usrp(mode);
+
+  main->set_tx_config(g_usrp,
+                      d_center_frequency,
+                      d_samp_rate,
+                      d_fft_size);
+}
+
+
+void
+hydra_gr_server_impl::set_rx_config(double d_center_frequency,
+                                    double d_samp_rate,
+                                    size_t d_fft_size,
+                                    std::string mode)
+{
+  init_usrp(mode);
+
+  main->set_rx_config(g_usrp,
+                      d_center_frequency,
+                      d_samp_rate,
+                      d_fft_size);
 }
 
 void

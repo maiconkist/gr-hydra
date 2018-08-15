@@ -22,7 +22,7 @@ HydraCore::set_rx_resources(uhd_hydra_sptr usrp,
   // Initialise the RX resources
   p_resource_manager->set_rx_resources(d_centre_freq, d_bandwidth);
 
-  usrp->set_rx_config(d_centre_freq, d_bandwidth, 60.0);
+  usrp->set_rx_config(d_centre_freq, d_bandwidth, 0);
   p_hypervisor->set_rx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
   // Toggle flag
@@ -202,11 +202,13 @@ HydraCore::query_resources()
 int
 HydraCore::free_resources(size_t radio_id)
 {
-   // Try to free the resources
-   bool b_rm_free = p_resource_manager->free_resources(radio_id);
-   bool b_hy_free = p_hypervisor->detach_virtual_radio(radio_id);
+  // Try to free the resources
+  bool b_rm_free = p_resource_manager->free_resources(radio_id);
+  bool b_hy_free = p_hypervisor->detach_virtual_radio(radio_id);
 
-   return 1;
+  std::cout << boost::format("FR %1%: b_rm_free: %2%, b_hy_free: %3%") % radio_id % b_rm_free % b_hy_free << std::endl;
+
+  return 1;
 }
 
 } // namespace hydra

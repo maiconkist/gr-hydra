@@ -12,21 +12,18 @@ namespace hydra {
 
 class hydra_client
 {
-  // Server host and port
-  std::string s_server_host;
-  std::string s_server_port;
+ public:
 
-  // Client ID -- TODO need a better way to define it
-  int u_id;
-  // Debug flag
-  bool b_debug_flag;
-
-public:
-    // Constructor
+  /* CTOR
+   */
   hydra_client(std::string s_host = "localhost",
-             unsigned int u_port = 5000,
-             unsigned int u_client_id = 10,
-             bool b_debug = false);
+               unsigned int u_port = 5000,
+               unsigned int u_client_id = 10,
+               bool b_debug = false);
+
+  /* DTOR
+   */
+  ~hydra_client();
 
   // Request RX resources
   int request_rx_resources(double d_centre_freq,
@@ -47,9 +44,18 @@ public:
   // Free resources
   std::string free_resources();
 
-private:
+ private:
   // Base message methods
   std::string factory(const std::string &s_message);
+
+  // Server host and port
+  std::string s_server_host;
+  std::string s_server_port;
+
+  // Client ID -- TODO need a better way to define it
+  int u_id;
+  // Debug flag
+  bool b_debug_flag;
 };
 
 

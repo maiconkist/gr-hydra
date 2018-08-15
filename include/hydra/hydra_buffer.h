@@ -80,10 +80,10 @@ public:
    // Destructor
    ~TxBuffer()
    {
-      // Stop the thread
-      thr_stop = true;
-      // Stop the buffer thread
-      buffer_thread->join();
+     /* Stop the thread */
+     thr_stop = true;
+     /* Stop the buffer thread */
+     buffer_thread->join();
    };
 
    void produce(const gr_complex *buf, size_t len);

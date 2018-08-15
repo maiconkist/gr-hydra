@@ -30,7 +30,7 @@ hydra_gr_client_sink_impl::hydra_gr_client_sink_impl(
                    gr::io_signature::make(0, 0, 0))
 {
   g_host = s_host;
-  client = new hydra_client(s_host, u_port, u_id, true);
+  client = std::make_unique<hydra_client>(s_host, u_port, u_id, true);
   client->check_connection();
 }
 
@@ -59,9 +59,19 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
   }
 }
 
+
+bool
+hydra_gr_client_sink_impl::stop()
+{
+  std::cout << "DTOOOOOOOOOOOOOOOOOOOOOOOOR" << std::endl;
+  client->free_resources();
+}
+
+
 hydra_gr_client_sink_impl::~hydra_gr_client_sink_impl()
 {
-  // client->free_resources();
+  std::cout << "DTOOOOOOOOOOOOOOOOOOOOOOOOR" << std::endl;
+  client->free_resources();
 }
 
   } /* namespace hydra */

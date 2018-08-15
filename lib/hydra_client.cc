@@ -13,6 +13,12 @@ hydra_client::hydra_client(std::string s_host,
   b_debug_flag = b_debug;
 }
 
+hydra_client::~hydra_client()
+{
+  free_resources();
+}
+
+
 int
 hydra_client::request_rx_resources(double d_centre_freq,
                                    double d_bandwidth,

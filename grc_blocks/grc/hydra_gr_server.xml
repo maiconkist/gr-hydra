@@ -5,28 +5,46 @@
   <import>import threading</import>
   <import>import hydra</import>
   <make>hydra.hydra_gr_server($port)
-self.$(id).set_tx_config($center_frequency, $samp_rate, $fft_size, $mode)
+self.$(id).set_tx_config($tx_center_frequency, $tx_samp_rate, $tx_fft_size, $mode)
+self.$(id).set_rx_config($rx_center_frequency, $rx_samp_rate, $rx_fft_size, $mode)
 self.$(id)_thread = threading.Thread(target=self.$(id).start_server)
 self.$(id)_thread.daemon = True
 self.$(id)_thread.start()</make>
   <param>
-    <name>Centre Frequency</name>
-    <key>center_frequency</key>
+    <name>TX Centre Frequency</name>
+    <key>tx_center_frequency</key>
     <type>real</type>
   </param>
   <param>
-    <name>Sampling Rate</name>
-    <key>samp_rate</key>
+    <name>TX Sampling Rate</name>
+    <key>tx_samp_rate</key>
     <type>real</type>
   </param>
+  <param>
+    <name>TX FFT M Size</name>
+    <key>tx_fft_size</key>
+    <type>int</type>
+  </param>
+
+  <param>
+    <name>RX Centre Frequency</name>
+    <key>rx_center_frequency</key>
+    <type>real</type>
+  </param>
+  <param>
+    <name>RX Sampling Rate</name>
+    <key>rx_samp_rate</key>
+    <type>real</type>
+  </param>
+  <param>
+    <name>RX FFT M Size</name>
+    <key>rx_fft_size</key>
+    <type>int</type>
+  </param>
+
   <param>
     <name>Server Port</name>
     <key>port</key>
-    <type>int</type>
-  </param>
-  <param>
-    <name>FFT M Size</name>
-    <key>fft_size</key>
     <type>int</type>
   </param>
   <param>
@@ -43,4 +61,5 @@ self.$(id)_thread.start()</make>
       <key>"IMG_GEN"</key>
     </option>
   </param>
+
 </block>

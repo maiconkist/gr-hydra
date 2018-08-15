@@ -133,7 +133,8 @@ udp_sink::udp_sink(
   std::mutex* in_mtx,
   const std::string& s_host,
   const std::string& s_port):
-  g_input_buffer(input_buffer)
+  g_input_buffer(input_buffer),
+  g_th_run(true)
 {
   // Get the mutex
   p_in_mtx = in_mtx;
@@ -154,7 +155,7 @@ udp_sink::transmit()
 {
   gr_complex output_buffer[BUFFER_SIZE];
 
-  while (true)
+  while (g_th_run)
   {
     // If there is anything to transmit
     if (g_input_buffer->size() > 0)

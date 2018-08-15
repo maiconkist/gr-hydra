@@ -26,9 +26,11 @@ public:
 
   ~hydra_gr_client_sink_impl();
 
+  virtual bool stop();
+
 private:
   gr::blocks::udp_sink::sptr d_udp_sink;
-  hydra_client *client;
+  std::unique_ptr<hydra_client> client;
   std::string g_host;
 };
 

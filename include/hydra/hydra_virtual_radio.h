@@ -29,6 +29,7 @@
 
 #include <vector>
 #include <mutex>
+#include <boost/format.hpp>
 
 namespace hydra {
 
@@ -36,7 +37,6 @@ class VirtualRadio
 {
 public:
   /** CTOR
-   * @param _idx
    */
  VirtualRadio(size_t _idx, Hypervisor *hypervisor);
 
@@ -76,11 +76,6 @@ public:
   void set_rx_mapping(const iq_map_vec &iq_map);
   size_t const set_rx_fft(size_t n) {return g_rx_fft_size = n;}
   void demap_iq_samples(const gr_complex *samples_buf, size_t len); // called by the hypervisor
-
-#if 0
-  size_t get_source_samples(size_t noutput_items, gr_complex *samples_buff);
-#endif
-
 
   /**
    */

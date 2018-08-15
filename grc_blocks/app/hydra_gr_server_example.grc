@@ -88,10 +88,6 @@
       <value></value>
     </param>
     <param>
-      <key>center_frequency</key>
-      <value>2e9</value>
-    </param>
-    <param>
       <key>comment</key>
       <value></value>
     </param>
@@ -100,12 +96,8 @@
       <value>1</value>
     </param>
     <param>
-      <key>fft_size</key>
-      <value>2048</value>
-    </param>
-    <param>
       <key>_coordinate</key>
-      <value>(216, 40)</value>
+      <value>(1078, 123)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -120,12 +112,32 @@
       <value>"USRP"</value>
     </param>
     <param>
-      <key>samp_rate</key>
+      <key>rx_center_frequency</key>
+      <value>950e6</value>
+    </param>
+    <param>
+      <key>rx_fft_size</key>
+      <value>1024</value>
+    </param>
+    <param>
+      <key>rx_samp_rate</key>
       <value>2e6</value>
     </param>
     <param>
       <key>port</key>
       <value>5000</value>
+    </param>
+    <param>
+      <key>tx_center_frequency</key>
+      <value>950e6</value>
+    </param>
+    <param>
+      <key>tx_fft_size</key>
+      <value>1024</value>
+    </param>
+    <param>
+      <key>tx_samp_rate</key>
+      <value>2e6</value>
     </param>
   </block>
 </flow_graph>

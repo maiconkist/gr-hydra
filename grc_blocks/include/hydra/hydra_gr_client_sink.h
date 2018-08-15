@@ -20,7 +20,6 @@ class HYDRA_API hydra_gr_client_sink : virtual public gr::hier_block2
     virtual void start_client(double d_center_frequency,
                               double d_samp_rate,
                               size_t u_payload) = 0;
-
 };
 
 

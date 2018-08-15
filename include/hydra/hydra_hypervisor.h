@@ -24,6 +24,8 @@
 #include <hydra/hydra_fft.h>
 #include <hydra/hydra_virtual_radio.h>
 
+
+#include <mutex>
 #include <vector>
 #include <thread>
 
@@ -85,31 +87,7 @@ class Hypervisor
   void rx_run();
   void forward_rx_window(window &optr, size_t len); // where the rx things happen
 
-
-
-#if 0
-  /**
-   * @param noutput_items
-   * @param output_items
-   * @param max_noutput_items
-   */
-  size_t source_add_samples(int nouput_items,
-                            gr_vector_int &ninput_items,
-                            gr_vector_const_void_star &input_items);
-
-  /**
-   * @param output_items
-   */
-  gr_vector_int get_source_outbuf(size_t noutput_items, gr_vector_void_star &output_items);
-#endif
-
-  /**
-   */
-  bool const source_ready();
-
 private:
-
-
   // All TX structures
   size_t tx_fft_len; // FFT M length
   double g_tx_cf; // Hypervisor central frequency
@@ -129,7 +107,9 @@ private:
   iq_map_vec g_rx_subcarriers_map; // mapping of subcarriers
   uhd_hydra_sptr g_rx_dev;
 
+
   vradio_vec g_vradios;
+  std::mutex vradios_mtx;
 };
 
 }; /* namespace hydra */
