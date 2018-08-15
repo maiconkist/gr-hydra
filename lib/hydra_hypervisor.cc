@@ -159,7 +159,7 @@ Hypervisor::tx_run()
 
   while (true)
   {
-    std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
+    //std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
     get_tx_window(optr , get_tx_fft());
     g_tx_dev->send(optr, get_tx_fft());
   }

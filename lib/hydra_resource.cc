@@ -188,32 +188,27 @@ rf_front_end::create_chunks(double d_centre_freq,
     /* If there's free space in the lower band */
     if (2 * it->d_centre_freq - it->d_bandwidth < 2 * d_centre_freq - d_bandwidth)
     {
-      std::cout << "------ allocating lower band" << std::endl;
       double l_bandwidth = (d_centre_freq - it->d_centre_freq) - 0.5 * (d_bandwidth - it->d_bandwidth);
       double l_centre_freq = d_centre_freq - 0.5 * (d_bandwidth + l_bandwidth);
       // If this is the first chunk
       if (it == resources.begin())
       {
-        std::cout << "1.1" << std::endl;
         //Insert a new free chunk before the current one
         resources.emplace_front(l_centre_freq, l_bandwidth);
       }
       // Otherwise, there are other chunks
       else
       {
-        std::cout << "1.2" << std::endl;
         // Check if the lower chunk is free
         auto pv = std::prev(it, 1);
         if (pv->u_id == 0)
         {
-          std::cout << "1.2.1" << std::endl;
           // Update the centre frequency as the geometric mean between the current free chunk and the new free region
           pv->d_centre_freq = sqrt(0.5 * (pv->d_centre_freq * pv->d_bandwidth + l_centre_freq * l_bandwidth));
           pv->d_bandwidth += l_bandwidth;
         }
         else
         {
-          std::cout << "1.2.2" << std::endl;
           resources.emplace(it, l_centre_freq, l_bandwidth);
         }
 
@@ -223,26 +218,22 @@ rf_front_end::create_chunks(double d_centre_freq,
     // If there's free space in the upper band
     if (2 * it->d_centre_freq + it->d_bandwidth > 2 * d_centre_freq + d_bandwidth)
     {
-      std::cout << "------ allocating upper band" << std::endl;
       double r_bandwidth = (it->d_centre_freq - d_centre_freq) + 0.5 * (it->d_bandwidth - d_bandwidth);
       double r_centre_freq =  d_centre_freq + 0.5 * (d_bandwidth + r_bandwidth);
 
       // If this is the last chunk
       if (it == --resources.end())
       {
-        std::cout << "2.1" << std::endl;
         //Insert a new free chunk after the current one
         resources.emplace_back(r_centre_freq, r_bandwidth);
       }
       // Otherwise, there are other chunks
       else
       {
-        std::cout << "2.2" << std::endl;
         // Check if the upper chunk is free
         auto nx = std::next(it, 1);
         if (nx->u_id == 0)
         {
-          std::cout << "2.2.1" << std::endl;
           // Update the centre frequency as the geometric mean between the current free chunk and the new free region
           nx->d_centre_freq = sqrt(0.5 * (nx->d_centre_freq * nx->d_bandwidth + r_centre_freq * r_bandwidth));
           nx->d_bandwidth += r_bandwidth;
@@ -250,7 +241,6 @@ rf_front_end::create_chunks(double d_centre_freq,
         // If not, add a new free chunk after this one
         else
         {
-          std::cout << "2.2.2" << std::endl;
           resources.emplace(nx, r_centre_freq, r_bandwidth);
         }
 
