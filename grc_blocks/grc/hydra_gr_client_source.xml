@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<block>
+  <name>HyDRA Client Source</name>
+  <key>hydra_gr__source</key>
+  <category>[HyDRA]</category>
+  <import>import hydra</import>
+  <make>hydra.hydra_gr_client_source($u_id, $host, $port)
+self.$(id).start_client($center_frequency, $samp_rate, $payload) 
+  </make>
+  <param>
+    <name>Centre Frequency</name>
+    <key>center_frequency</key>
+    <type>real</type>
+  </param>
+  <param>
+    <name>Sampling Rate</name>
+    <key>samp_rate</key>
+    <type>real</type>
+  </param>
+  <param>
+    <name>Virtual Radio ID</name>
+    <key>u_id</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Host</name>
+    <key>host</key>
+    <type>string</type>
+  </param>
+  <param>
+    <name>Port</name>
+    <key>port</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Payload Size</name>
+    <key>payload</key>
+    <type>int</type>
+  </param>
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>
