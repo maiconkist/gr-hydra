@@ -25,3 +25,8 @@ install(FILES
     hydra_gr_server.xml
     DESTINATION share/gnuradio/grc/blocks
 )
+
+install(FILES
+   __init__.py
+   DESTINATION ${GR_PYTHON_DIR}/hydra
+   )

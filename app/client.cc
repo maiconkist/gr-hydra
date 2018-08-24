@@ -1,6 +1,9 @@
 #include "hydra/hydra_client.h"
+
+
 #include <iostream>
 #include <signal.h>
+#include <boost/format.hpp>
 
 
 hydra::hydra_client s1, s2, s3;
