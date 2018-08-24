@@ -14,7 +14,7 @@ void xvl_monitor::start(void)
   //  Prepare our context and socket
   zmq::context_t context (1);
   zmq::socket_t socket (context, ZMQ_PULL);
-  socket.bind (("tcp://127.0.0.1:" + s_server_port).c_str());
+  socket.bind (("tcp://*:" + s_server_port).c_str());
 
   // Message type object
   zmq::message_t request;
