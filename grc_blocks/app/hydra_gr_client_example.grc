@@ -270,7 +270,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -679,7 +679,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>fft_len</key>
@@ -891,6 +891,10 @@
       <value>freq</value>
     </param>
     <param>
+      <key>c_host</key>
+      <value>134.226.55.64</value>
+    </param>
+    <param>
       <key>comment</key>
       <value></value>
     </param>
@@ -954,6 +958,10 @@
       <value>freq + 1e6</value>
     </param>
     <param>
+      <key>c_host</key>
+      <value>134.226.55.64</value>
+    </param>
+    <param>
       <key>comment</key>
       <value></value>
     </param>
@@ -963,7 +971,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -1471,7 +1479,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -2021,7 +2029,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>fftsize</key>

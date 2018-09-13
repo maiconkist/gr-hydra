@@ -31,12 +31,13 @@ hydra_client::request_rx_resources(double d_centre_freq,
     std::cerr << "Missing RX information!" << std::endl;
   }
 
+
   // Set message type
   std::string message = "{\"xvl_rrx\":{\"id\":" + std::to_string(u_id) + "," +
     "\"centre_freq\":" + std::to_string(d_centre_freq) + "," +
     "\"bandwidth\":" + std::to_string(d_bandwidth) + ", " +
-    "\"padding\":" + std::to_string(bpad) + "," +
-    "\"ip\":" + s_client_host + "}}";
+    "\"ip\":\"" + s_client_host + "\", " +
+    "\"padding\":" + std::to_string(bpad) + "}}";
 
   std::stringstream ss;
   // Return the result of the request message
@@ -78,9 +79,9 @@ hydra_client::request_tx_resources(double d_centre_freq,
 
   // Set message type
   std::string message = "{\"xvl_rtx\":{\"id\":" + std::to_string(u_id) + "," +
-    ("\"centre_freq\":" + std::to_string(d_centre_freq) + ",") +
-    ("\"padding\":" + std::to_string(bpad) + ",") +
-    ("\"bandwidth\":" + std::to_string(d_bandwidth) + "}}");
+    "\"centre_freq\":" + std::to_string(d_centre_freq) + "," +
+    "\"padding\":" + std::to_string(bpad) + "," +
+    "\"bandwidth\":" + std::to_string(d_bandwidth) + "}}";
 
   // Return the result of the request message
   std::stringstream ss;

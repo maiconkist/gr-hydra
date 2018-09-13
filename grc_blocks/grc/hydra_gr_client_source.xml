@@ -4,7 +4,7 @@
   <key>hydra_gr__source</key>
   <category>[HyDRA]</category>
   <import>import hydra</import>
-  <make>hydra.hydra_gr_client_source($u_id, $s_host, $port)
+  <make>hydra.hydra_gr_client_source($u_id, $c_host, $s_host, $port)
 self.$(id).start_client($center_frequency, $samp_rate, $payload) 
   </make>
   <param>
@@ -21,6 +21,11 @@ self.$(id).start_client($center_frequency, $samp_rate, $payload)
     <name>Virtual Radio ID</name>
     <key>u_id</key>
     <type>int</type>
+  </param>
+  <param>
+    <name>Client IP</name>
+    <key>c_host</key>
+    <type>string</type>
   </param>
   <param>
     <name>HyDRA-AAS IP</name>
