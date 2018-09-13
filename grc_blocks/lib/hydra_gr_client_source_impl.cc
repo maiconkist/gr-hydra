@@ -10,10 +10,10 @@ namespace gr {
 
 hydra_gr_client_source::sptr
 hydra_gr_client_source::make(unsigned           u_id,
-                             const std::string &host,
+                             const std::string &s_host,
                              unsigned int       port)
 {
-  return gnuradio::get_initial_sptr(new hydra_gr_client_source_impl(u_id, host, port));
+  return gnuradio::get_initial_sptr(new hydra_gr_client_source_impl(u_id, s_host, port));
 }
 
 /* CTOR
@@ -25,7 +25,7 @@ hydra_gr_client_source_impl::hydra_gr_client_source_impl(unsigned int u_id,
                   gr::io_signature::make(0, 0, 0),
                   gr::io_signature::make(1, 1, sizeof(gr_complex)))
 {
-  g_host = s_host;
+  server_host = s_host;
   client = std::make_unique<hydra_client>(s_host, u_port, u_id, true);
   client->check_connection();
 }
@@ -49,14 +49,14 @@ void hydra_gr_client_source_impl::start_client(double d_center_frequency,
 
   if (i_rx_port)
   {
+    std::cout << boost::format("Creating GNURadio UDP source block: (%1%: %2%)") % "0.0.0.0" % i_rx_port << std::endl;
     d_udp_source = gr::blocks::udp_source::make(sizeof(gr_complex),
-                                                g_host,
+                                                "0.0.0.0",
                                                 i_rx_port,
                                                 u_payload,
                                                 false);
 
     connect(d_udp_source, 0, self(), 0);
-    std::cout << boost::format("Client Source initialized successfully: (%1%: %2%)") % g_host % i_rx_port << std::endl;
   }
   else
   {

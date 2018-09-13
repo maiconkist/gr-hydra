@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client Example
-# Generated: Wed Aug 15 11:17:49 2018
+# Generated: Thu Sep 13 14:36:34 2018
 ##################################################
 
 from distutils.version import StrictVersion
@@ -245,14 +245,14 @@ class hydra_gr_client_example(gr.top_block, Qt.QWidget):
 
         self._qtgui_histogram_sink_x_0_1_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0_1.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_histogram_sink_x_0_1_win)
-        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(3, '127.0.0.1', 5000)
+        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(3, '134.226.55.93', 5000)
         self.hydra_gr_sink_0_0.start_client(freq + 1e6, samp_rate, 1024)
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '127.0.0.1', 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '134.226.55.93', 5000)
         self.hydra_gr_sink_0.start_client(freq, samp_rate * 1.5, 1024)
-        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, '127.0.0.1', 5000)
+        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, '134.226.55.93', 5000)
         self.hydra_gr__source_0_0_0.start_client(freq + 1e6, samp_rate, 10000)
 
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '127.0.0.1', 5000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '134.226.55.93', 5000)
         self.hydra_gr__source_0_0.start_client(freq, samp_rate * 1.5, 10000)
 
         self.digital_ofdm_tx_0 = digital.ofdm_tx(

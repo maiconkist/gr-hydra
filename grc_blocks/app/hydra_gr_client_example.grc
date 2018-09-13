@@ -223,7 +223,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -911,8 +911,8 @@
       <value>180</value>
     </param>
     <param>
-      <key>host</key>
-      <value>127.0.0.1</value>
+      <key>s_host</key>
+      <value>134.226.55.93</value>
     </param>
     <param>
       <key>id</key>
@@ -974,8 +974,8 @@
       <value>180</value>
     </param>
     <param>
-      <key>host</key>
-      <value>127.0.0.1</value>
+      <key>s_host</key>
+      <value>134.226.55.93</value>
     </param>
     <param>
       <key>id</key>
@@ -1030,7 +1030,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1118, 163)</value>
+      <value>(1104, 164)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1038,7 +1038,7 @@
     </param>
     <param>
       <key>host</key>
-      <value>127.0.0.1</value>
+      <value>134.226.55.93</value>
     </param>
     <param>
       <key>id</key>
@@ -1085,7 +1085,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1118, 299)</value>
+      <value>(1104, 300)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1093,7 +1093,7 @@
     </param>
     <param>
       <key>host</key>
-      <value>127.0.0.1</value>
+      <value>134.226.55.93</value>
     </param>
     <param>
       <key>id</key>
