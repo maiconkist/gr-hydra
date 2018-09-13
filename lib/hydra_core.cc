@@ -52,26 +52,28 @@ HydraCore::request_rx_resources(unsigned int u_id,
                                 double d_bandwidth,
                                 const std::string &remote_addr)
 {
+
   // If not configured to receive
   if (not b_receiver)
   {
     // Return error -- zero is bad
+    std::cout << "RX Resources not configured. Rejecting request." << std::endl;
     return 0;
   }
 
   auto vr = p_hypervisor->get_vradio(u_id);
-
   // vr exist and is not enabled for receive
   if (vr != nullptr and not vr->get_rx_enabled())
   {
-     // Return error -- zero is bad
-     return 0;
+    // Return error -- zero is bad
+    return 0;
   }
 
   // Try to reserve the resource chunks
   if(p_resource_manager->reserve_rx_resources(u_id, d_centre_freq, d_bandwidth))
   {
     // Return error -- zero is bad
+    std::cout << "RX Resources already in use. Rejecting request." << std::endl;
     return 0;
   }
 
@@ -89,6 +91,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
   }
 
    // If able to create all of it, return the port number
+  std::cout << "RX Resources allocated successfully." << std::endl;
   return u_udp_port++;
 }
 

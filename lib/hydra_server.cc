@@ -43,6 +43,8 @@ HydraServer::run()
     std::stringstream ss; ss << std::string(static_cast<char*>(request.data()),
                                          request.size());
 
+    std::cout << std::string(static_cast<char*>(request.data()), request.size()) << std::endl;
+
     // Create output JSON tree
     boost::property_tree::ptree output_tree;
     // Inner tree, holding the message's content
@@ -54,7 +56,7 @@ HydraServer::run()
     // Try to load the input stream as JSON
     try
     {
-        boost::property_tree::read_json(ss, root);
+      boost::property_tree::read_json(ss, root);
     }
     // Return message if it failed
     catch (const boost::property_tree::json_parser::json_parser_error &e)
@@ -66,9 +68,10 @@ HydraServer::run()
       output_tree.add_child("xvl_err", content);
     }
 
-
     // Extract key from the JSON tree
     std::string key = root.front().first;
+    std::cout << "key: " << key << std::endl;
+
     // Sync message, reply with status
     if (boost::iequals(key, "xvl_syn"))
     {
@@ -80,7 +83,6 @@ HydraServer::run()
       // Append the content to the output tree
       output_tree.add_child("xvl_ack", content);
     }
-
     // Query message, reply with the current allocation
     else if (boost::iequals(key , "xvl_que"))
     {
@@ -124,6 +126,7 @@ HydraServer::run()
         {
           // Try to reserve RX resources
           std::string client_ip = root.get(key + ".ip", "0.0.0.0");
+          std::cout << client_ip << std::endl;
           u_reserved = p_core->request_rx_resources(u_id, d_cf, d_bw, client_ip);
         }
         else
@@ -196,6 +199,7 @@ HydraServer::run()
     // Otherwise, unknown message
     else
     {
+      std::cout << "Unknown Message. Rejecting" << std::endl;
       // Add the content
       content.put("status", false);
       content.put("message","Unknown message: " + key);
