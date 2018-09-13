@@ -53,7 +53,8 @@ public:
    // Request RX resources
    int request_rx_resources(unsigned int u_id,
                             double d_centre_freq,
-                            double d_bandwidth);
+                            double d_bandwidth,
+                            const std::string &remote_addr);
 
    // Request TX resources
    int request_tx_resources(unsigned int u_id,

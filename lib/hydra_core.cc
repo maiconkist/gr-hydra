@@ -49,7 +49,8 @@ HydraCore::set_tx_resources(uhd_hydra_sptr usrp,
 int
 HydraCore::request_rx_resources(unsigned int u_id,
                                 double d_centre_freq,
-                                double d_bandwidth)
+                                double d_bandwidth,
+                                const std::string &remote_addr)
 {
   // If not configured to receive
   if (not b_receiver)
@@ -79,7 +80,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
   if (vr == nullptr)
   {
       vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
-      vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth);
+      vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth, remote_addr);
       p_hypervisor->attach_virtual_radio(vr);
   }
   else

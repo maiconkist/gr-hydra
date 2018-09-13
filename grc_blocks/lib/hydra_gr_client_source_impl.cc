@@ -10,23 +10,24 @@ namespace gr {
 
 hydra_gr_client_source::sptr
 hydra_gr_client_source::make(unsigned           u_id,
+                             const std::string &c_host,
                              const std::string &s_host,
                              unsigned int       port)
 {
-  return gnuradio::get_initial_sptr(new hydra_gr_client_source_impl(u_id, s_host, port));
+  return gnuradio::get_initial_sptr(new hydra_gr_client_source_impl(u_id, c_host, s_host, port));
 }
 
 /* CTOR
  */
 hydra_gr_client_source_impl::hydra_gr_client_source_impl(unsigned int u_id,
+                                                         const std::string &c_host,
                                                          const std::string &s_host,
                                                          unsigned int u_port):
   gr::hier_block2("gr_client_source",
                   gr::io_signature::make(0, 0, 0),
                   gr::io_signature::make(1, 1, sizeof(gr_complex)))
 {
-  server_host = s_host;
-  client = std::make_unique<hydra_client>(s_host, u_port, u_id, true);
+  client = std::make_unique<hydra_client>(c_host, s_host, u_port, u_id, true);
   client->check_connection();
 }
 

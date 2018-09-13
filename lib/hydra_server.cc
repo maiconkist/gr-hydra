@@ -123,8 +123,8 @@ HydraServer::run()
         if (boost::iequals(key, "xvl_rrx"))
         {
           // Try to reserve RX resources
-          bool bpad = root.get(key + ".padding", false);
-          u_reserved = p_core->request_rx_resources(u_id, d_cf, d_bw);
+          std::string client_ip = root.get(key + ".ip", "0.0.0.0");
+          u_reserved = p_core->request_rx_resources(u_id, d_cf, d_bw, client_ip);
         }
         else
         {

@@ -2,12 +2,14 @@
 
 namespace hydra {
 
-hydra_client::hydra_client(std::string s_host,
+hydra_client::hydra_client(std::string client_ip,
+                           std::string server_ip,
                            unsigned int u_port,
                            unsigned int u_client_id,
                            bool b_debug)
 {
-  s_server_host = s_host;
+  s_client_host = client_ip;
+  s_server_host = server_ip;
   s_server_port = std::to_string(u_port);
   u_id = u_client_id;
   b_debug_flag = b_debug;
@@ -17,7 +19,6 @@ hydra_client::~hydra_client()
 {
   free_resources();
 }
-
 
 int
 hydra_client::request_rx_resources(double d_centre_freq,
@@ -32,9 +33,10 @@ hydra_client::request_rx_resources(double d_centre_freq,
 
   // Set message type
   std::string message = "{\"xvl_rrx\":{\"id\":" + std::to_string(u_id) + "," +
-    ("\"centre_freq\":" + std::to_string(d_centre_freq) + ",") +
-    ("\"padding\":" + std::to_string(bpad) + ",") +
-    ("\"bandwidth\":" + std::to_string(d_bandwidth) + "}}");
+    "\"centre_freq\":" + std::to_string(d_centre_freq) + "," +
+    "\"bandwidth\":" + std::to_string(d_bandwidth) + ", " +
+    "\"padding\":" + std::to_string(bpad) + "," +
+    "\"ip\":" + s_client_host + "}}";
 
   std::stringstream ss;
   // Return the result of the request message

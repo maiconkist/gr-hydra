@@ -34,6 +34,7 @@ public:
   typedef boost::shared_ptr<hydra_gr_client_source> sptr;
 
   static sptr make(unsigned int       u_id,
+                   const std::string &c_host,
                    const std::string &s_host,
                    unsigned int       u_port);
 

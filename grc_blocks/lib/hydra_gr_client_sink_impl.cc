@@ -30,7 +30,7 @@ hydra_gr_client_sink_impl::hydra_gr_client_sink_impl(
                    gr::io_signature::make(0, 0, 0))
 {
   g_host = s_host;
-  client = std::make_unique<hydra_client>(s_host, u_port, u_id, true);
+  client = std::make_unique<hydra_client>("0.0.0.0", s_host, u_port, u_id, true);
   client->check_connection();
 }
 

@@ -42,7 +42,8 @@ public:
 
  int set_rx_chain(unsigned int u_rx_udp,
                   double d_rx_centre_freq,
-                  double d_rx_bw);
+                  double d_rx_bw,
+                  const std::string &remote_addr = "0.0.0.0");
 
  int set_tx_chain(unsigned int u_tx_udp,
                   double d_tx_centre_freq,

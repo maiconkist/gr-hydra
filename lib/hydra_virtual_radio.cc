@@ -40,7 +40,8 @@ VirtualRadio::VirtualRadio(size_t _idx, Hypervisor *hypervisor):
 int
 VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                            double d_rx_freq,
-                           double d_rx_bw)
+                           double d_rx_bw,
+                           const std::string &remote_addr)
 {
   // If already receiving
   if (b_receiver)
@@ -69,7 +70,7 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   // Create UDP transmitter
   rx_socket = udp_sink::make(rx_buffer->stream(),
                              rx_buffer->mutex(),
-                             "0.0.0.0",
+			     remote_addr,
                              std::to_string(u_rx_udp));
 
   // Toggle receiving flag

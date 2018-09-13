@@ -27,17 +27,17 @@ int main()
   std::string lalala;
   // Request resources
   std::cout << boost::format("------------- Requesting %1%, %2%") % (cf+200e3) % 200e3 << std::endl;
-  s1 = hydra::hydra_client("127.0.0.1", 5000, 90, true);
+  s1 = hydra::hydra_client("127.0.0.1", "127.0.0.1", 5000, 90, true);
   std::cout << s1.query_resources() << std::endl;
   std::cout << s1.request_rx_resources(cf + 200e3, 200e3, false) << std::endl;
 
   // Request resources
   std::cout << boost::format("------------- Requesting %1%, %2%") % (cf-200e3) % 100e3 << std::endl;
-  s2 = hydra::hydra_client("127.0.0.1", 5000, 91, true);
+  s2 = hydra::hydra_client("127.0.0.1", "127.0.0.1", 5000, 91, true);
   std::cout << s2.request_rx_resources(cf - 200e3, 100e3, false) << std::endl;
 
   std::cout << boost::format("------------- Requesting %1%, %2%") % (cf) % 100e3 << std::endl;
-  s3 = hydra::hydra_client("127.0.0.1", 5000, 93, true);
+  s3 = hydra::hydra_client("127.0.0.1", "127.0.0.1", 5000, 93, true);
   std::cout << s3.request_rx_resources(cf, 100e3, false) << std::endl;
 
   // Free resources from a given service
