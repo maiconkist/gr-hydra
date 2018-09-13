@@ -4,7 +4,7 @@
   <key>hydra_gr__source</key>
   <category>[HyDRA]</category>
   <import>import hydra</import>
-  <make>hydra.hydra_gr_client_source($u_id, $host, $port)
+  <make>hydra.hydra_gr_client_source($u_id, $s_host, $port)
 self.$(id).start_client($center_frequency, $samp_rate, $payload) 
   </make>
   <param>
@@ -23,8 +23,8 @@ self.$(id).start_client($center_frequency, $samp_rate, $payload)
     <type>int</type>
   </param>
   <param>
-    <name>Host</name>
-    <key>host</key>
+    <name>HyDRA-AAS IP</name>
+    <key>s_host</key>
     <type>string</type>
   </param>
   <param>
