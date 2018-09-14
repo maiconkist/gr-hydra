@@ -63,14 +63,12 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
 bool
 hydra_gr_client_sink_impl::stop()
 {
-  std::cout << "DTOOOOOOOOOOOOOOOOOOOOOOOOR" << std::endl;
   client->free_resources();
 }
 
 
 hydra_gr_client_sink_impl::~hydra_gr_client_sink_impl()
 {
-  std::cout << "DTOOOOOOOOOOOOOOOOOOOOOOOOR" << std::endl;
   client->free_resources();
 }
 
