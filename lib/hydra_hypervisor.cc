@@ -68,7 +68,6 @@ Hypervisor::attach_virtual_radio(VirtualRadioPtr vradio)
    if (vr != nullptr)
       return;
 
-
    std::lock_guard<std::mutex> _l(vradios_mtx);
    g_vradios.push_back(vradio);
 }

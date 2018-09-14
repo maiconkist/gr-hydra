@@ -126,7 +126,6 @@ HydraServer::run()
         {
           // Try to reserve RX resources
           std::string client_ip = root.get(key + ".ip", "0.0.0.0");
-          std::cout << client_ip << std::endl;
           u_reserved = p_core->request_rx_resources(u_id, d_cf, d_bw, client_ip);
         }
         else

@@ -82,13 +82,10 @@ HydraCore::request_rx_resources(unsigned int u_id,
   if (vr == nullptr)
   {
       vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
-      vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth, remote_addr);
       p_hypervisor->attach_virtual_radio(vr);
   }
-  else
-  {
-      vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth);
-  }
+
+  vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth, remote_addr);
 
    // If able to create all of it, return the port number
   std::cout << "RX Resources allocated successfully." << std::endl;

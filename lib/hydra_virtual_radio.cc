@@ -70,7 +70,7 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   // Create UDP transmitter
   rx_socket = udp_sink::make(rx_buffer->stream(),
                              rx_buffer->mutex(),
-			     remote_addr,
+                             remote_addr,
                              std::to_string(u_rx_udp));
 
   // Toggle receiving flag
