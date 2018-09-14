@@ -1,5 +1,5 @@
 <block>
-  <name>HyDRA Server</name>
+  <name>HyDRA-AAS</name>
   <key>hydra_gr_server</key>
   <category>[HyDRA]</category>
   <import>import threading</import>
@@ -41,7 +41,6 @@ self.$(id)_thread.start()</make>
     <key>rx_fft_size</key>
     <type>int</type>
   </param>
-
   <param>
     <name>Server Port</name>
     <key>port</key>
