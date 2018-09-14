@@ -31,6 +31,8 @@ private:
    // Set of occupied UDP ports
    std::set<unsigned int> used_ports;
 
+   std::mutex g_mutex;
+
 public:
    // Constructor
    HydraCore();

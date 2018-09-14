@@ -100,7 +100,6 @@ Hypervisor::detach_virtual_radio(size_t radio_id)
 int
 Hypervisor::notify(VirtualRadio &vr)
 {
-
   if (vr.get_tx_enabled())
   {
     iq_map_vec subcarriers_map = g_tx_subcarriers_map;

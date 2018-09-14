@@ -52,6 +52,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
                                 double d_bandwidth,
                                 const std::string &remote_addr)
 {
+  std::lock_guard<std::mutex> _p(g_mutex);
 
   // If not configured to receive
   if (not b_receiver)
@@ -98,6 +99,8 @@ HydraCore::request_tx_resources(unsigned int u_id,
                                 double d_bandwidth,
                                 bool bpad)
 {
+  std::lock_guard<std::mutex> _p(g_mutex);
+
   // If not configured to transmit
   if (not b_transmitter)
   {
