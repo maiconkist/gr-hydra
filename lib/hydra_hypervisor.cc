@@ -98,9 +98,9 @@ Hypervisor::detach_virtual_radio(size_t radio_id)
 }
 
 int
-Hypervisor::notify(VirtualRadio &vr)
+Hypervisor::notify(VirtualRadio &vr, Hypervisor::Notify set_maps)
 {
-  if (vr.get_tx_enabled())
+  if (vr.get_tx_enabled() || (set_maps & Hypervisor::SET_TX_MAP))
   {
     iq_map_vec subcarriers_map = g_tx_subcarriers_map;
     std::replace(subcarriers_map.begin(),
@@ -116,7 +116,7 @@ Hypervisor::notify(VirtualRadio &vr)
     }
   }
 
-  if (vr.get_rx_enabled())
+  if (vr.get_rx_enabled() || (set_maps & Hypervisor::SET_RX_MAP))
   {
     iq_map_vec subcarriers_map = g_rx_subcarriers_map;
     std::replace(subcarriers_map.begin(),

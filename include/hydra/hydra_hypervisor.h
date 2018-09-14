@@ -35,6 +35,7 @@ namespace hydra {
 class Hypervisor
 {
  public:
+
   Hypervisor();
   Hypervisor(size_t _fft_m_len,
              double central_frequency,
@@ -62,7 +63,13 @@ class Hypervisor
    * @param vr
    * @return -1 if error, 0 otherwise
    */
-  int notify(VirtualRadio &vr);
+  enum Notify {
+        SET_NONE = 0x0,
+	SET_RX_MAP = 0x1,
+	SET_TX_MAP = 0x2,
+  };
+
+  int notify(VirtualRadio &vr, Notify set_maps = Notify::SET_NONE);
 
   double const get_tx_central_frequency() { return g_tx_cf; }
   double const get_tx_bandwidth() { return g_tx_bw; }
@@ -86,6 +93,7 @@ class Hypervisor
   int set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map);
   void rx_run();
   void forward_rx_window(window &optr, size_t len); // where the rx things happen
+
 
 private:
   // All TX structures

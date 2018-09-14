@@ -67,17 +67,18 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                                          d_rx_bw,
                                          g_rx_fft_size);
 
-  // Create UDP transmitter
+  /* Create UDP transmitter */
   rx_socket = udp_sink::make(rx_buffer->stream(),
                              rx_buffer->mutex(),
                              remote_addr,
                              std::to_string(u_rx_udp));
 
-  // Toggle receiving flag
-  b_receiver = true;
 
-  // Always in the end.
-  p_hypervisor->notify(*this);
+  /* Always in the end. */
+  p_hypervisor->notify(*this, Hypervisor::SET_RX_MAP);
+
+  /* Toggle receiving flag */
+  b_receiver = true;
 
   // Create reports object
   //rx_report = std::make_unique<xvl_report>(g_idx, rx_socket->buffer());
@@ -117,10 +118,10 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
    // create fft object
    g_fft_complex  = sfft_complex(new fft_complex(g_tx_fft_size));
 
+   p_hypervisor->notify(*this, Hypervisor::SET_TX_MAP);
+
    // Toggle transmitting flag
    b_transmitter = true;
-   p_hypervisor->notify(*this);
-
 
    // TODO Create TX reports object
    // tx_report = std::make_unique<xvl_report>(u_id, tx_socket->windows());
@@ -228,11 +229,20 @@ VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
 {
   if (!b_receiver) return;
 
+  if (g_ifft_complex == NULL) std::cout << "NULLLLLLLLLLL" << std::endl;
+  if (len < g_rx_fft_size) std::cout << "SMALLLLLLLLLLL" << std::endl;
+  if (g_rx_map.size() < g_rx_fft_size) std::cout << "SMALLLLLLLLLLL22222" << std::endl;
+
+
+  static int printer = 1;
+
+  if (printer)
+	std::cout << boost::format("sb.length(): %1%, g_fft: %2%") % len % g_rx_fft_size << std::endl;
+  printer = 0;
+
   /* Copy the samples used by this radio */
   for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
-  {
     g_ifft_complex->get_inbuf()[idx] = samples_buf[g_rx_map[idx]];
-  }
 
   g_ifft_complex->execute();
 
