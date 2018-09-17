@@ -57,8 +57,6 @@ device_uhd::set_tx_config(double freq, double rate, double gain)
   usrp->set_tx_freq(freq);
   std::cout << "Actual TX freq: " << usrp->get_tx_freq()/1e6 << " MHz" << std::endl;
 
-
-
   uhd::stream_args_t stream_args("fc32", "sc16");
   tx_stream = usrp->get_tx_stream(stream_args);
 }
@@ -82,21 +80,16 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
   std::cout << "Actual RX freq: " << usrp->get_rx_freq()/1e6 << " MHz" << std::endl;
 
 
-  std::cout << "--------- 1" << std::endl;
   uhd::stream_args_t stream_args("fc32"); //complex floats
   rx_stream = usrp->get_rx_stream(stream_args);
-  std::cout << "--------- 2" << std::endl;
 
   /* setup streaming */
   uhd::stream_cmd_t stream_cmd = uhd::stream_cmd_t(uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS);
   stream_cmd.num_samps = 0;
   stream_cmd.stream_now = true;
   stream_cmd.time_spec = uhd::time_spec_t();
-  std::cout << "--------- 3" << std::endl;
   rx_stream->issue_stream_cmd(stream_cmd);
-  std::cout << "--------- 4" << std::endl;
 }
-
 
 void
 device_uhd::send(const window &buf, size_t len)

@@ -384,11 +384,7 @@ int main(int argv, char **argc)
   std::cout << es.str() << std::endl;
 
 
-
-
-
-
-  #if 0
+#if 0
   rm.set_rx_resources(2e3, 20);
   int workd;
 
@@ -445,7 +441,7 @@ int main(int argv, char **argc)
   output_tree = rm.query_resources();
   boost::property_tree::json_parser::write_json(es, output_tree);
   std::cout << es.str() << std::endl;
-  #endif
+#endif
 
   return 0;
 }

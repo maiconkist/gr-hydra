@@ -7,7 +7,7 @@ hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>();
 void
 signal_handler(int signum)
 {
-  std::cout << "FODA-SE" << std::endl;
+  std::cout << "Closing Application." << std::endl;
   usrp->release();
 }
 
