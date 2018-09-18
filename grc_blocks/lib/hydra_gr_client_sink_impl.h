@@ -24,6 +24,11 @@ public:
                             double d_samp_rate,
                             size_t u_payload);
 
+
+  virtual int request_tx_resources(double d_center_frequency,
+                                   double d_samp_rate,
+                                   size_t u_payload);
+
   ~hydra_gr_client_sink_impl();
 
   virtual bool stop();
