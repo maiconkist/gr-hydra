@@ -148,7 +148,7 @@ xvl_resource_manager::free_resources(size_t u_id)
   if (b_transmitter)
   {
     // Delete all possible ID's TX resources
-    rx_resources->delete_chunks(u_id);
+    tx_resources->delete_chunks(u_id);
   }
 
   // Unlock the mutex
