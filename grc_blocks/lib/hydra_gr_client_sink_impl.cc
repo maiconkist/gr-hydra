@@ -34,11 +34,17 @@ hydra_gr_client_sink_impl::hydra_gr_client_sink_impl(
   client->check_connection();
 }
 
+hydra_gr_client_sink_impl::~hydra_gr_client_sink_impl()
+{
+  client->free_resources();
+}
+
 void
 hydra_gr_client_sink_impl::start_client(double d_center_frequency,
                                         double d_samp_rate,
                                         size_t u_payload)
 {
+
   int i_tx_port = client->request_tx_resources(d_center_frequency, d_samp_rate, false);
 
   if (i_tx_port)
@@ -55,8 +61,8 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
   else
   {
     std::cerr << "Not able to reserve resources." << std::endl;
-    exit(1);
   }
+
 }
 
 
@@ -66,10 +72,12 @@ hydra_gr_client_sink_impl::stop()
   client->free_resources();
 }
 
-
-hydra_gr_client_sink_impl::~hydra_gr_client_sink_impl()
+int
+hydra_gr_client_sink_impl::request_tx_resources(double d_center_frequency,
+                                                double d_samp_rate,
+                                                size_t u_payload)
 {
-  client->free_resources();
+  client->request_tx_resources(d_center_frequency, d_samp_rate, false);
 }
 
   } /* namespace hydra */

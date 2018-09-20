@@ -51,7 +51,6 @@ hydra_client::request_rx_resources(double d_centre_freq,
   {
     boost::property_tree::read_json(ss, root);
   }
-
   catch (const boost::property_tree::json_parser::json_parser_error &e)
   {
     return 0;
@@ -73,9 +72,9 @@ hydra_client::request_tx_resources(double d_centre_freq,
 {
   // If ill defined one of the parameters
   if (not bool(d_centre_freq) or not bool(d_bandwidth))
-    {
-      std::cerr << "Missing TX information!" << std::endl;
-    }
+  {
+    std::cerr << "Missing TX information!" << std::endl;
+  }
 
   // Set message type
   std::string message = "{\"xvl_rtx\":{\"id\":" + std::to_string(u_id) + "," +
@@ -92,22 +91,20 @@ hydra_client::request_tx_resources(double d_centre_freq,
 
   // Try to load the input stream as JSON
   try
-    {
-      boost::property_tree::read_json(ss, root);
-    }
-
+  {
+    boost::property_tree::read_json(ss, root);
+  }
   catch (const boost::property_tree::json_parser::json_parser_error &e)
-    {
-      return 0;
-    }
+  {
+    return 0;
+  }
 
   bool success = root.get("xvl_rep.status", false);
 
   if (success)
-    {
-      return root.get("xvl_rep.udp_port", 0);
-    }
-
+  {
+    return root.get("xvl_rep.udp_port", 0);
+  }
 
   return 0;
 }
