@@ -32,7 +32,9 @@ VirtualRadio::VirtualRadio(size_t _idx, Hypervisor *hypervisor):
    g_idx(_idx),
    p_hypervisor(hypervisor),
    b_receiver(false),
-   b_transmitter(false)
+   g_rx_udp_port(0),
+   b_transmitter(false),
+   g_tx_udp_port(0)
 {
 }
 
