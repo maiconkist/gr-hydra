@@ -49,34 +49,40 @@ public:
 
 class rf_front_end
 {
-  // List of chunks
-  std::list<chunk> resources;
+  public:
+    rf_front_end() {};
 
-public:
-  // Class constructor
-  rf_front_end(double d_cf,
-               double d_bw,
-               unsigned int u_id = 0);
+    // CTOR
+    rf_front_end(double d_cf,
+                 double d_bw,
+                 unsigned int u_id = 0);
 
-  // Create new chunks
-  int create_chunks(double d_centre_freq,
-                    double d_bandwidth,
-                    unsigned int u_id = 0);
 
-  // List chunks
-  boost::property_tree::ptree list_chunks();
 
-  // Delete chunk from chunk list and resize/create free spaces
-  void delete_chunks(const unsigned int &u_id);
+    // Create new chunks
+    int create_chunks(double d_centre_freq,
+                      double d_bandwidth,
+                      unsigned int u_id = 0);
+
+    boost::property_tree::ptree list_chunks();
+    void delete_chunks(unsigned int u_id);
+    bool check_chunk(double d_centre_freq, double d_bandwidth);
+
+  private:
+    // List of chunks
+    std::list<chunk> resources;
+
 };
 
 class xvl_resource_manager
 {
 private:
    // List of RX chunks
-   std::unique_ptr<rf_front_end> rx_resources;
+   rf_front_end rx_resources;
+
    // List of TX chunks
-   std::unique_ptr<rf_front_end> tx_resources;
+   rf_front_end tx_resources;
+
    // Mutex to make its method thread safe
    std::mutex mtx;
    // Flags
@@ -108,11 +114,15 @@ public:
                             double d_centre_freq,
                             double d_bandwidth);
 
+   int check_rx_free(double d_centre_freq, double d_bandwidth, size_t u_id = 0);
+   int check_tx_free(double d_centre_freq, double d_bandwidth, size_t u_id = 0);
+
    // Method to query the list of chunks
    boost::property_tree::ptree query_resources();
 
    // Method to free chunks of a service
-   int free_resources(size_t u_id);
+   int free_tx_resources(size_t u_id);
+   int free_rx_resources(size_t u_id);
 };
 
 } // namespace hydra

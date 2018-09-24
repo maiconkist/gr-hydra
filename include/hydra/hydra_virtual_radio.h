@@ -55,7 +55,7 @@ public:
    */
   int const get_id() {return g_idx;}
 
-  bool const get_tx_enabled(){ return true; };
+  bool const get_tx_enabled(){ return g_tx_udp_port; };
   size_t const get_tx_udp_port(){ return g_tx_udp_port; }
   size_t const get_tx_fft() {return g_rx_fft_size;}
   double const get_tx_freq() { return g_tx_cf; }
@@ -67,7 +67,7 @@ public:
   bool map_tx_samples(gr_complex *samples_buf); // called by the hypervisor
 
 
-  bool const get_rx_enabled(){ return true; };
+  bool const get_rx_enabled(){ return g_rx_udp_port; };
   size_t const get_rx_udp_port(){ return g_rx_udp_port; }
   size_t const get_rx_fft() {return g_rx_fft_size;}
   double const get_rx_freq() { return g_rx_cf; }

@@ -133,10 +133,12 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
 int
 VirtualRadio::set_tx_freq(double cf)
 {
+  if (cf == g_tx_cf) return 0;
+
    double old_cf = g_tx_cf;
    g_tx_cf = cf;
 
-   int err = p_hypervisor->notify(*this);
+   int err = p_hypervisor->notify(*this, Hypervisor::SET_TX_MAP);
    if (err < 0)
       g_tx_cf = old_cf;
 
@@ -146,10 +148,13 @@ VirtualRadio::set_tx_freq(double cf)
 void
 VirtualRadio::set_tx_bandwidth(double bw)
 {
+  if (bw == g_tx_bw) return;
+
+
    double old_bw = g_tx_bw;
    g_tx_bw = bw;
 
-   int err = p_hypervisor->notify(*this);
+   int err = p_hypervisor->notify(*this, Hypervisor::SET_TX_MAP);
    if (err < 0)
       g_tx_bw = old_bw;
 }
@@ -157,7 +162,7 @@ VirtualRadio::set_tx_bandwidth(double bw)
 void
 VirtualRadio::set_tx_mapping(const iq_map_vec &iq_map)
 {
-   g_tx_map = iq_map;
+  g_tx_map = iq_map;
 }
 
 bool
@@ -228,17 +233,6 @@ void
 VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
 {
   if (!b_receiver) return;
-
-  if (g_ifft_complex == NULL) std::cout << "NULLLLLLLLLLL" << std::endl;
-  if (len < g_rx_fft_size) std::cout << "SMALLLLLLLLLLL" << std::endl;
-  if (g_rx_map.size() < g_rx_fft_size) std::cout << "SMALLLLLLLLLLL22222" << std::endl;
-
-
-  static int printer = 1;
-
-  if (printer)
-	std::cout << boost::format("sb.length(): %1%, g_fft: %2%") % len % g_rx_fft_size << std::endl;
-  printer = 0;
 
   /* Copy the samples used by this radio */
   for (size_t idx = 0; idx < g_rx_fft_size; ++idx)

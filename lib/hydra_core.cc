@@ -54,6 +54,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
 {
   std::lock_guard<std::mutex> _p(g_mutex);
 
+
   // If not configured to receive
   if (not b_receiver)
   {
@@ -63,11 +64,20 @@ HydraCore::request_rx_resources(unsigned int u_id,
   }
 
   auto vr = p_hypervisor->get_vradio(u_id);
-  // vr exist and is not enabled for receive
-  if (vr != nullptr and not vr->get_rx_enabled())
+
+  if(vr != nullptr and vr->get_rx_enabled())
   {
-    // Return error -- zero is bad
-    return 0;
+    // requesting tx resources for a VR already existing 
+    if (p_resource_manager->check_rx_free(d_centre_freq, d_bandwidth, u_id))
+    {
+      p_resource_manager->free_rx_resources(u_id);
+      p_resource_manager->reserve_rx_resources(u_id, d_centre_freq, d_bandwidth);
+
+      vr->set_rx_freq(d_centre_freq);
+      vr->set_rx_bandwidth(d_bandwidth);
+
+      return 1;
+    }
   }
 
   // Try to reserve the resource chunks
@@ -111,13 +121,28 @@ HydraCore::request_tx_resources(unsigned int u_id,
   // Tey to find the given VR
   auto vr = p_hypervisor->get_vradio(u_id);
 
-  if (vr != nullptr and not vr->get_tx_enabled())
-     // requesting tx resources for a VR already existing 
-     return 0;
+  if(vr != nullptr and vr->get_tx_enabled())
+  {
+    // requesting tx resources for a VR already existing 
+    if (p_resource_manager->check_tx_free(d_centre_freq, d_bandwidth, u_id))
+    {
 
-  // Try to reserve the resource chunks
+      p_resource_manager->free_tx_resources(u_id);
+      p_resource_manager->reserve_tx_resources(u_id, d_centre_freq, d_bandwidth);
+
+      vr->set_tx_freq(d_centre_freq);
+      vr->set_tx_bandwidth(d_bandwidth);
+
+      return 1;
+    }
+  }
+
+  /* Try to reserve the resource chunks */
   if(p_resource_manager->reserve_tx_resources(u_id, d_centre_freq, d_bandwidth))
-     return 0;
+  {
+    return 0;
+  }
+
 
   static size_t u_udp_port = 7000;
   if (vr == nullptr)
@@ -206,11 +231,9 @@ HydraCore::query_resources()
 int
 HydraCore::free_resources(size_t radio_id)
 {
-  // Try to free the resources
-  bool b_rm_free = p_resource_manager->free_resources(radio_id);
-  bool b_hy_free = p_hypervisor->detach_virtual_radio(radio_id);
-
-  std::cout << boost::format("FR %1%: b_rm_free: %2%, b_hy_free: %3%") % radio_id % b_rm_free % b_hy_free << std::endl;
+  p_resource_manager->free_rx_resources(radio_id);
+  p_resource_manager->free_tx_resources(radio_id);
+  p_hypervisor->detach_virtual_radio(radio_id);
 
   return 1;
 }

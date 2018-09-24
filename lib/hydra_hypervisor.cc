@@ -111,7 +111,7 @@ Hypervisor::notify(VirtualRadio &vr, Hypervisor::Notify set_maps)
     // enter 'if' in case of success
     if (set_tx_mapping(vr, subcarriers_map ) > 0)
     {
-      //LOG(INFO) << "success";
+      // LOG(INFO) << "success";
       g_tx_subcarriers_map = subcarriers_map;
     }
   }
@@ -132,7 +132,7 @@ Hypervisor::notify(VirtualRadio &vr, Hypervisor::Notify set_maps)
     }
   }
 
-  return -1;
+  return 1;
 }
 
 void
@@ -190,8 +190,9 @@ Hypervisor::set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    int sc = offset / (g_tx_bw / tx_fft_len);
    size_t fft_n = vr_bw /(g_tx_bw /tx_fft_len);
 
-   if (sc < 0 || sc > tx_fft_len) {
-      return -1;
+   if (sc < 0 || sc > tx_fft_len)
+   {
+     return -1;
    }
 
    std::cout << "VR " << vr.get_id() << ": CF @" << vr_cf << ", BW @" << vr_bw << ", Offset @" << offset << ", First SC @ " << sc << ". Last SC @" << sc + fft_n << std::endl;
@@ -221,7 +222,6 @@ Hypervisor::set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
 size_t
 Hypervisor::get_tx_window(window &optr, size_t len)
 {
-
   {
     std::lock_guard<std::mutex> _l(vradios_mtx);
 

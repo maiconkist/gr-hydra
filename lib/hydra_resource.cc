@@ -27,7 +27,7 @@ xvl_resource_manager::set_rx_resources(double d_centre_freq,
   b_receiver = true;
 
   // Initial chunk, with all the available resources
-  rx_resources = std::make_unique<rf_front_end>(d_centre_freq, d_bandwidth);
+  rx_resources = rf_front_end(d_centre_freq, d_bandwidth);
 }
 
 void
@@ -45,7 +45,7 @@ xvl_resource_manager::set_tx_resources(double d_centre_freq,
   b_transmitter = true;
 
   // Initial chunk, with all the available resources
-  tx_resources = std::make_unique<rf_front_end>(d_centre_freq, d_bandwidth);
+  tx_resources = rf_front_end(d_centre_freq, d_bandwidth);
 }
 
 int
@@ -64,7 +64,7 @@ xvl_resource_manager::reserve_rx_resources(unsigned int u_id,
   mtx.lock();
 
   // Try to allocate the RX chunks
-  int result = rx_resources->create_chunks(d_centre_freq, d_bandwidth, u_id);
+  int result = rx_resources.create_chunks(d_centre_freq, d_bandwidth, u_id);
 
   // Unlock the mutex
   mtx.unlock();
@@ -79,16 +79,16 @@ xvl_resource_manager::reserve_tx_resources(unsigned int u_id,
 {
   // If the TX resources were not defined
   if (not b_transmitter)
-    {
-      // Cannot reserve TX resources
-      return 1;
-    }
+  {
+    // Cannot reserve TX resources
+    return 1;
+  }
 
   // Lock the mutex
   mtx.lock();
 
   // Try to allocate the RX chunks
-  int result = tx_resources->create_chunks(d_centre_freq, d_bandwidth, u_id);
+  int result = tx_resources.create_chunks(d_centre_freq, d_bandwidth, u_id);
 
   // Unlock the mutex
   mtx.unlock();
@@ -114,10 +114,10 @@ xvl_resource_manager::query_resources()
 
   // Add the chunks to the tree
   if (b_receiver)
-    tree.add_child("receiver", rx_resources->list_chunks());
+    tree.add_child("receiver", rx_resources.list_chunks());
 
   if (b_transmitter)
-    tree.add_child("transmitter", tx_resources->list_chunks());
+    tree.add_child("transmitter", tx_resources.list_chunks());
 
   // Unlock the mutex
   mtx.unlock();
@@ -126,11 +126,11 @@ xvl_resource_manager::query_resources()
 }
 
 int
-xvl_resource_manager::free_resources(size_t u_id)
+xvl_resource_manager::free_tx_resources(size_t u_id)
 {
   // TODO should be able to return an error message
   // If the RX/TX resources were no defined
-  if ((not b_receiver) and (not b_transmitter))
+  if (not b_transmitter)
     {
       std::cerr << "Must define set of resources!" << std::endl;
       exit(30);
@@ -138,24 +138,49 @@ xvl_resource_manager::free_resources(size_t u_id)
 
   // Lock the mutex
   mtx.lock();
-
-  if (b_receiver)
-  {
-    // Delete all possible ID's RX resources
-    rx_resources->delete_chunks(u_id);
-  }
-
-  if (b_transmitter)
-  {
-    // Delete all possible ID's TX resources
-    rx_resources->delete_chunks(u_id);
-  }
-
-  // Unlock the mutex
+  rx_resources.delete_chunks(u_id);
   mtx.unlock();
 
   // Return false if succeeded
   return 0;
+}
+
+int
+xvl_resource_manager::free_rx_resources(size_t u_id)
+{
+  if (not b_receiver)
+  {
+    std::cerr << "Must define set of resources!" << std::endl;
+    exit(30);
+  }
+
+  mtx.lock();
+  rx_resources.delete_chunks(u_id);
+  mtx.unlock();
+
+  // Return false if succeeded
+  return 0;
+}
+
+int
+xvl_resource_manager::check_tx_free(double d_centre_freq,
+                                    double d_bandwidth,
+                                    size_t u_id)
+{
+  rf_front_end tmp = tx_resources;
+  tmp.delete_chunks(u_id);
+  return  tmp.check_chunk(d_centre_freq, d_bandwidth);
+}
+
+
+int
+xvl_resource_manager::check_rx_free(double d_centre_freq,
+                                    double d_bandwidth,
+                                    size_t u_id)
+{
+  rf_front_end tmp = rx_resources;
+  tmp.delete_chunks(u_id);
+  return  tmp.check_chunk(d_centre_freq, d_bandwidth);
 }
 
 
@@ -261,6 +286,27 @@ rf_front_end::create_chunks(double d_centre_freq,
   return result;
 }
 
+
+bool
+rf_front_end::check_chunk(double d_centre_freq,
+                          double d_bandwidth)
+{
+
+  auto lo_freq = [](double cf, double bw) { return cf - bw/2.0;};
+  auto hi_freq = [](double cf, double bw) { return cf + bw/2.0;};
+
+  for (auto it = resources.begin(); it != resources.end(); ++it)
+  {
+    if (lo_freq(d_centre_freq, d_bandwidth) >= lo_freq(it->d_centre_freq, it->d_bandwidth) &&
+        hi_freq(d_centre_freq, d_bandwidth) <= hi_freq(it->d_centre_freq, it->d_bandwidth))
+
+      return true;
+  }
+
+  return false;
+}
+
+
 boost::property_tree::ptree
 rf_front_end::list_chunks()
 {
@@ -276,7 +322,7 @@ rf_front_end::list_chunks()
 }
 
 void
-rf_front_end::delete_chunks(const unsigned int &u_id)
+rf_front_end::delete_chunks(unsigned int u_id)
 {
   // Iterate over the list of chunks
   for (auto it = resources.begin(); it != resources.end(); it++)
@@ -371,14 +417,14 @@ int main(int argv, char **argc)
 
   es.str("");
   std::cout << "\nFreed first chunk" << std::endl;
-  workd = rm.free_resources(1);
+  workd = rm.free_rx_resources(1);
   output_tree = rm.query_resources();
   boost::property_tree::json_parser::write_json(es, output_tree);
   std::cout << es.str() << std::endl;
 
   es.str("");
   std::cout << "\nFreed first chunk" << std::endl;
-  workd = rm.free_resources(2);
+  workd = rm.free_rx_resources(2);
   output_tree = rm.query_resources();
   boost::property_tree::json_parser::write_json(es, output_tree);
   std::cout << es.str() << std::endl;
