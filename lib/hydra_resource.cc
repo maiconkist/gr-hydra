@@ -56,7 +56,7 @@ xvl_resource_manager::reserve_rx_resources(unsigned int u_id,
   // If the RX resources were not defined
   if (not b_receiver)
   {
-    // Cannot reserve RX resources
+    std::cerr << __PRETTY_FUNCTION__ << ": RX Resources not configured." << std::endl;
     return 1;
   }
 
@@ -278,7 +278,6 @@ rf_front_end::create_chunks(double d_centre_freq,
 
     // Change the result flag -- zero is a great signal
     result = 0;
-    // And break the loop
     break;
 
   } // End for loop
