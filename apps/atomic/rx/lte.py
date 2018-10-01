@@ -3,8 +3,9 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Lte
-# Generated: Mon May 28 12:06:41 2018
+# Generated: Thu Sep 27 18:01:55 2018
 ##################################################
+
 
 from gnuradio import blocks
 from gnuradio import digital
@@ -16,7 +17,6 @@ from gnuradio.filter import firdes
 from optparse import OptionParser
 import ConfigParser
 import SimpleXMLRPCServer
-import psutil
 import threading
 import time
 
@@ -35,7 +35,6 @@ class lte(gr.top_block):
         self.fft_len = fft_len = 64
         self.bytes_tx = bytes_tx = 0
         self.bytes_rx = bytes_rx = 0
-        self.zcpu = zcpu = psutil
         self.sync_word2 = sync_word2 = [0., 0., 0., 0., 0., 0.,] + pattern2 * ((fft_len-12)/len(pattern2))  +[0., 0., 0., 0., 0., 0.,]
         self.sync_word1 = sync_word1 = [0., 0., 0., 0., 0., 0.,] + pattern1 * ((fft_len-12)/len(pattern1))  +[0., 0., 0., 0., 0., 0.,]
         self._samprate_config = ConfigParser.ConfigParser()
@@ -74,7 +73,7 @@ class lte(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.xmlrpc_server_0 = SimpleXMLRPCServer.SimpleXMLRPCServer(('localhost', 1235), allow_none=True)
+        self.xmlrpc_server_0 = SimpleXMLRPCServer.SimpleXMLRPCServer(('134.226.55.25', 1235), allow_none=True)
         self.xmlrpc_server_0.register_instance(self)
         self.xmlrpc_server_0_thread = threading.Thread(target=self.xmlrpc_server_0.serve_forever)
         self.xmlrpc_server_0_thread.daemon = True
@@ -207,12 +206,6 @@ class lte(gr.top_block):
     def set_bytes_rx(self, bytes_rx):
         self.bytes_rx = bytes_rx
         self.set_error_rate(self.bytes_rx/(self.bytes_tx if self.bytes_tx>0 else 1))
-
-    def get_zcpu(self):
-        return self.zcpu
-
-    def set_zcpu(self, zcpu):
-        self.zcpu = zcpu
 
     def get_sync_word2(self):
         return self.sync_word2
