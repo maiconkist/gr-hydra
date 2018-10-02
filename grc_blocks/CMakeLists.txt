@@ -209,6 +209,7 @@ find_package(UHD REQUIRED)
 add_subdirectory(include/hydra)
 add_subdirectory(lib)
 add_subdirectory(swig)
+add_subdirectory(python)
 add_subdirectory(grc)
 
 ########################################################################
