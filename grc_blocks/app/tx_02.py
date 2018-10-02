@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Tx 02
-# Generated: Tue Oct  2 22:23:13 2018
+# Generated: Tue Oct  2 22:36:54 2018
 ##################################################
 
 if __name__ == '__main__':
@@ -63,7 +63,7 @@ class tx_02(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(11, "10.194.38.201", 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(12, "10.194.38.201", 5000)
         self.hydra_gr_sink_0.start_client(freq_2, samp_rate_2, 1024)
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
