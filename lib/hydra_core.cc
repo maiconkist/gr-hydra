@@ -89,7 +89,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
   }
 
   // Create RX UDP port
-  static size_t u_udp_port = 6000;
+  static size_t u_udp_port = 33000;
   if (vr == nullptr)
   {
       vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
@@ -144,7 +144,7 @@ HydraCore::request_tx_resources(unsigned int u_id,
   }
 
 
-  static size_t u_udp_port = 7000;
+  static size_t u_udp_port = 33500;
   if (vr == nullptr)
   {
      vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
