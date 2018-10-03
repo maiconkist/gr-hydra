@@ -45,7 +45,13 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
                                         size_t u_payload)
 {
 
+  // auto begin = std::chrono::high_resolution_clock::now();
   int i_tx_port = client->request_tx_resources(d_center_frequency, d_samp_rate, false);
+  // auto end = std::chrono::high_resolution_clock::now();
+
+  // auto dur = end - begin;
+  // auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+  // std::cout << "Elapsed time:\t" << ms << std::endl;
 
   if (i_tx_port)
   {

@@ -63,7 +63,7 @@ class tx_01(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(11, "10.194.38.201", 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(11, "192.168.5.182", 5000)
         self.hydra_gr_sink_0.start_client(freq_1, samp_rate_1, 1024)
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
