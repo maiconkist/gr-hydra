@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 ##################################################
 # GNU Radio Python Flow Graph
-# Title: Hydra Gr Client Vr 1
-# Generated: Wed Oct  3 11:11:54 2018
+# Title: Hydra Gr Client 1Tx 1Rx
+# Generated: Thu Nov 29 17:34:48 2018
 ##################################################
+
+from distutils.version import StrictVersion
 
 if __name__ == '__main__':
     import ctypes
@@ -16,7 +18,8 @@ if __name__ == '__main__':
         except:
             print "Warning: failed to XInitThreads()"
 
-from PyQt4 import Qt
+from PyQt5 import Qt
+from PyQt5 import Qt, QtCore
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
@@ -33,12 +36,12 @@ import threading
 from gnuradio import qtgui
 
 
-class hydra_gr_client_vr_1(gr.top_block, Qt.QWidget):
+class hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
 
     def __init__(self, freq=1.1e9, samp_rate=200e3):
-        gr.top_block.__init__(self, "Hydra Gr Client Vr 1")
+        gr.top_block.__init__(self, "Hydra Gr Client 1Tx 1Rx")
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Hydra Gr Client Vr 1")
+        self.setWindowTitle("Hydra Gr Client 1Tx 1Rx")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -56,8 +59,12 @@ class hydra_gr_client_vr_1(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_vr_1")
-        self.restoreGeometry(self.settings.value("geometry").toByteArray())
+        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_1rx")
+
+        if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
+            self.restoreGeometry(self.settings.value("geometry").toByteArray())
+        else:
+            self.restoreGeometry(self.settings.value("geometry", type=QtCore.QByteArray))
 
         ##################################################
         # Parameters
@@ -123,7 +130,6 @@ class hydra_gr_client_vr_1(gr.top_block, Qt.QWidget):
 
         self._qtgui_histogram_sink_x_0_1_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0_1.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_histogram_sink_x_0_1_win)
-
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '10.154.48.12', 5000)
         self.hydra_gr_sink_0.start_client(freq1, samp_rate * 2, 1024)
         self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '10.154.48.13', '10.154.48.12', 5000)
@@ -168,7 +174,7 @@ class hydra_gr_client_vr_1(gr.top_block, Qt.QWidget):
         self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_vr_1")
+        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_1rx")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
 
@@ -205,12 +211,11 @@ def argument_parser():
     return parser
 
 
-def main(top_block_cls=hydra_gr_client_vr_1, options=None):
+def main(top_block_cls=hydra_gr_client_1tx_1rx, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    from distutils.version import StrictVersion
-    if StrictVersion(Qt.qVersion()) >= StrictVersion("4.5.0"):
+    if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')
         Qt.QApplication.setGraphicsSystem(style)
     qapp = Qt.QApplication(sys.argv)
@@ -222,7 +227,7 @@ def main(top_block_cls=hydra_gr_client_vr_1, options=None):
     def quitting():
         tb.stop()
         tb.wait()
-    qapp.connect(qapp, Qt.SIGNAL("aboutToQuit()"), quitting)
+    qapp.aboutToQuit.connect(quitting)
     qapp.exec_()
 
 

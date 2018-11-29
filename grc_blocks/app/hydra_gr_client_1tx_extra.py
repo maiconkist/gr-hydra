@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 ##################################################
 # GNU Radio Python Flow Graph
-# Title: Tx 01
-# Generated: Tue Oct  2 22:23:31 2018
+# Title: Hydra Gr Client 1Tx Extra
+# Generated: Thu Nov 29 17:38:11 2018
 ##################################################
+
+from distutils.version import StrictVersion
 
 if __name__ == '__main__':
     import ctypes
@@ -16,7 +18,7 @@ if __name__ == '__main__':
         except:
             print "Warning: failed to XInitThreads()"
 
-from PyQt4 import Qt
+from PyQt5 import Qt, QtCore
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
@@ -27,14 +29,16 @@ from optparse import OptionParser
 import hydra
 import sys
 import threading
+from gnuradio import qtgui
 
 
-class tx_01(gr.top_block, Qt.QWidget):
+class hydra_gr_client_1tx_extra(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freq_1=1.1005e9, samp_rate_1=1e6):
-        gr.top_block.__init__(self, "Tx 01")
+    def __init__(self, freq_2=1.0995e9, samp_rate_2=1e6):
+        gr.top_block.__init__(self, "Hydra Gr Client 1Tx Extra")
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Tx 01")
+        self.setWindowTitle("Hydra Gr Client 1Tx Extra")
+        qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
         except:
@@ -51,20 +55,24 @@ class tx_01(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "tx_01")
-        self.restoreGeometry(self.settings.value("geometry").toByteArray())
+        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_extra")
+
+        if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
+            self.restoreGeometry(self.settings.value("geometry").toByteArray())
+        else:
+            self.restoreGeometry(self.settings.value("geometry", type=QtCore.QByteArray))
 
         ##################################################
         # Parameters
         ##################################################
-        self.freq_1 = freq_1
-        self.samp_rate_1 = samp_rate_1
+        self.freq_2 = freq_2
+        self.samp_rate_2 = samp_rate_2
 
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(11, "192.168.5.182", 5000)
-        self.hydra_gr_sink_0.start_client(freq_1, samp_rate_1, 1024)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(12, '10.194.38.201', 5000)
+        self.hydra_gr_sink_0.start_client(freq_2, samp_rate_2, 1024)
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
         	  packet_length_tag_key="len",
@@ -74,51 +82,49 @@ class tx_01(gr.top_block, Qt.QWidget):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_vector_source_x_0 = blocks.vector_source_b([x for x in range(0,256)], True, 1, [])
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate_1,True)
+        self.blocks_vector_source_x_0_0 = blocks.vector_source_b([x for x in range(0,128)], True, 1, [])
+        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate_2,True)
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.1, ))
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))    
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))    
-        self.connect((self.blocks_throttle_0, 0), (self.blocks_multiply_const_vxx_0, 0))    
-        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))    
-        self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_throttle_0, 0))    
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))
+        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
+        self.connect((self.blocks_throttle_0, 0), (self.blocks_multiply_const_vxx_0, 0))
+        self.connect((self.blocks_vector_source_x_0_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
+        self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_throttle_0, 0))
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "tx_01")
+        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_extra")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
 
+    def get_freq_2(self):
+        return self.freq_2
 
-    def get_freq_1(self):
-        return self.freq_1
+    def set_freq_2(self, freq_2):
+        self.freq_2 = freq_2
 
-    def set_freq_1(self, freq_1):
-        self.freq_1 = freq_1
+    def get_samp_rate_2(self):
+        return self.samp_rate_2
 
-    def get_samp_rate_1(self):
-        return self.samp_rate_1
-
-    def set_samp_rate_1(self, samp_rate_1):
-        self.samp_rate_1 = samp_rate_1
-        self.blocks_throttle_0.set_sample_rate(self.samp_rate_1)
+    def set_samp_rate_2(self, samp_rate_2):
+        self.samp_rate_2 = samp_rate_2
+        self.blocks_throttle_0.set_sample_rate(self.samp_rate_2)
 
 
 def argument_parser():
-    parser = OptionParser(option_class=eng_option, usage="%prog: [options]")
+    parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     return parser
 
 
-def main(top_block_cls=tx_01, options=None):
+def main(top_block_cls=hydra_gr_client_1tx_extra, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    from distutils.version import StrictVersion
-    if StrictVersion(Qt.qVersion()) >= StrictVersion("4.5.0"):
+    if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')
         Qt.QApplication.setGraphicsSystem(style)
     qapp = Qt.QApplication(sys.argv)
@@ -130,7 +136,7 @@ def main(top_block_cls=tx_01, options=None):
     def quitting():
         tb.stop()
         tb.wait()
-    qapp.connect(qapp, Qt.SIGNAL("aboutToQuit()"), quitting)
+    qapp.aboutToQuit.connect(quitting)
     qapp.exec_()
 
 

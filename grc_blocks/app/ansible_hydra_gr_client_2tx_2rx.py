@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 ##################################################
 # GNU Radio Python Flow Graph
-# Title: Hydra Gr Client 2Tx 2Rx
-# Generated: Thu Nov 29 17:18:43 2018
+# Title: Ansible Hydra Gr Client 2Tx 2Rx
+# Generated: Thu Nov 29 17:31:54 2018
 ##################################################
 
 
@@ -18,10 +18,10 @@ import hydra
 import threading
 
 
-class hydra_gr_client_2tx_2rx(gr.top_block):
+class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
     def __init__(self, freq=1.1e9, samp_rate=200e3):
-        gr.top_block.__init__(self, "Hydra Gr Client 2Tx 2Rx")
+        gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
         # Parameters
@@ -32,14 +32,14 @@ class hydra_gr_client_2tx_2rx(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, '10.154.48.12', 5000)
+        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, 'hydraServerIP', 5000)
         self.hydra_gr_sink_0_0.start_client(freq + 700e3, samp_rate, 1024)
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, 'hydraServerIP', 5000)
         self.hydra_gr_sink_0.start_client(freq - 100e3, samp_rate * 2, 1024)
-        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, '10.154.48.13', '10.154.48.12', 5000)
+        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, 'hydraClientIP', 'hydraServerIP', 5000)
         self.hydra_gr__source_0_0_0.start_client(freq + 700e3, samp_rate, 10000)
 
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '10.154.48.13', '10.154.48.12', 5000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, 'hydraClientIP', 'hydraServerIP', 5000)
         self.hydra_gr__source_0_0.start_client(freq - 100e3, samp_rate * 2, 10000)
 
         self.digital_ofdm_tx_0_0 = digital.ofdm_tx(
@@ -135,7 +135,7 @@ def argument_parser():
     return parser
 
 
-def main(top_block_cls=hydra_gr_client_2tx_2rx, options=None):
+def main(top_block_cls=ansible_hydra_gr_client_2tx_2rx, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
