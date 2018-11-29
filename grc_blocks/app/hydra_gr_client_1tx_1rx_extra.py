@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 ##################################################
 # GNU Radio Python Flow Graph
-# Title: Hydra Gr Client 2Tx 2Rx
-# Generated: Thu Nov 29 19:25:19 2018
+# Title: Hydra Gr Client 1Tx 1Rx Extra
+# Generated: Thu Nov 29 19:24:14 2018
 ##################################################
 
 from distutils.version import StrictVersion
@@ -36,12 +36,12 @@ import threading
 from gnuradio import qtgui
 
 
-class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
+class hydra_gr_client_1tx_1rx_extra(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-100e3, vr2offset=700e3):
-        gr.top_block.__init__(self, "Hydra Gr Client 2Tx 2Rx")
+    def __init__(self, samp_rate=200e3, freqrx=1.2e9, freqtx=1.1e9, vr2offset=700e3, vr1offset=-100e3):
+        gr.top_block.__init__(self, "Hydra Gr Client 1Tx 1Rx Extra")
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Hydra Gr Client 2Tx 2Rx")
+        self.setWindowTitle("Hydra Gr Client 1Tx 1Rx Extra")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -59,7 +59,7 @@ class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_2tx_2rx")
+        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_1rx_extra")
 
         if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
             self.restoreGeometry(self.settings.value("geometry").toByteArray())
@@ -69,25 +69,20 @@ class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
         ##################################################
         # Parameters
         ##################################################
+        self.samp_rate = samp_rate
         self.freqrx = freqrx
         self.freqtx = freqtx
-        self.samp_rate = samp_rate
-        self.vr1offset = vr1offset
         self.vr2offset = vr2offset
+        self.vr1offset = vr1offset
 
         ##################################################
         # Variables
         ##################################################
-        self.mul2 = mul2 = 0.1
         self.mul1 = mul1 = 0.1
-        self.freq1 = freq1 = freqtx - 100e3
 
         ##################################################
         # Blocks
         ##################################################
-        self._mul2_range = Range(0, 1, 0.01, 0.1, 200)
-        self._mul2_win = RangeWidget(self._mul2_range, self.set_mul2, 'mul2', "counter_slider", float)
-        self.top_layout.addWidget(self._mul2_win)
         self._mul1_range = Range(0, 1, 0.01, 0.1, 200)
         self._mul1_win = RangeWidget(self._mul1_range, self.set_mul1, 'mul1', "counter_slider", float)
         self.top_layout.addWidget(self._mul1_win)
@@ -134,72 +129,12 @@ class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
 
         self._qtgui_histogram_sink_x_0_1_0_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0_1_0.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_histogram_sink_x_0_1_0_win)
-        self.qtgui_histogram_sink_x_0_1 = qtgui.histogram_sink_f(
-        	1024,
-        	100,
-                -1,
-                1000,
-        	"Data Rcv VR1",
-        	1
-        )
-
-        self.qtgui_histogram_sink_x_0_1.set_update_time(0.10)
-        self.qtgui_histogram_sink_x_0_1.enable_autoscale(True)
-        self.qtgui_histogram_sink_x_0_1.enable_accumulate(True)
-        self.qtgui_histogram_sink_x_0_1.enable_grid(False)
-        self.qtgui_histogram_sink_x_0_1.enable_axis_labels(True)
-
-        if not True:
-          self.qtgui_histogram_sink_x_0_1.disable_legend()
-
-        labels = ['', '', '', '', '',
-                  '', '', '', '', '']
-        widths = [1, 1, 1, 1, 1,
-                  1, 1, 1, 1, 1]
-        colors = ["blue", "red", "green", "black", "cyan",
-                  "magenta", "yellow", "dark red", "dark green", "dark blue"]
-        styles = [1, 1, 1, 1, 1,
-                  1, 1, 1, 1, 1]
-        markers = [-1, -1, -1, -1, -1,
-                   -1, -1, -1, -1, -1]
-        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-                  1.0, 1.0, 1.0, 1.0, 1.0]
-        for i in xrange(1):
-            if len(labels[i]) == 0:
-                self.qtgui_histogram_sink_x_0_1.set_line_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_histogram_sink_x_0_1.set_line_label(i, labels[i])
-            self.qtgui_histogram_sink_x_0_1.set_line_width(i, widths[i])
-            self.qtgui_histogram_sink_x_0_1.set_line_color(i, colors[i])
-            self.qtgui_histogram_sink_x_0_1.set_line_style(i, styles[i])
-            self.qtgui_histogram_sink_x_0_1.set_line_marker(i, markers[i])
-            self.qtgui_histogram_sink_x_0_1.set_line_alpha(i, alphas[i])
-
-        self._qtgui_histogram_sink_x_0_1_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0_1.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_histogram_sink_x_0_1_win)
         self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, '10.154.48.12', 5000)
         self.hydra_gr_sink_0_0.start_client(freqtx + vr2offset, samp_rate, 1024)
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '10.154.48.12', 5000)
-        self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
         self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, '10.154.48.13', '10.154.48.12', 5000)
         self.hydra_gr__source_0_0_0.start_client(freqrx + vr2offset, samp_rate, 10000)
 
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '10.154.48.13', '10.154.48.12', 5000)
-        self.hydra_gr__source_0_0.start_client(freqtx + vr1offset, samp_rate * 2, 10000)
-
-        self._freq1_range = Range(freqtx - 1e6, freqtx + 1e6, 100e3, freqtx - 100e3, 200)
-        self._freq1_win = RangeWidget(self._freq1_range, self.set_freq1, 'freq1', "counter_slider", float)
-        self.top_layout.addWidget(self._freq1_win)
         self.digital_ofdm_tx_0_0 = digital.ofdm_tx(
-        	  fft_len=64, cp_len=16,
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
-        	  rolloff=0,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
-        self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
         	  packet_length_tag_key="len",
         	  bps_header=1,
@@ -217,54 +152,37 @@ class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.digital_ofdm_rx_0 = digital.ofdm_rx(
-        	  fft_len=64, cp_len=16,
-        	  frame_length_tag_key='frame_'+"len",
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
         self.blocks_vector_source_x_0_0 = blocks.vector_source_b([x for x in range(0,128)], True, 1, [])
-        self.blocks_vector_source_x_0 = blocks.vector_source_b([x for x in range(0,256)], True, 1, [])
         self.blocks_throttle_0_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate * 2,True)
         self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR2 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
-        self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_stream_to_tagged_stream_0_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
-        self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul2, ))
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul1, ))
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul1, ))
         self.blocks_char_to_float_0_0 = blocks.char_to_float(1, 1)
-        self.blocks_char_to_float_0 = blocks.char_to_float(1, 1)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_char_to_float_0, 0), (self.qtgui_histogram_sink_x_0_1, 0))
         self.connect((self.blocks_char_to_float_0_0, 0), (self.qtgui_histogram_sink_x_0_1_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.hydra_gr_sink_0_0, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
         self.connect((self.blocks_stream_to_tagged_stream_0_0, 0), (self.digital_ofdm_tx_0_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.blocks_multiply_const_vxx_0, 0))
         self.connect((self.blocks_throttle_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
-        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
         self.connect((self.blocks_vector_source_x_0_0, 0), (self.blocks_stream_to_tagged_stream_0_0, 0))
-        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_char_to_float_0, 0))
-        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.digital_ofdm_rx_0_0, 0), (self.blocks_char_to_float_0_0, 0))
         self.connect((self.digital_ofdm_rx_0_0, 0), (self.blocks_tag_debug_0_0, 0))
-        self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_throttle_0, 0))
         self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_throttle_0_0, 0))
-        self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
         self.connect((self.hydra_gr__source_0_0_0, 0), (self.digital_ofdm_rx_0_0, 0))
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_2tx_2rx")
+        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_1rx_extra")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
+
+    def get_samp_rate(self):
+        return self.samp_rate
+
+    def set_samp_rate(self, samp_rate):
+        self.samp_rate = samp_rate
+        self.blocks_throttle_0_0.set_sample_rate(self.samp_rate)
 
     def get_freqrx(self):
         return self.freqrx
@@ -277,21 +195,6 @@ class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
 
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
-        self.set_freq1(self.freqtx - 100e3)
-
-    def get_samp_rate(self):
-        return self.samp_rate
-
-    def set_samp_rate(self, samp_rate):
-        self.samp_rate = samp_rate
-        self.blocks_throttle_0_0.set_sample_rate(self.samp_rate)
-        self.blocks_throttle_0.set_sample_rate(self.samp_rate * 2)
-
-    def get_vr1offset(self):
-        return self.vr1offset
-
-    def set_vr1offset(self, vr1offset):
-        self.vr1offset = vr1offset
 
     def get_vr2offset(self):
         return self.vr2offset
@@ -299,25 +202,18 @@ class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
 
-    def get_mul2(self):
-        return self.mul2
+    def get_vr1offset(self):
+        return self.vr1offset
 
-    def set_mul2(self, mul2):
-        self.mul2 = mul2
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul2, ))
+    def set_vr1offset(self, vr1offset):
+        self.vr1offset = vr1offset
 
     def get_mul1(self):
         return self.mul1
 
     def set_mul1(self, mul1):
         self.mul1 = mul1
-        self.blocks_multiply_const_vxx_0.set_k((self.mul1, ))
-
-    def get_freq1(self):
-        return self.freq1
-
-    def set_freq1(self, freq1):
-        self.freq1 = freq1
+        self.blocks_multiply_const_vxx_0_0.set_k((self.mul1, ))
 
 
 def argument_parser():
@@ -325,7 +221,7 @@ def argument_parser():
     return parser
 
 
-def main(top_block_cls=hydra_gr_client_2tx_2rx, options=None):
+def main(top_block_cls=hydra_gr_client_1tx_1rx_extra, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 

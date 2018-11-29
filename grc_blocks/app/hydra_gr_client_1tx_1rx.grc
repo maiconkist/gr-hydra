@@ -89,69 +89,6 @@
     </param>
     <param>
       <key>value</key>
-      <value>freq - 100e3</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(760, 0)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>freq1</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>freq1</value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>freq - 1e6</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>100e3</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>freq + 1e6</value>
-    </param>
-    <param>
-      <key>rangeType</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>counter_slider</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_range</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
       <value>0.1</value>
     </param>
     <param>
@@ -160,7 +97,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(616, 0)</value>
+      <value>(824, 4)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -557,7 +494,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(728, 336)</value>
+      <value>(736, 332)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -723,6 +660,49 @@
     </param>
     <param>
       <key>_coordinate</key>
+      <value>(552, 4)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>freqrx</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>1.2e9</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
       <value>(448, 4)</value>
     </param>
     <param>
@@ -731,7 +711,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>freq</value>
+      <value>freqtx</value>
     </param>
     <param>
       <key>label</key>
@@ -758,7 +738,7 @@
     </param>
     <param>
       <key>center_frequency</key>
-      <value>freq - 100e3</value>
+      <value>freqrx + vr1offset</value>
     </param>
     <param>
       <key>c_host</key>
@@ -778,7 +758,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(952, 328)</value>
+      <value>(984, 324)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -825,7 +805,7 @@
     </param>
     <param>
       <key>center_frequency</key>
-      <value>freq1</value>
+      <value>freqtx + vr1offset</value>
     </param>
     <param>
       <key>comment</key>
@@ -841,7 +821,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(952, 160)</value>
+      <value>(984, 156)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -904,7 +884,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 328)</value>
+      <value>(304, 324)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1463,6 +1443,92 @@
     <param>
       <key>value</key>
       <value>200e3</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(448, 68)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>vr1offset</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>-100e3</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(552, 68)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>vr2offset</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>700e3</value>
     </param>
   </block>
   <connection>

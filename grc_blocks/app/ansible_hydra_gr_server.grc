@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>hydra_gr_server_example</value>
+      <value>ansible_hydra_gr_server</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -113,7 +113,7 @@
     </param>
     <param>
       <key>rx_center_frequency</key>
-      <value>950e6</value>
+      <value>1.1e9</value>
     </param>
     <param>
       <key>rx_fft_size</key>
@@ -129,7 +129,7 @@
     </param>
     <param>
       <key>tx_center_frequency</key>
-      <value>950e6</value>
+      <value>1.1e9</value>
     </param>
     <param>
       <key>tx_fft_size</key>

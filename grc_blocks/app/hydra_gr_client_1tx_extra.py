@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 1Tx Extra
-# Generated: Thu Nov 29 17:38:11 2018
+# Generated: Thu Nov 29 19:23:56 2018
 ##################################################
 
 from distutils.version import StrictVersion
@@ -34,7 +34,7 @@ from gnuradio import qtgui
 
 class hydra_gr_client_1tx_extra(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freq_2=1.0995e9, samp_rate_2=1e6):
+    def __init__(self, samp_rate=200e3, freqrx=1.2e9, freqtx=1.1e9, vr2offset=700e3, vr1offset=-100e3):
         gr.top_block.__init__(self, "Hydra Gr Client 1Tx Extra")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Hydra Gr Client 1Tx Extra")
@@ -65,14 +65,17 @@ class hydra_gr_client_1tx_extra(gr.top_block, Qt.QWidget):
         ##################################################
         # Parameters
         ##################################################
-        self.freq_2 = freq_2
-        self.samp_rate_2 = samp_rate_2
+        self.samp_rate = samp_rate
+        self.freqrx = freqrx
+        self.freqtx = freqtx
+        self.vr2offset = vr2offset
+        self.vr1offset = vr1offset
 
         ##################################################
         # Blocks
         ##################################################
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(12, '10.194.38.201', 5000)
-        self.hydra_gr_sink_0.start_client(freq_2, samp_rate_2, 1024)
+        self.hydra_gr_sink_0.start_client(freqtx + vr2offset, samp_rate, 1024)
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
         	  packet_length_tag_key="len",
@@ -83,7 +86,7 @@ class hydra_gr_client_1tx_extra(gr.top_block, Qt.QWidget):
         	  scramble_bits=False
         	 )
         self.blocks_vector_source_x_0_0 = blocks.vector_source_b([x for x in range(0,128)], True, 1, [])
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate_2,True)
+        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.1, ))
 
@@ -101,18 +104,36 @@ class hydra_gr_client_1tx_extra(gr.top_block, Qt.QWidget):
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
 
-    def get_freq_2(self):
-        return self.freq_2
+    def get_samp_rate(self):
+        return self.samp_rate
 
-    def set_freq_2(self, freq_2):
-        self.freq_2 = freq_2
+    def set_samp_rate(self, samp_rate):
+        self.samp_rate = samp_rate
+        self.blocks_throttle_0.set_sample_rate(self.samp_rate)
 
-    def get_samp_rate_2(self):
-        return self.samp_rate_2
+    def get_freqrx(self):
+        return self.freqrx
 
-    def set_samp_rate_2(self, samp_rate_2):
-        self.samp_rate_2 = samp_rate_2
-        self.blocks_throttle_0.set_sample_rate(self.samp_rate_2)
+    def set_freqrx(self, freqrx):
+        self.freqrx = freqrx
+
+    def get_freqtx(self):
+        return self.freqtx
+
+    def set_freqtx(self, freqtx):
+        self.freqtx = freqtx
+
+    def get_vr2offset(self):
+        return self.vr2offset
+
+    def set_vr2offset(self, vr2offset):
+        self.vr2offset = vr2offset
+
+    def get_vr1offset(self):
+        return self.vr1offset
+
+    def set_vr1offset(self, vr1offset):
+        self.vr1offset = vr1offset
 
 
 def argument_parser():

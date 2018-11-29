@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 1Tx 1Rx
-# Generated: Thu Nov 29 17:34:48 2018
+# Generated: Thu Nov 29 19:24:42 2018
 ##################################################
 
 from distutils.version import StrictVersion
@@ -38,7 +38,7 @@ from gnuradio import qtgui
 
 class hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freq=1.1e9, samp_rate=200e3):
+    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-100e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Hydra Gr Client 1Tx 1Rx")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Hydra Gr Client 1Tx 1Rx")
@@ -69,14 +69,16 @@ class hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
         ##################################################
         # Parameters
         ##################################################
-        self.freq = freq
+        self.freqrx = freqrx
+        self.freqtx = freqtx
         self.samp_rate = samp_rate
+        self.vr1offset = vr1offset
+        self.vr2offset = vr2offset
 
         ##################################################
         # Variables
         ##################################################
         self.mul1 = mul1 = 0.1
-        self.freq1 = freq1 = freq - 100e3
 
         ##################################################
         # Blocks
@@ -84,9 +86,6 @@ class hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
         self._mul1_range = Range(0, 1, 0.01, 0.1, 200)
         self._mul1_win = RangeWidget(self._mul1_range, self.set_mul1, 'mul1', "counter_slider", float)
         self.top_layout.addWidget(self._mul1_win)
-        self._freq1_range = Range(freq - 1e6, freq + 1e6, 100e3, freq - 100e3, 200)
-        self._freq1_win = RangeWidget(self._freq1_range, self.set_freq1, 'freq1', "counter_slider", float)
-        self.top_layout.addWidget(self._freq1_win)
         self.qtgui_histogram_sink_x_0_1 = qtgui.histogram_sink_f(
         	1024,
         	100,
@@ -131,9 +130,9 @@ class hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
         self._qtgui_histogram_sink_x_0_1_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0_1.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_histogram_sink_x_0_1_win)
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '10.154.48.12', 5000)
-        self.hydra_gr_sink_0.start_client(freq1, samp_rate * 2, 1024)
+        self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
         self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '10.154.48.13', '10.154.48.12', 5000)
-        self.hydra_gr__source_0_0.start_client(freq - 100e3, samp_rate * 2, 10000)
+        self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 10000)
 
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
@@ -178,12 +177,17 @@ class hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
 
-    def get_freq(self):
-        return self.freq
+    def get_freqrx(self):
+        return self.freqrx
 
-    def set_freq(self, freq):
-        self.freq = freq
-        self.set_freq1(self.freq - 100e3)
+    def set_freqrx(self, freqrx):
+        self.freqrx = freqrx
+
+    def get_freqtx(self):
+        return self.freqtx
+
+    def set_freqtx(self, freqtx):
+        self.freqtx = freqtx
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -192,18 +196,24 @@ class hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate
         self.blocks_throttle_0.set_sample_rate(self.samp_rate * 2)
 
+    def get_vr1offset(self):
+        return self.vr1offset
+
+    def set_vr1offset(self, vr1offset):
+        self.vr1offset = vr1offset
+
+    def get_vr2offset(self):
+        return self.vr2offset
+
+    def set_vr2offset(self, vr2offset):
+        self.vr2offset = vr2offset
+
     def get_mul1(self):
         return self.mul1
 
     def set_mul1(self, mul1):
         self.mul1 = mul1
         self.blocks_multiply_const_vxx_0.set_k((self.mul1, ))
-
-    def get_freq1(self):
-        return self.freq1
-
-    def set_freq1(self, freq1):
-        self.freq1 = freq1
 
 
 def argument_parser():
