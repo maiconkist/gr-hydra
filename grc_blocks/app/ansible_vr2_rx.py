@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Vr2 Rx
-# Generated: Mon Dec  3 14:49:04 2018
+# Generated: Mon Dec  3 15:33:24 2018
 ##################################################
 
 
@@ -110,11 +110,6 @@ def main(top_block_cls=ansible_vr2_rx, options=None):
 
     tb = top_block_cls()
     tb.start()
-    try:
-        raw_input('Press Enter to quit: ')
-    except EOFError:
-        pass
-    tb.stop()
     tb.wait()
 
 
