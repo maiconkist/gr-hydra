@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Server
-# Generated: Thu Nov 29 19:31:40 2018
+# Generated: Mon Dec  3 18:54:52 2018
 ##################################################
 
 
@@ -31,7 +31,7 @@ class ansible_hydra_gr_server(gr.top_block):
         # Blocks
         ##################################################
         self.ahydra_gr_server_0 = hydra.hydra_gr_server(5000)
-        self.ahydra_gr_server_0.set_tx_config(freqtx, 2e6, 1024, "USRP")
+        self.ahydra_gr_server_0.set_tx_config(freqtx, 2e6, 2048, "USRP")
         self.ahydra_gr_server_0.set_rx_config(freqrx, 2e6, 1024, "USRP")
         self.ahydra_gr_server_0_thread = threading.Thread(target=self.ahydra_gr_server_0.start_server)
         self.ahydra_gr_server_0_thread.daemon = True
@@ -52,6 +52,12 @@ class ansible_hydra_gr_server(gr.top_block):
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
+    parser.add_option(
+        "", "--freqrx", dest="freqrx", type="eng_float", default=eng_notation.num_to_str(1.2e9),
+        help="Set freqrx [default=%default]")
+    parser.add_option(
+        "", "--freqtx", dest="freqtx", type="eng_float", default=eng_notation.num_to_str(1.1e9),
+        help="Set freqtx [default=%default]")
     return parser
 
 
@@ -59,7 +65,7 @@ def main(top_block_cls=ansible_hydra_gr_server, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls()
+    tb = top_block_cls(freqrx=options.freqrx, freqtx=options.freqtx)
     tb.start()
     tb.wait()
 

@@ -25,7 +25,7 @@ int main()
    unsigned int u_tx_fft_size = 1024;
 
    /* RECEIVER */
-   double d_rx_centre_freq = 1.1e9;
+   double d_rx_centre_freq = 1.2e9;
    double d_rx_samp_rate   = 2e6;
    unsigned int u_rx_fft_size = 1024;
 

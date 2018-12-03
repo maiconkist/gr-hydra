@@ -133,7 +133,7 @@
     </param>
     <param>
       <key>tx_fft_size</key>
-      <value>1024</value>
+      <value>2048</value>
     </param>
     <param>
       <key>tx_samp_rate</key>
@@ -176,7 +176,7 @@
     </param>
     <param>
       <key>type</key>
-      <value></value>
+      <value>eng_float</value>
     </param>
     <param>
       <key>value</key>
@@ -219,7 +219,7 @@
     </param>
     <param>
       <key>type</key>
-      <value></value>
+      <value>eng_float</value>
     </param>
     <param>
       <key>value</key>
