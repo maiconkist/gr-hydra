@@ -391,7 +391,7 @@
     </param>
     <param>
       <key>center_freq0</key>
-      <value>freqrx + vr2offset</value>
+      <value>freqtx + vr2offset</value>
     </param>
     <param>
       <key>dc_offs_enb0</key>
@@ -1687,7 +1687,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>samp_rate*2</value>
+      <value>samp_rate</value>
     </param>
     <param>
       <key>hide_cmd_port</key>
@@ -1754,7 +1754,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>-100e3</value>
+      <value>-200e3</value>
     </param>
   </block>
   <block>
