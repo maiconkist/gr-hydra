@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Vr2 Rx
-# Generated: Mon Dec  3 14:49:04 2018
+# Generated: Mon Dec  3 18:54:57 2018
 ##################################################
 
 
@@ -20,17 +20,17 @@ import time
 
 class ansible_vr2_rx(gr.top_block):
 
-    def __init__(self, samp_rate=200e3, freqtx=1.1e9, vr2offset=700e3, freqrx=1.2e9, vr1offset=-100e3):
+    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-200e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Vr2 Rx")
 
         ##################################################
         # Parameters
         ##################################################
-        self.samp_rate = samp_rate
-        self.freqtx = freqtx
-        self.vr2offset = vr2offset
         self.freqrx = freqrx
+        self.freqtx = freqtx
+        self.samp_rate = samp_rate
         self.vr1offset = vr1offset
+        self.vr2offset = vr2offset
 
         ##################################################
         # Blocks
@@ -42,8 +42,8 @@ class ansible_vr2_rx(gr.top_block):
         		channels=range(1),
         	),
         )
-        self.uhd_usrp_source_0.set_samp_rate(samp_rate*2)
-        self.uhd_usrp_source_0.set_center_freq(freqrx + vr2offset, 0)
+        self.uhd_usrp_source_0.set_samp_rate(samp_rate)
+        self.uhd_usrp_source_0.set_center_freq(freqtx + vr2offset, 0)
         self.uhd_usrp_source_0.set_normalized_gain(0, 0)
         self.uhd_usrp_source_0.set_antenna('RX2', 0)
         self.digital_ofdm_rx_0 = digital.ofdm_rx(
@@ -65,38 +65,38 @@ class ansible_vr2_rx(gr.top_block):
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tagged_stream_to_pdu_0, 0))
         self.connect((self.uhd_usrp_source_0, 0), (self.digital_ofdm_rx_0, 0))
 
-    def get_samp_rate(self):
-        return self.samp_rate
+    def get_freqrx(self):
+        return self.freqrx
 
-    def set_samp_rate(self, samp_rate):
-        self.samp_rate = samp_rate
-        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate*2)
+    def set_freqrx(self, freqrx):
+        self.freqrx = freqrx
 
     def get_freqtx(self):
         return self.freqtx
 
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
+        self.uhd_usrp_source_0.set_center_freq(self.freqtx + self.vr2offset, 0)
 
-    def get_vr2offset(self):
-        return self.vr2offset
+    def get_samp_rate(self):
+        return self.samp_rate
 
-    def set_vr2offset(self, vr2offset):
-        self.vr2offset = vr2offset
-        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
-
-    def get_freqrx(self):
-        return self.freqrx
-
-    def set_freqrx(self, freqrx):
-        self.freqrx = freqrx
-        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
+    def set_samp_rate(self, samp_rate):
+        self.samp_rate = samp_rate
+        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
 
     def get_vr1offset(self):
         return self.vr1offset
 
     def set_vr1offset(self, vr1offset):
         self.vr1offset = vr1offset
+
+    def get_vr2offset(self):
+        return self.vr2offset
+
+    def set_vr2offset(self, vr2offset):
+        self.vr2offset = vr2offset
+        self.uhd_usrp_source_0.set_center_freq(self.freqtx + self.vr2offset, 0)
 
 
 def argument_parser():
@@ -110,11 +110,6 @@ def main(top_block_cls=ansible_vr2_rx, options=None):
 
     tb = top_block_cls()
     tb.start()
-    try:
-        raw_input('Press Enter to quit: ')
-    except EOFError:
-        pass
-    tb.stop()
     tb.wait()
 
 
