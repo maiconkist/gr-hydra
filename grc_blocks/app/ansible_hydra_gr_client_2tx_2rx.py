@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Mon Dec  3 19:59:23 2018
+# Generated: Tue Dec  4 10:45:16 2018
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-100e3, vr2offset=700e3):
+    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-200e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -91,8 +91,8 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
         self.blocks_null_sink_1 = blocks.null_sink(gr.sizeof_float*1)
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_float*1)
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((0.1, ))
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.1, ))
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((0.03, ))
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.03, ))
         self.blocks_char_to_float_0_0 = blocks.char_to_float(1, 1)
         self.blocks_char_to_float_0 = blocks.char_to_float(1, 1)
 
