@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 ##################################################
 # GNU Radio Python Flow Graph
-# Title: Ansible Vr2 Rx
-# Generated: Tue Dec  4 10:45:23 2018
+# Title: Ansible Hydra Vr2 Rx
+# Generated: Tue Dec  4 14:37:05 2018
 ##################################################
 
 
@@ -18,10 +18,10 @@ from optparse import OptionParser
 import time
 
 
-class ansible_vr2_rx(gr.top_block):
+class ansible_hydra_vr2_rx(gr.top_block):
 
     def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-200e3, vr2offset=700e3):
-        gr.top_block.__init__(self, "Ansible Vr2 Rx")
+        gr.top_block.__init__(self, "Ansible Hydra Vr2 Rx")
 
         ##################################################
         # Parameters
@@ -104,7 +104,7 @@ def argument_parser():
     return parser
 
 
-def main(top_block_cls=ansible_vr2_rx, options=None):
+def main(top_block_cls=ansible_hydra_vr2_rx, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 

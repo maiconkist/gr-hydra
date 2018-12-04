@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ansible_vr2_rx</value>
+      <value>ansible_hydra_vr2_rx</value>
     </param>
     <param>
       <key>max_nouts</key>
