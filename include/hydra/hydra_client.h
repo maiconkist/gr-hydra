@@ -29,12 +29,12 @@ class hydra_client
   // Request RX resources
   int request_rx_resources(double d_centre_freq,
                            double d_bandwidth,
-                           bool bpad);
+                           bool bpad = false);
 
   // Request TX resources
   int request_tx_resources(double d_centre_freq,
                            double d_bandwidth,
-                           bool bpad);
+                           bool bpad = false);
 
 
   // Check whether the hypervisor is alive
