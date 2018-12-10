@@ -16,7 +16,7 @@ list(APPEND hydra_sources
     hydra_uhd_interface.cc
 )
 
-add_library(hydra ${hydra_sources})
+add_library(hydra SHARED ${hydra_sources})
 target_link_libraries(hydra
   ${Boost_LIBRARIES}
   ${FFTW_LIBRARIES}
@@ -37,7 +37,6 @@ install(TARGETS hydra
     ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
     RUNTIME DESTINATION bin              # .dll file
 )
-
 
 
 add_executable(hydra_test_resource hydra_resource.cc)
