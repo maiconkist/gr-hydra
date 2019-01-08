@@ -30,7 +30,8 @@ hydra_gr_client_sink_impl::hydra_gr_client_sink_impl(
                    gr::io_signature::make(0, 0, 0))
 {
   g_host = s_host;
-  client = std::make_unique<hydra_client>("0.0.0.0", s_host, u_port, u_id, true);
+  client = std::make_unique<hydra_client>(g_host, u_port, u_id, true);
+
   client->check_connection();
 }
 
@@ -44,20 +45,14 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
                                         double d_samp_rate,
                                         size_t u_payload)
 {
+  struct rx_configuration rx_conf{d_center_frequency, d_samp_rate, false};
+  int err = client->request_tx_resources(rx_conf);
 
-  // auto begin = std::chrono::high_resolution_clock::now();
-  int i_tx_port = client->request_tx_resources(d_center_frequency, d_samp_rate, false);
-  // auto end = std::chrono::high_resolution_clock::now();
-
-  // auto dur = end - begin;
-  // auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-  // std::cout << "Elapsed time:\t" << ms << std::endl;
-
-  if (i_tx_port)
+  if (!err)
   {
     d_udp_sink = gr::blocks::udp_sink::make(sizeof(gr_complex),
-                                                g_host,
-                                                i_tx_port,
+                                                rx_conf.server_ip,
+                                                rx_conf.server_port,
                                                 u_payload,
                                                 true);
 
@@ -68,7 +63,6 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
   {
     std::cerr << "Not able to reserve resources." << std::endl;
   }
-
 }
 
 

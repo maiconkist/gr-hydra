@@ -22,8 +22,8 @@ private:
 public:
   // Constructor
 	UDPClient(boost::asio::io_service& io_service,
-            const std::string& host,
-            const std::string& port
+            const std::string host,
+            const std::string port
 	) : io_service_(io_service), socket_(io_service, udp::endpoint(udp::v4(), 0))
   {
 		udp::resolver resolver(io_service_);
@@ -93,13 +93,15 @@ int main(int argc, char* argv[])
 
   // Request resources
   std::string lalala;
-  hydra::hydra_client s1 = hydra::hydra_client("127.0.0.1", "127.0.0.1", 5000, 1, true);
-  lalala = s1.request_tx_resources(2e9 + 1e6, std::stof(rate), false);
+  hydra::hydra_client s1 = hydra::hydra_client("127.0.0.1", 5000, 1, true);
+
+  hydra::rx_configuration tx_conf{2e9 + 1e6, std::stof(rate), false};
+  lalala = s1.request_tx_resources(tx_conf);
   std::cout << lalala << std::endl;
 
   // Initialise the async IO service
   boost::asio::io_service io_service;
-  UDPClient client(io_service, host, "7000");
+  UDPClient client(io_service, tx_conf.server_ip, std::to_string(tx_conf.server_port));
 
   std::cout << "FFT Size: " << p_size << "\tSampling rate: " << rate << "\tThreshold: " << p_size * 1e6 / std::stod(rate) << std::endl;
   // Construct the payload array

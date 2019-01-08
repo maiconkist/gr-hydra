@@ -26,6 +26,7 @@ include_directories(${Boost_INCLUDE_DIR} ../../include)
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND hydra_sources
+    ../../lib/util/udp.cc
     ../../lib/hydra_fft.cc
     ../../lib/hydra_virtual_radio.cc
     ../../lib/hydra_hypervisor.cc

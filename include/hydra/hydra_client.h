@@ -11,6 +11,20 @@
 namespace hydra
 {
 
+
+struct rx_configuration
+{
+   rx_configuration(double cf, double bw, bool bp): center_freq(cf), bandwidth(bw), bpad(bp) {};
+
+   double center_freq;
+   double bandwidth;
+   bool bpad;
+   int         server_port;
+   std::string server_ip;
+};
+
+
+
 class hydra_client
 {
 public:
@@ -18,7 +32,6 @@ public:
    /* CTOR
     */
    hydra_client(std::string client_ip = "localhost",
-                std::string server_ip = "localhost",
                 unsigned int u_port = 5000,
                 unsigned int u_client_id = 10,
                 bool b_debug = false);
@@ -28,15 +41,10 @@ public:
    ~hydra_client();
 
    /* Request RX resources */
-   int request_rx_resources(double d_centre_freq,
-                            double d_bandwidth,
-                            bool bpad = false);
+   int request_rx_resources(rx_configuration &rx_conf);
 
    /* Request TX resources */
-   int request_tx_resources(double d_centre_freq,
-                            double d_bandwidth,
-                            bool bpad = false);
-
+   int request_tx_resources(rx_configuration &tx_conf);
 
    /* Check whether the hypervisor is alive */
    std::string check_connection();

@@ -109,11 +109,17 @@ recv_udp(char *msg,
    }
 
    if (setsockopt(sd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) == -1)
+   {
+      std::cout << "could not setsockopt BROADCAST" << std::endl;
       return -1;
+   }
 
    if ((timeout.tv_sec > 0 || timeout.tv_usec > 0) &&
        (setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval)) == -1))
+   {
+      std::cout << "could not setsockopt SO_RCVTIMEO" << std::endl;
       return -1;
+   }
 
 
    /* bind local server port */

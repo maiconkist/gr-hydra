@@ -44,6 +44,9 @@ HydraServer::run()
   // Change the server status
   server_info.s_status = "Enabled";
 
+
+  std::thread autod = std::thread(&HydraServer::auto_discovery, this);
+
   // Message type object
   zmq::message_t request;
 

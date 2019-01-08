@@ -24,7 +24,7 @@ self.$(id).start_client($center_frequency, $samp_rate, $payload)
     <type>int</type>
   </param>
   <param>
-    <name>HyDRA-AAS IP</name>
+    <name>Client IP</name>
     <key>host</key>
     <type>string</type>
   </param>

@@ -4,16 +4,16 @@
 namespace hydra {
 
 hydra_client::hydra_client(std::string client_ip,
-                           std::string server_ip,
                            unsigned int u_port,
                            unsigned int u_client_id,
                            bool b_debug)
 {
   s_client_host = client_ip;
-  s_server_host = server_ip;
   s_server_port = std::to_string(u_port);
   u_id = u_client_id;
   b_debug_flag = b_debug;
+
+  std::cout << boost::format("s_client_host: %s -  s_server_host: %s") % s_client_host % s_server_host << std::endl;
 }
 
 hydra_client::~hydra_client()
@@ -22,23 +22,20 @@ hydra_client::~hydra_client()
 }
 
 int
-hydra_client::request_rx_resources(double d_centre_freq,
-                                   double d_bandwidth,
-                                   bool bpad)
+hydra_client::request_rx_resources(rx_configuration &rx_conf)
 {
   // If ill defined one of the parameters
-  if (not bool(d_centre_freq) or not bool(d_bandwidth))
+   if (not bool(rx_conf.center_freq) or not bool(rx_conf.bandwidth))
   {
     std::cerr << "Missing RX information!" << std::endl;
   }
 
-
   // Set message type
   std::string message = "{\"xvl_rrx\":{\"id\":" + std::to_string(u_id) + "," +
-    "\"centre_freq\":" + std::to_string(d_centre_freq) + "," +
-    "\"bandwidth\":" + std::to_string(d_bandwidth) + ", " +
+    "\"centre_freq\":" + std::to_string(rx_conf.center_freq) + "," +
+    "\"bandwidth\":" + std::to_string(rx_conf.bandwidth) + ", " +
     "\"ip\":\"" + s_client_host + "\", " +
-    "\"padding\":" + std::to_string(bpad) + "}}";
+    "\"padding\":" + std::to_string(rx_conf.bpad) + "}}";
 
   std::stringstream ss;
   // Return the result of the request message
@@ -54,16 +51,20 @@ hydra_client::request_rx_resources(double d_centre_freq,
   }
   catch (const boost::property_tree::json_parser::json_parser_error &e)
   {
-    return 0;
+    return -1;
   }
 
   bool success = root.get("xvl_rep.status", false);
 
   if (success)
   {
-    return root.get("xvl_rep.udp_port", 0);
+    rx_conf.server_port = root.get("xvl_rep.udp_port", 0);
+    rx_conf.server_ip = s_server_host;
+
+    return 0;
   }
-  return 0;
+
+  return -1;
 }
 
 
@@ -72,14 +73,13 @@ hydra_client::discover_server(std::string client_ip,
                 std::string &server_ip)
 {
    const int MAX_MSG = 1000;
-   send_udp(client_ip, client_ip, true, 5000);
+   send_udp(client_ip, client_ip, true, 5001);
 
    char msg[MAX_MSG];
-   if (recv_udp(msg, MAX_MSG, true, 5006, {2, 0}))
+   if (recv_udp(msg, MAX_MSG, true, 5002, {2, 0}))
    {
       std::cout << "some error occurred" << std::endl;
       return -1;
-
    }
    else
    {
@@ -91,21 +91,19 @@ hydra_client::discover_server(std::string client_ip,
 
 
 int
-hydra_client::request_tx_resources(double d_centre_freq,
-                                   double d_bandwidth,
-                                   bool bpad)
+hydra_client::request_tx_resources(rx_configuration &tx_conf)
 {
   // If ill defined one of the parameters
-  if (not bool(d_centre_freq) or not bool(d_bandwidth))
+  if (not bool(tx_conf.center_freq) or not bool(tx_conf.bandwidth))
   {
     std::cerr << "Missing TX information!" << std::endl;
   }
 
   // Set message type
   std::string message = "{\"xvl_rtx\":{\"id\":" + std::to_string(u_id) + "," +
-    "\"centre_freq\":" + std::to_string(d_centre_freq) + "," +
-    "\"padding\":" + std::to_string(bpad) + "," +
-    "\"bandwidth\":" + std::to_string(d_bandwidth) + "}}";
+    "\"centre_freq\":" + std::to_string(tx_conf.center_freq) + "," +
+    "\"padding\":" + std::to_string(tx_conf.bpad) + "," +
+    "\"bandwidth\":" + std::to_string(tx_conf.bandwidth) + "}}";
 
   // Return the result of the request message
   std::stringstream ss;
@@ -128,17 +126,18 @@ hydra_client::request_tx_resources(double d_centre_freq,
 
   if (success)
   {
-    return root.get("xvl_rep.udp_port", 0);
+     tx_conf.server_port = root.get("xvl_rep.udp_port", 0);
+     tx_conf.server_ip = s_server_host;
+     return 0;
   }
 
-  return 0;
+  return -1;
 }
 
 std::string
 hydra_client::check_connection()
 {
-
-   while (discover_server(s_client_host, s_server_host)  < 0) sleep(1);
+   while (discover_server(s_client_host, s_server_host) < 0) sleep(1);
 
    // Set message type
    std::string message = "{\"xvl_syn\":\"\"}";
