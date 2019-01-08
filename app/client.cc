@@ -1,6 +1,5 @@
 #include "hydra/hydra_client.h"
 
-
 #include <iostream>
 #include <signal.h>
 #include <boost/format.hpp>

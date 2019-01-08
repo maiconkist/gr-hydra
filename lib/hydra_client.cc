@@ -1,4 +1,5 @@
 #include "hydra/hydra_client.h"
+#include "hydra/util/udp.h"
 
 namespace hydra {
 
@@ -65,6 +66,30 @@ hydra_client::request_rx_resources(double d_centre_freq,
   return 0;
 }
 
+
+int
+hydra_client::discover_server(std::string client_ip,
+                std::string &server_ip)
+{
+   const int MAX_MSG = 1000;
+   send_udp(client_ip, client_ip, true, 5000);
+
+   char msg[MAX_MSG];
+   if (recv_udp(msg, MAX_MSG, true, 5006, {2, 0}))
+   {
+      std::cout << "some error occurred" << std::endl;
+      return -1;
+
+   }
+   else
+   {
+      std::cout << "Received: " << msg << std::endl;
+   }
+
+   return 0;
+}
+
+
 int
 hydra_client::request_tx_resources(double d_centre_freq,
                                    double d_bandwidth,
@@ -112,10 +137,13 @@ hydra_client::request_tx_resources(double d_centre_freq,
 std::string
 hydra_client::check_connection()
 {
-  // Set message type
-  std::string message = "{\"xvl_syn\":\"\"}";
-  // Send message and return acknowledgement
-  return factory(message);
+
+   while (discover_server(s_client_host, s_server_host)  < 0) sleep(1);
+
+   // Set message type
+   std::string message = "{\"xvl_syn\":\"\"}";
+   // Send message and return acknowledgement
+   return factory(message);
 }
 
 std::string

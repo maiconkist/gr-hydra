@@ -64,9 +64,9 @@ class Hypervisor
    * @return -1 if error, 0 otherwise
    */
   enum Notify {
-        SET_NONE = 0x0,
-	SET_RX_MAP = 0x1,
-	SET_TX_MAP = 0x2,
+     SET_NONE = 0x0,
+     SET_RX_MAP = 0x1,
+     SET_TX_MAP = 0x2,
   };
 
   int notify(VirtualRadio &vr, Notify set_maps = Notify::SET_NONE);
@@ -116,8 +116,8 @@ private:
   uhd_hydra_sptr g_rx_dev;
 
 
-  vradio_vec g_vradios;
-  std::mutex vradios_mtx;
+   vradio_vec g_vradios;
+   std::mutex vradios_mtx;
 };
 
 }; /* namespace hydra */
