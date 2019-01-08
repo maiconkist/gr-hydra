@@ -1,5 +1,5 @@
 #include "hydra/hydra_server.h"
-
+#include "hydra/util/udp.h"
 #include <boost/algorithm/string.hpp>
 
 
@@ -17,6 +17,20 @@ HydraServer::HydraServer(unsigned int u_port,
   // Change the server status
   server_info.s_status = "Idle";
 }
+
+int
+HydraServer::auto_discovery()
+{
+   const int MAX_MSG = 1000;
+   char msg[MAX_MSG];
+
+   while (1)
+   {
+      recv_udp(msg, MAX_MSG, true, 5001);
+      send_udp(msg, msg, true, 5002);
+   }
+}
+
 
 // Run the server
 int

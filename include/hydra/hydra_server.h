@@ -35,6 +35,16 @@ struct xvl_info
 
 class HydraServer
 {
+public:
+   /* CTOR */
+   HydraServer(unsigned int u_port, std::shared_ptr<HydraCore> core);
+
+   /* Run the server */
+   int run();
+
+   /* Run auto discovery service */
+   int auto_discovery();
+
 private:
    // Struct with the server info
    xvl_info server_info;
@@ -43,16 +53,9 @@ private:
    // Pointer to ther XVL Core
    std::shared_ptr<HydraCore> p_core;
 
-public:
-   // CTOR
-   HydraServer(unsigned int u_port, std::shared_ptr<HydraCore> core);
-
-   // Run the server
-   int run(void);
 };
 
 
-}; // namespace hydra
+}; /* namespace hydra */
 
-/* Your function statement here */
 #endif
