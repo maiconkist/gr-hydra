@@ -185,7 +185,7 @@ class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
         self.hydra_gr__source_0_0_0.start_client(freqrx + vr2offset, samp_rate, 10000)
 
         self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '10.154.48.13', '10.154.48.12', 5000)
-        self.hydra_gr__source_0_0.start_client(freqtx + vr1offset, samp_rate * 2, 10000)
+        self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 10000)
 
         self._freq1_range = Range(freqtx - 1e6, freqtx + 1e6, 100e3, freqtx - 100e3, 200)
         self._freq1_win = RangeWidget(self._freq1_range, self.set_freq1, 'freq1', "counter_slider", float)

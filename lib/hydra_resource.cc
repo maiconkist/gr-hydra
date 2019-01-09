@@ -290,7 +290,6 @@ bool
 rf_front_end::check_chunk(double d_centre_freq,
                           double d_bandwidth)
 {
-
   auto lo_freq = [](double cf, double bw) { return cf - bw/2.0;};
   auto hi_freq = [](double cf, double bw) { return cf + bw/2.0;};
 

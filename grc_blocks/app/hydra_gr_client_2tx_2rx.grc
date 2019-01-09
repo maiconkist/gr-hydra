@@ -1364,7 +1364,7 @@
     </param>
     <param>
       <key>center_frequency</key>
-      <value>freqtx + vr1offset</value>
+      <value>freqrx + vr1offset</value>
     </param>
     <param>
       <key>c_host</key>
