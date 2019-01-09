@@ -137,7 +137,6 @@ recv_udp(char *msg,
    cliLen = sizeof(cliAddr);
    n = recvfrom(sd, msg, msg_len, 0, (struct sockaddr *) &cliAddr, (socklen_t *) &cliLen);
 
-   std::cout << boost::format("recvfrom: %d") % n << std::endl;
    if (n == EAGAIN || n == EWOULDBLOCK || n < 0)
    {
       close(sd);

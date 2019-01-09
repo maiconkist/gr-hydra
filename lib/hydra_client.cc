@@ -75,9 +75,9 @@ int
 hydra_client::discover_server(std::string client_ip,
                 std::string &server_ip)
 {
- S  const int MAX_MSG = 1000;
+   const int MAX_MSG = 1000;
    send_udp(client_ip, client_ip, true, 5001);
-S
+
    char msg[MAX_MSG];
    if (recv_udp(msg, MAX_MSG, false, 5002, {2, 0}))
    {
