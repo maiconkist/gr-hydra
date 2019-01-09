@@ -121,7 +121,6 @@ recv_udp(char *msg,
       return -1;
    }
 
-
    /* bind local server port */
    servAddr.sin_family = AF_INET;
    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -138,8 +137,13 @@ recv_udp(char *msg,
    cliLen = sizeof(cliAddr);
    n = recvfrom(sd, msg, msg_len, 0, (struct sockaddr *) &cliAddr, (socklen_t *) &cliLen);
 
+   std::cout << boost::format("recvfrom: %d") % n << std::endl;
    if (n == EAGAIN || n == EWOULDBLOCK || n < 0)
+   {
+      close(sd);
       return -1;
+   }
+   
 
    /* print received message */
    std::cout << boost::format("from %s: UDP %u: %s") % inet_ntoa(cliAddr.sin_addr) % ntohs(cliAddr.sin_port) % msg << std::endl;
