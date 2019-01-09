@@ -27,7 +27,7 @@ hydra_gr_client_source_impl::hydra_gr_client_source_impl(unsigned int u_id,
                   gr::io_signature::make(0, 0, 0),
                   gr::io_signature::make(1, 1, sizeof(gr_complex)))
 {
-  client = std::make_unique<hydra_client>(c_host, s_host, u_port, u_id, true);
+  client = std::make_unique<hydra_client>(c_host, u_port, u_id, true);
   client->check_connection();
 }
 
@@ -46,14 +46,16 @@ void hydra_gr_client_source_impl::start_client(double d_center_frequency,
                                                double d_samp_rate,
                                                size_t u_payload)
 {
-  int i_rx_port = client->request_rx_resources(d_center_frequency, d_samp_rate, false);
 
-  if (i_rx_port)
+  rx_configuration rx_config{d_center_frequency, d_samp_rate, false};
+  int err = client->request_rx_resources(rx_config);
+
+  if (!err)
   {
-    std::cout << boost::format("Creating GNURadio UDP source block: (%1%: %2%)") % "0.0.0.0" % i_rx_port << std::endl;
+    std::cout << boost::format("Creating GNURadio UDP source block: (%1%: %2%)") % "0.0.0.0" % rx_config.server_port << std::endl;
     d_udp_source = gr::blocks::udp_source::make(sizeof(gr_complex),
                                                 "0.0.0.0",
-                                                i_rx_port,
+                                                rx_config.server_port,
                                                 u_payload,
                                                 false);
 

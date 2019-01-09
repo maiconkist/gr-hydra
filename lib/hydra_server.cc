@@ -5,11 +5,11 @@
 
 namespace hydra {
 
-HydraServer::HydraServer(unsigned int u_port,
+   HydraServer::HydraServer(std::string server_addr,
                        std::shared_ptr<HydraCore> core)
 {
   // Get the server port
-  s_server_port = std::to_string(u_port);
+  s_server_addr = server_addr;
 
   // Pointer to the XVL Core
   p_core = core;
@@ -27,7 +27,7 @@ HydraServer::auto_discovery()
    while (1)
    {
       recv_udp(msg, MAX_MSG, true, 5001);
-      send_udp(msg, msg, true, 5002);
+      send_udp(msg, s_server_addr, false, 5002);
    }
 }
 
@@ -39,7 +39,7 @@ HydraServer::run()
   //  Prepare our context and socket
   zmq::context_t context (1);
   zmq::socket_t socket (context, ZMQ_REP);
-  socket.bind (("tcp://0.0.0.0:" + s_server_port).c_str());
+  socket.bind (("tcp://" + s_server_addr).c_str());
 
   // Change the server status
   server_info.s_status = "Enabled";

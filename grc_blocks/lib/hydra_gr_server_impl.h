@@ -16,9 +16,10 @@ namespace gr {
 class hydra_gr_server_impl : public hydra_gr_server
 {
  public:
+
   /** CTOR
    */
-  hydra_gr_server_impl(unsigned int u_port);
+   hydra_gr_server_impl(std::string u_port);
 
   /** DTOR
    */

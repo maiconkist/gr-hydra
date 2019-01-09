@@ -12,18 +12,18 @@ namespace gr {
   namespace hydra {
 
 hydra_gr_server::sptr
-hydra_gr_server::make(unsigned int port)
+hydra_gr_server::make(std::string server_addr)
 {
-  return gnuradio::get_initial_sptr(new hydra_gr_server_impl(port));
+  return gnuradio::get_initial_sptr(new hydra_gr_server_impl(server_addr));
 }
 
-hydra_gr_server_impl::hydra_gr_server_impl(unsigned int u_port)
+     hydra_gr_server_impl::hydra_gr_server_impl(std::string server_addr)
   :gr::hier_block2("server",
                    gr::io_signature::make(0, 0, 0),
                    gr::io_signature::make(0, 0, 0))
 {
   std::cout << "CTOR server " << std::endl;
-  main = new HydraMain(u_port);
+  main = new HydraMain(server_addr);
 }
 
 hydra_gr_server_impl::~hydra_gr_server_impl()

@@ -4,7 +4,7 @@
   <category>[HyDRA]</category>
   <import>import threading</import>
   <import>import hydra</import>
-  <make>hydra.hydra_gr_server($port)
+  <make>hydra.hydra_gr_server($ip)
 self.$(id).set_tx_config($tx_center_frequency, $tx_samp_rate, $tx_fft_size, $mode)
 self.$(id).set_rx_config($rx_center_frequency, $rx_samp_rate, $rx_fft_size, $mode)
 self.$(id)_thread = threading.Thread(target=self.$(id).start_server)
@@ -42,9 +42,9 @@ self.$(id)_thread.start()</make>
     <type>int</type>
   </param>
   <param>
-    <name>Server Port</name>
-    <key>port</key>
-    <type>int</type>
+    <name>Server IP:PORT</name>
+    <key>ip</key>
+    <type>string</type>
   </param>
   <param>
     <name>Mode</name>

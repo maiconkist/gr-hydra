@@ -1,5 +1,8 @@
 #include "hydra/hydra_client.h"
 #include "hydra/util/udp.h"
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
 
 namespace hydra {
 
@@ -76,7 +79,7 @@ hydra_client::discover_server(std::string client_ip,
    send_udp(client_ip, client_ip, true, 5001);
 
    char msg[MAX_MSG];
-   if (recv_udp(msg, MAX_MSG, true, 5002, {2, 0}))
+   if (recv_udp(msg, MAX_MSG, false, 5002, {2, 0}))
    {
       std::cout << "some error occurred" << std::endl;
       return -1;
@@ -84,6 +87,10 @@ hydra_client::discover_server(std::string client_ip,
    else
    {
       std::cout << "Received: " << msg << std::endl;
+
+      std::vector<std::string> sp;
+      boost::split(sp, msg, [](char c){return c == ':';});
+      server_ip = sp[0];
    }
 
    return 0;
@@ -173,7 +180,7 @@ hydra_client::factory(const std::string &s_message)
   // If printing debug messages
   if (b_debug_flag)
   {
-    std::cout << "Connecting to XVL server..." << std::endl;
+     std::cout << boost::format("Connecting to XVL server: %s:%s") % s_server_host % s_server_port << std::endl;
   }
   // Connect to the XVL Server
   socket.connect (("tcp://" + s_server_host + ":" + s_server_port).c_str());

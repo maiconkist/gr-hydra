@@ -77,7 +77,9 @@ hydra_gr_client_sink_impl::request_tx_resources(double d_center_frequency,
                                                 double d_samp_rate,
                                                 size_t u_payload)
 {
-  client->request_tx_resources(d_center_frequency, d_samp_rate, false);
+   rx_configuration rx_conf{d_center_frequency, d_samp_rate, false};
+   client->request_tx_resources(rx_conf);
+   // TODO
 }
 
   } /* namespace hydra */

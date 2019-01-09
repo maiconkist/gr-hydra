@@ -33,7 +33,7 @@ int main()
    unsigned int u_port = 5000;
 
    /* Instantiate XVL */
-   hydra::HydraMain main = hydra::HydraMain(u_port);
+   hydra::HydraMain main = hydra::HydraMain("127.0.0.1:5000");
 
 
    main.set_tx_config(

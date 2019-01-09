@@ -37,7 +37,7 @@ class HydraServer
 {
 public:
    /* CTOR */
-   HydraServer(unsigned int u_port, std::shared_ptr<HydraCore> core);
+   HydraServer(std::string server_addr, std::shared_ptr<HydraCore> core);
 
    /* Run the server */
    int run();
@@ -48,8 +48,8 @@ public:
 private:
    // Struct with the server info
    xvl_info server_info;
-   // Server port
-   std::string s_server_port;
+   // Server ip:port
+   std::string s_server_addr;
    // Pointer to ther XVL Core
    std::shared_ptr<HydraCore> p_core;
 

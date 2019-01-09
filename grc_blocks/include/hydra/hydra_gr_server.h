@@ -14,7 +14,7 @@ namespace gr {
       public:
         typedef boost::shared_ptr<hydra_gr_server> sptr;
 
-        static sptr make(unsigned int u_port);
+        static sptr make(std::string server_addr);
 
         virtual void set_tx_config(double d_center_frequency,
                                    double d_samp_rate,

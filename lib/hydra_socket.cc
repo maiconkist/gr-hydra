@@ -46,6 +46,7 @@ udp_source::udp_source(
 void
 udp_source::receive()
 {
+   std::cout << "Initializing UDP for pkt recv" << std::endl;
   p_socket->async_receive_from(
     boost::asio::buffer(input_buffer, BUFFER_SIZE),
     endpoint_rcvd,
@@ -60,6 +61,8 @@ udp_source::handle_receive(
   const boost::system::error_code& error,
   unsigned int u_bytes_trans)
 {
+   std::cout << "Received packet in UDP" << std::endl;
+
   if (!error)
   {
     // If there isn't enough data for a single element
