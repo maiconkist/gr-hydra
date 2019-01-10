@@ -71,7 +71,7 @@ void RxBuffer::run()
      std::this_thread::sleep_for(std::chrono::microseconds(l_threshold));
 
      // If the destructor has been called
-     if (thr_stop){return;}
+     if (thr_stop){ return; }
 
 #if 0
      // Windows not being consumed
@@ -82,7 +82,6 @@ void RxBuffer::run()
        //std::cerr << "Too many windows!" << std::endl;
      }
 #endif
-
      {
         std::lock_guard<std::mutex> _p(*p_in_mtx);
         // Get the current size of the queue
@@ -123,6 +122,7 @@ void RxBuffer::run()
         // Without padding, just transmit an empty window and wait for the next one
         else
         {
+#if 0
            // Fill the window with complex zeroes
            window.assign(u_fft_size, empty_iq);
 
@@ -130,6 +130,7 @@ void RxBuffer::run()
            std::lock_guard<std::mutex> _l(out_mtx);
            output_buffer.push_back(window);
            out_mtx.unlock();
+#endif
         }
      } // Too much data check
 

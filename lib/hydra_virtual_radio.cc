@@ -175,10 +175,7 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
   std::lock_guard<std::mutex> _l(g_mutex);
   const iq_window * buf = tx_buffer->consume();
 
-  if (buf == nullptr)
-  {
-    return false;
-  }
+  if (buf == nullptr) { return false; }
 
   const gr_complex *window = reinterpret_cast<const gr_complex*>(buf->data());
 

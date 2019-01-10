@@ -157,9 +157,9 @@ Hypervisor::tx_run()
 
   while (true)
   {
-    //std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
-    get_tx_window(optr , get_tx_fft());
-    g_tx_dev->send(optr, get_tx_fft());
+     get_tx_window(optr , get_tx_fft());
+     g_tx_dev->send(optr, get_tx_fft());
+     //std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
   }
 }
 
@@ -230,7 +230,11 @@ Hypervisor::get_tx_window(window &optr, size_t len)
          ++it)
     {
       if ((*it)->get_tx_enabled())
-        (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
+         (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
+#if 0
+         if (! (*it)->map_tx_samples(g_ifft_complex->get_inbuf()))
+            return 0;
+#endif
     }
   }
 
@@ -245,7 +249,7 @@ Hypervisor::get_tx_window(window &optr, size_t len)
   optr.assign(g_ifft_complex->get_outbuf(),
               g_ifft_complex->get_outbuf() + len);
 
-  return tx_fft_len;
+  return len;
 }
 
 void
