@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Server
-# Generated: Mon Dec  3 18:58:29 2018
+# Generated: Mon Jan 21 11:55:55 2019
 ##################################################
 
 
@@ -18,7 +18,7 @@ import threading
 
 class ansible_hydra_gr_server(gr.top_block):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9):
+    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, hydraServerIP='192.168.5.64:5000'):
         gr.top_block.__init__(self, "Ansible Hydra Gr Server")
 
         ##################################################
@@ -26,13 +26,16 @@ class ansible_hydra_gr_server(gr.top_block):
         ##################################################
         self.freqrx = freqrx
         self.freqtx = freqtx
+        self.hydraServerIP = hydraServerIP
 
         ##################################################
         # Blocks
         ##################################################
-        self.ahydra_gr_server_0 = hydra.hydra_gr_server(5000)
-        self.ahydra_gr_server_0.set_tx_config(freqtx, 2e6, 2048, "USRP")
-        self.ahydra_gr_server_0.set_rx_config(freqrx, 2e6, 1024, "USRP")
+        self.ahydra_gr_server_0 = hydra.hydra_gr_server(hydraServerIP)
+        if freqtx > 0 and 2e6 > 0 and 2048 > 0:
+           self.ahydra_gr_server_0.set_tx_config(freqtx, 2e6, 2048, "USRP")
+        if freqrx > 0 and 2e6 > 0 and 2048 > 0:
+           self.ahydra_gr_server_0.set_rx_config(freqrx, 2e6, 2048, "USRP")
         self.ahydra_gr_server_0_thread = threading.Thread(target=self.ahydra_gr_server_0.start_server)
         self.ahydra_gr_server_0_thread.daemon = True
         self.ahydra_gr_server_0_thread.start()
@@ -49,6 +52,12 @@ class ansible_hydra_gr_server(gr.top_block):
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
 
+    def get_hydraServerIP(self):
+        return self.hydraServerIP
+
+    def set_hydraServerIP(self, hydraServerIP):
+        self.hydraServerIP = hydraServerIP
+
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
@@ -58,6 +67,9 @@ def argument_parser():
     parser.add_option(
         "", "--freqtx", dest="freqtx", type="eng_float", default=eng_notation.num_to_str(1.1e9),
         help="Set freqtx [default=%default]")
+    parser.add_option(
+        "", "--hydraServerIP", dest="hydraServerIP", type="string", default='192.168.5.64:5000',
+        help="Set hydraServerIP [default=%default]")
     return parser
 
 
@@ -65,7 +77,7 @@ def main(top_block_cls=ansible_hydra_gr_server, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls(freqrx=options.freqrx, freqtx=options.freqtx)
+    tb = top_block_cls(freqrx=options.freqrx, freqtx=options.freqtx, hydraServerIP=options.hydraServerIP)
     tb.start()
     tb.wait()
 

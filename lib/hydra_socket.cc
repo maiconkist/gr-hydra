@@ -4,8 +4,8 @@
 #include <complex>
 #include <boost/format.hpp>
 
-
-namespace hydra {
+namespace hydra
+{
 
 udp_source::udp_source(
   const std::string& s_host,
@@ -60,6 +60,8 @@ udp_source::handle_receive(
   const boost::system::error_code& error,
   unsigned int u_bytes_trans)
 {
+  std::cout << "u_bytes_trans:" << u_bytes_trans << std::endl;
+
   if (!error)
   {
     // If there isn't enough data for a single element
@@ -72,12 +74,11 @@ udp_source::handle_receive(
       // Update the remainder bytes count
       u_remainder += u_bytes_trans;
     }
-
     // Hooray, we have elements
     else
     {
       // Data not being consumed
-      if (output_buffer.size() > 1e8)
+      if (output_buffer.size() > 1e6)
       {
         std::cerr << "Too much data!" << std::endl;
       }
@@ -85,40 +86,39 @@ udp_source::handle_receive(
       else
       {
         // Lock the mutex
-         {
-            std::lock_guard<std::mutex> _l(out_mtx);
-            // If there is data from a previous transfer
-            if (u_remainder > 0)
-            {
-               // Copy the missing bytes from the input buffer to the remainder buffer
-               std::copy(input_buffer.begin(),
-                         input_buffer.begin() + IQ_SIZE - u_remainder,
-                         remainder_buffer.begin() + u_remainder);
-               // Append this element to the output buffer
-               output_buffer.insert(output_buffer.end(),
-                                    remainder_buffer.begin(),
-                                    remainder_buffer.begin() + 1);
-               // Clear the remainder
-               u_remainder = 0;
-            }
-            // Calculate the new remainder
-            u_remainder = u_bytes_trans % IQ_SIZE;
+        {
+           std::lock_guard<std::mutex> _l(out_mtx);
+           // If there is data from a previous transfer
+           if (u_remainder > 0)
+           {
+              // Copy the missing bytes from the input buffer to the remainder buffer
+              std::copy(input_buffer.begin(),
+                        input_buffer.begin() + IQ_SIZE - u_remainder,
+                        remainder_buffer.begin() + u_remainder);
+              // Append this element to the output buffer
+              output_buffer.insert(output_buffer.end(),
+                                   remainder_buffer.begin(),
+                                   remainder_buffer.begin() + 1);
+              // Clear the remainder
+              u_remainder = 0;
+           }
+           // Calculate the new remainder
+           u_remainder = u_bytes_trans % IQ_SIZE;
 
-            // Insert new elements in the output buffer
-            output_buffer.insert(output_buffer.end(),
-                                 p_reinterpreted_cast,
-                                 p_reinterpreted_cast +
-                                 (u_bytes_trans - u_remainder)/IQ_SIZE);
-         }
-
+           // Insert new elements in the output buffer
+           output_buffer.insert(output_buffer.end(),
+                                p_reinterpreted_cast,
+                                p_reinterpreted_cast +
+                                (u_bytes_trans - u_remainder)/IQ_SIZE);
+        }
 
         // If there is a new remainder
         if (u_remainder > 0)
         {
-          // Save it in the remainder buffer
-          std::copy(input_buffer.begin() + u_bytes_trans - u_remainder,
-                    input_buffer.begin() + u_bytes_trans ,
-                    remainder_buffer.begin());
+           // Save it in the remainder buffer
+           std::copy(input_buffer.begin() + u_bytes_trans - u_remainder,
+                     input_buffer.begin() + u_bytes_trans ,
+                     remainder_buffer.begin());
         }
       } // end data else
     } // end no data
@@ -184,13 +184,11 @@ udp_sink::transmit()
       while (bytes_sent < total_size_bytes)
       {
         size_t bytes_to_send = std::min((size_t)BUFFER_SIZE * IQ_SIZE, (total_size_bytes - bytes_sent));
-
         try
         {
           size_t r = p_socket->send_to(
             boost::asio::buffer(reinterpret_cast<char *>(&output_buffer[0]) + bytes_sent,
                                 bytes_to_send), endpoint_);
-
           bytes_sent += r;
         }
         catch (std::exception &e)
@@ -201,7 +199,7 @@ udp_sink::transmit()
     }
     else
     {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      std::this_thread::sleep_for(std::chrono::microseconds(1));
     }
   } // while
 }

@@ -2,9 +2,11 @@
 
 #include "hydra/hydra_fft.h"
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <numeric>
+#include <thread>
 #include <uhd/usrp/usrp.h>
 #include <opencv2/opencv.hpp>
 
@@ -50,7 +52,7 @@ device_uhd::set_tx_config(double freq, double rate, double gain)
   std::cout << "Actual TX Rate: " << usrp->get_tx_rate() << std::endl;
 
   std::cout << "Setting TX Gain: " << gain << std::endl;
-  usrp->set_tx_gain(gain);
+  usrp->set_normalized_tx_gain(gain);
   std::cout << "Actual TX Gain: " << usrp->get_tx_gain() << std::endl;
 
   std::cout << "Setting TX freq: " << freq / 1e6 << " MHz" << std::endl;
@@ -72,7 +74,7 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
 
   // no gain for reception. 
   std::cout << "Setting RX Gain: " << gain << std::endl;
-  usrp->set_rx_gain(0.0);
+  usrp->set_normalized_rx_gain(0.0);
   std::cout << "Actual RX Gain: " << usrp->get_rx_gain() << std::endl;
 
   std::cout << "Setting RX freq: " << freq / 1e6 << " MHz" << std::endl;
@@ -95,10 +97,11 @@ void
 device_uhd::send(const window &buf, size_t len)
 {
   static window big_buf;
+
   big_buf.insert(big_buf.end(), buf.begin(), buf.end());
 
-  if (big_buf.size() > g_tx_rate / 10)
-  {
+ if (1)
+ {
 #ifdef USE_USRP_STREAM_API
     uhd::tx_metadata_t md;
     md.start_of_burst = false;
@@ -118,12 +121,11 @@ device_uhd::send(const window &buf, size_t len)
     md.has_time_spec = false;
     tx_stream->send(&big_buf.front(), big_buf.size(), md);
 #endif
-
     big_buf.clear();
   }
 }
 
-void
+size_t
 device_uhd::receive(window &buf, size_t len)
 {
   uhd::rx_metadata_t md;
@@ -147,6 +149,7 @@ device_uhd::receive(window &buf, size_t len)
   switch(md.error_code)
   {
     case uhd::rx_metadata_t::ERROR_CODE_NONE:
+      return num_samps;
       break;
 
     case uhd::rx_metadata_t::ERROR_CODE_TIMEOUT:
@@ -158,17 +161,13 @@ device_uhd::receive(window &buf, size_t len)
       break;
   }
 #else
-
-  size_t num_rx_samps = rx_stream->recv(&buf.front(), buf.size(), md, 0.1);
+  return rx_stream->recv(&buf.front(), buf.size(), md, 0.001);
 #endif
-
 }
-
 
 device_image_gen::device_image_gen(std::string device_args)
 {
 }
-
 
 void
 device_image_gen::send(const window &buf, size_t len)
@@ -185,7 +184,7 @@ device_image_gen::send(const window &buf, size_t len)
                        g_ifft_complex->get_outbuf(),
                        g_ifft_complex->get_outbuf() + len);
 
-   // TODO get fft size and number of rows from somewhere else
+   /* TODO get fft size and number of rows from somewhere else */
    if (g_iq_samples.size() == cols * rows)
    {
       cv::Mat img(rows, cols, CV_8UC3, cv::Scalar(0,0,0));
@@ -220,7 +219,7 @@ device_image_gen::send(const window &buf, size_t len)
    }
 }
 
-void
+size_t
 device_image_gen::receive(window &buf, size_t len)
 {
   static const char *str_read = "/home/connect/ofdm.bin";
@@ -239,5 +238,27 @@ device_image_gen::receive(window &buf, size_t len)
   }
 }
 
+device_loopback::device_loopback(std::string device_args)
+{
+}
 
-} // namespace hydra
+void
+device_loopback::send(const window &buf, size_t len)
+{
+   std::lock_guard<std::mutex> _l(g_mutex);
+   g_windows_vec.push_back(buf);
+}
+
+size_t
+device_loopback::receive(window &buf, size_t len)
+{
+   while (g_windows_vec.size() == 0) { return 0; };
+
+   std::lock_guard<std::mutex> _l(g_mutex);
+   buf = g_windows_vec.front();
+   g_windows_vec.pop_front();
+
+   return buf.size();
+}
+
+} /* namespace hydra */

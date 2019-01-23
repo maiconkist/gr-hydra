@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 2Tx 2Rx
-# Generated: Thu Nov 29 19:31:04 2018
+# Generated: Mon Jan 14 16:43:10 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -38,7 +38,7 @@ from gnuradio import qtgui
 
 class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-100e3, vr2offset=700e3):
+    def __init__(self, freqrx=1.1e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-100e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Hydra Gr Client 2Tx 2Rx")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Hydra Gr Client 2Tx 2Rx")
@@ -177,15 +177,15 @@ class hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
 
         self._qtgui_histogram_sink_x_0_1_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0_1.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_histogram_sink_x_0_1_win)
-        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, '10.154.48.12', 5000)
+        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, '192.168.5.52', 5000)
         self.hydra_gr_sink_0_0.start_client(freqtx + vr2offset, samp_rate, 1024)
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '10.154.48.12', 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '192.168.5.52', 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
-        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, '10.154.48.13', '10.154.48.12', 5000)
-        self.hydra_gr__source_0_0_0.start_client(freqrx + vr2offset, samp_rate, 10000)
+        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, '192.168.5.52', '192.168.5.52', 5000)
+        self.hydra_gr__source_0_0_0.start_client(freqtx + vr2offset, samp_rate, 10000)
 
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '10.154.48.13', '10.154.48.12', 5000)
-        self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 10000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '192.168.5.52', '192.168.5.52', 5000)
+        self.hydra_gr__source_0_0.start_client(freqtx + vr1offset, samp_rate * 2, 10000)
 
         self._freq1_range = Range(freqtx - 1e6, freqtx + 1e6, 100e3, freqtx - 100e3, 200)
         self._freq1_win = RangeWidget(self._freq1_range, self.set_freq1, 'freq1', "counter_slider", float)

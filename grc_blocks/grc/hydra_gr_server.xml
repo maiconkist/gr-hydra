@@ -5,8 +5,10 @@
   <import>import threading</import>
   <import>import hydra</import>
   <make>hydra.hydra_gr_server($ip)
-self.$(id).set_tx_config($tx_center_frequency, $tx_samp_rate, $tx_fft_size, $mode)
-self.$(id).set_rx_config($rx_center_frequency, $rx_samp_rate, $rx_fft_size, $mode)
+if $(tx_center_frequency) > 0 and $(tx_samp_rate) > 0 and $(tx_fft_size) > 0:
+   self.$(id).set_tx_config($tx_center_frequency, $tx_samp_rate, $tx_fft_size, $mode)
+if $(rx_center_frequency) > 0 and $(rx_samp_rate) > 0 and $(rx_fft_size) > 0:
+   self.$(id).set_rx_config($rx_center_frequency, $rx_samp_rate, $rx_fft_size, $mode)
 self.$(id)_thread = threading.Thread(target=self.$(id).start_server)
 self.$(id)_thread.daemon = True
 self.$(id)_thread.start()</make>
@@ -59,6 +61,11 @@ self.$(id)_thread.start()</make>
       <name>Image Generation</name>
       <key>"IMG_GEN"</key>
     </option>
+    <option>
+      <name>Loopback</name>
+      <key>"LOOPBACK"</key>
+    </option>
+
   </param>
 
 </block>

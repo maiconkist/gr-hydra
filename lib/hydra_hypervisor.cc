@@ -19,12 +19,12 @@
  */
 
 #include "hydra/hydra_hypervisor.h"
+#include "hydra/hydra_uhd_interface.h"
 
 #include <algorithm>
 #include <functional>
 #include <iostream>
-
-#include "hydra/hydra_uhd_interface.h"
+#include <mutex>
 #include <numeric>
 
 namespace hydra {
@@ -145,6 +145,7 @@ Hypervisor::set_tx_resources(uhd_hydra_sptr tx_dev, double cf, double bw, size_t
    g_tx_subcarriers_map = iq_map_vec(fft, -1);
    g_ifft_complex = sfft_complex(new fft_complex(fft, false));
 
+
    g_tx_thread = std::make_unique<std::thread>(&Hypervisor::tx_run, this);
 }
 
@@ -152,14 +153,18 @@ void
 Hypervisor::tx_run()
 {
   size_t g_tx_sleep_time = llrint(get_tx_fft() * 1e6 / get_tx_bandwidth());
-
   window optr(get_tx_fft());
 
   while (true)
   {
-     get_tx_window(optr , get_tx_fft());
-     g_tx_dev->send(optr, get_tx_fft());
-     //std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
+     if (get_tx_window(optr , get_tx_fft()))
+     {
+        g_tx_dev->send(optr, get_tx_fft());
+     }
+     else
+     {
+           std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
+     }
   }
 }
 
@@ -222,6 +227,8 @@ Hypervisor::set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
 size_t
 Hypervisor::get_tx_window(window &optr, size_t len)
 {
+   if (g_vradios.size() == 0) return 0;
+
   {
     std::lock_guard<std::mutex> _l(vradios_mtx);
 
@@ -230,11 +237,12 @@ Hypervisor::get_tx_window(window &optr, size_t len)
          ++it)
     {
       if ((*it)->get_tx_enabled())
-         (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
-#if 0
-         if (! (*it)->map_tx_samples(g_ifft_complex->get_inbuf()))
+      {
+         if (!(*it)->map_tx_samples(g_ifft_complex->get_inbuf()))
+         {
             return 0;
-#endif
+         }
+      }
     }
   }
 
@@ -273,9 +281,10 @@ Hypervisor::rx_run()
 
   while (true)
   {
-    //std::this_thread::sleep_for(std::chrono::nanoseconds(g_rx_sleep_time));
-    g_rx_dev->receive(optr, get_rx_fft());
-    forward_rx_window(optr, get_rx_fft());
+     if (g_rx_dev->receive(optr, get_rx_fft()))
+     {
+        forward_rx_window(optr, get_rx_fft());
+     }
   }
 }
 

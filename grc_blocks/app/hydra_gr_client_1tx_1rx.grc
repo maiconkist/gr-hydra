@@ -215,7 +215,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(800, 196)</value>
+      <value>(832, 200)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -372,7 +372,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(632, 196)</value>
+      <value>(664, 200)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -738,11 +738,11 @@
     </param>
     <param>
       <key>center_frequency</key>
-      <value>freqrx + vr1offset</value>
+      <value>freqtx + vr1offset</value>
     </param>
     <param>
       <key>c_host</key>
-      <value>10.154.48.13</value>
+      <value>192.168.5.52</value>
     </param>
     <param>
       <key>comment</key>
@@ -763,10 +763,6 @@
     <param>
       <key>_rotation</key>
       <value>180</value>
-    </param>
-    <param>
-      <key>s_host</key>
-      <value>10.154.48.12</value>
     </param>
     <param>
       <key>id</key>
@@ -808,6 +804,10 @@
       <value>freqtx + vr1offset</value>
     </param>
     <param>
+      <key>host</key>
+      <value>192.168.5.52</value>
+    </param>
+    <param>
       <key>comment</key>
       <value></value>
     </param>
@@ -821,15 +821,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(984, 156)</value>
+      <value>(1016, 160)</value>
     </param>
     <param>
       <key>_rotation</key>
       <value>0</value>
-    </param>
-    <param>
-      <key>host</key>
-      <value>10.154.48.12</value>
     </param>
     <param>
       <key>id</key>

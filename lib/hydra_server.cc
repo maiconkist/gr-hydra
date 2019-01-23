@@ -5,8 +5,8 @@
 
 namespace hydra {
 
-   HydraServer::HydraServer(std::string server_addr,
-                       std::shared_ptr<HydraCore> core)
+HydraServer::HydraServer(std::string server_addr,
+                         std::shared_ptr<HydraCore> core)
 {
   // Get the server port
   s_server_addr = server_addr;

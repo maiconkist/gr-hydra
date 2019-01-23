@@ -39,6 +39,8 @@ hydra_gr_server_impl::init_usrp(std::string mode)
       g_usrp = std::make_shared<device_uhd>();
     else if (mode == "IMG_GEN")
       g_usrp = std::make_shared<device_image_gen>();
+    else if (mode == "LOOPBACK")
+       g_usrp = std::make_shared<device_loopback>();
     else
       std::cout << "Unknown device type: " << __PRETTY_FUNCTION__ << std::endl;
   }

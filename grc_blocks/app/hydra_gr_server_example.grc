@@ -97,7 +97,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(808, 140)</value>
+      <value>(584, 116)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -105,7 +105,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ahydra_gr_server_0</value>
+      <value>ahydra_gr_server_0_0</value>
     </param>
     <param>
       <key>mode</key>
@@ -113,31 +113,160 @@
     </param>
     <param>
       <key>rx_center_frequency</key>
-      <value>950e6</value>
+      <value>freqrx</value>
     </param>
     <param>
       <key>rx_fft_size</key>
-      <value>1024</value>
+      <value>2048</value>
     </param>
     <param>
       <key>rx_samp_rate</key>
       <value>2e6</value>
     </param>
     <param>
-      <key>port</key>
-      <value>5000</value>
+      <key>ip</key>
+      <value>hydraServerIP</value>
     </param>
     <param>
       <key>tx_center_frequency</key>
-      <value>950e6</value>
+      <value>freqtx</value>
     </param>
     <param>
       <key>tx_fft_size</key>
-      <value>1024</value>
+      <value>2048</value>
     </param>
     <param>
       <key>tx_samp_rate</key>
       <value>2e6</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(312, 12)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>freqrx</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>eng_float</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>1.1e9</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(208, 12)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>freqtx</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>eng_float</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>1.1e9</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(400, 12)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>hydraServerIP</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>192.168.5.77:5000</value>
     </param>
   </block>
 </flow_graph>

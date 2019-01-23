@@ -46,11 +46,7 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                            const std::string &remote_addr)
 {
   // If already receiving
-  if (b_receiver)
-  {
-    // Return error
-    return 1;
-  }
+  if (b_receiver) { return 1; }
 
   // Set the VR RX UDP port
   g_rx_udp_port = u_rx_udp;
@@ -173,16 +169,15 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
   if (!b_transmitter) return false;
 
   std::lock_guard<std::mutex> _l(g_mutex);
-  const iq_window * buf = tx_buffer->consume();
 
-  if (buf == nullptr) { return false; }
+  const iq_window *buf = tx_buffer->consume();
+  if (buf == nullptr){ return false; }
 
-  const gr_complex *window = reinterpret_cast<const gr_complex*>(buf->data());
+  const gr_complex *window = buf->data();
 
   // Copy samples in TIME domain to FFT buffer, execute FFT
   g_fft_complex->set_data(window, g_tx_fft_size);
   g_fft_complex->execute();
-
   gr_complex *outbuf = g_fft_complex->get_outbuf();
 
   // map samples in FREQ domain to samples_buff

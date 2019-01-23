@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 1Tx 1Rx
-# Generated: Thu Nov 29 19:30:37 2018
+# Generated: Mon Jan 14 16:43:41 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -129,10 +129,10 @@ class hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
 
         self._qtgui_histogram_sink_x_0_1_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0_1.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_histogram_sink_x_0_1_win)
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '10.154.48.12', 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '192.168.5.52', 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '10.154.48.13', '10.154.48.12', 5000)
-        self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 10000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '192.168.5.52', '192.168.5.52', 5000)
+        self.hydra_gr__source_0_0.start_client(freqtx + vr1offset, samp_rate * 2, 10000)
 
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,

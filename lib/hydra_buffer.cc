@@ -42,16 +42,16 @@ RxBuffer::consume()
    {
       never_delete = output_buffer.front();
       output_buffer.pop_front();
-   }
-   else
-   {
-      return nullptr;
+
+      return &never_delete;
    }
 
-   return &never_delete;
+   return nullptr;
 }
 
-void RxBuffer::run()
+
+void
+RxBuffer::run()
 {
   // Thread stop condition
   thr_stop = false;
@@ -68,11 +68,10 @@ void RxBuffer::run()
   while(true)
   {
      // Wait for "threshold" nanoseconds
-     std::this_thread::sleep_for(std::chrono::microseconds(l_threshold));
+     //std::this_thread::sleep_for(std::chrono::microseconds(l_threshold));
 
      // If the destructor has been called
      if (thr_stop){ return; }
-
 #if 0
      // Windows not being consumed
      if (output_buffer.size() > 100)
@@ -82,6 +81,7 @@ void RxBuffer::run()
        //std::cerr << "Too many windows!" << std::endl;
      }
 #endif
+
      {
         std::lock_guard<std::mutex> _p(*p_in_mtx);
         // Get the current size of the queue
@@ -119,10 +119,10 @@ void RxBuffer::run()
            std::lock_guard<std::mutex> _l(out_mtx);
            output_buffer.push_back(window);
         }
+#if 0
         // Without padding, just transmit an empty window and wait for the next one
         else
         {
-#if 0
            // Fill the window with complex zeroes
            window.assign(u_fft_size, empty_iq);
 
@@ -130,13 +130,11 @@ void RxBuffer::run()
            std::lock_guard<std::mutex> _l(out_mtx);
            output_buffer.push_back(window);
            out_mtx.unlock();
-#endif
         }
-     } // Too much data check
-
-  } // End of loop
-} // End of method
-
+#endif
+     }
+  }
+}
 
 
 TxBuffer::TxBuffer(window_stream* input_buffer,

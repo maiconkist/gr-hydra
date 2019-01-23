@@ -38,8 +38,7 @@ HydraCore::set_tx_resources(uhd_hydra_sptr usrp,
    // Initialise the RX resources
    p_resource_manager->set_tx_resources(d_centre_freq, d_bandwidth);
 
-
-   usrp->set_tx_config(d_centre_freq, d_bandwidth, 60.0);
+   usrp->set_tx_config(d_centre_freq, d_bandwidth, 0.6);
    p_hypervisor->set_tx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
    // Toggle flag
