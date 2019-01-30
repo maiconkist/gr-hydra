@@ -110,6 +110,7 @@ hydra_client::request_tx_resources(rx_configuration &tx_conf)
   std::string message = "{\"xvl_rtx\":{\"id\":" + std::to_string(u_id) + "," +
     "\"centre_freq\":" + std::to_string(tx_conf.center_freq) + "," +
     "\"padding\":" + std::to_string(tx_conf.bpad) + "," +
+    "\"ip\":\"" + s_client_host + "\", " +
     "\"bandwidth\":" + std::to_string(tx_conf.bandwidth) + "}}";
 
   // Return the result of the request message

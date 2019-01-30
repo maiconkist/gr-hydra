@@ -106,6 +106,7 @@ int
 HydraCore::request_tx_resources(unsigned int u_id,
                                 double d_centre_freq,
                                 double d_bandwidth,
+                                const std::string &remote_addr,
                                 bool bpad)
 {
   std::lock_guard<std::mutex> _p(g_mutex);
@@ -147,12 +148,12 @@ HydraCore::request_tx_resources(unsigned int u_id,
   if (vr == nullptr)
   {
      vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
-     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, bpad);
+     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, remote_addr, bpad);
      p_hypervisor->attach_virtual_radio(vr);
   }
   else
   {
-     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, bpad);
+    vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, remote_addr, bpad);
   }
 
   // If able to create all of it, return the port number

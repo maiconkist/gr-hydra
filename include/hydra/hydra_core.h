@@ -62,6 +62,7 @@ public:
    int request_tx_resources(unsigned int u_id,
                             double d_centre_freq,
                             double d_bandwidth,
+                            const std::string &remote_addr,
                             bool bpad);
 
    // Query resources

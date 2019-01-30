@@ -7,6 +7,118 @@
 namespace hydra
 {
 
+
+tcp_source::tcp_source(
+  const std::string& host,
+  const std::string& port):
+  s_host(host),
+  s_port(port)
+{
+    // Reinterpret the cast to the input buffer to pass it to the output buffer
+    p_reinterpreted_cast = reinterpret_cast<iq_sample*>(&input_buffer);
+    // Set the remainder counter to zero
+    u_remainder = 0;
+
+    // Create a thread to receive the data
+    rx_udp_thread = std::make_unique<std::thread>(&tcp_source::connect, this);
+}
+
+
+void
+tcp_source::connect()
+{
+  std::this_thread::sleep_for(std::chrono::seconds(5));
+  boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(s_host), std::stoi(s_port));
+  p_socket = std::make_unique<boost::asio::ip::tcp::socket>(io_service);
+  p_socket->connect(endpoint);
+  std::cout << boost::format("Source %s:%s connected successfully.") % s_host % s_port << std::endl;
+
+  receive();
+  io_service.run();
+}
+
+void
+tcp_source::receive()
+{
+  p_socket->async_receive(
+                          boost::asio::buffer(input_buffer, BUFFER_SIZE),
+                          boost::bind(&tcp_source::handle_receive, this,
+                                      boost::asio::placeholders::error,
+                                      boost::asio::placeholders::bytes_transferred)
+                          );
+}
+
+void
+tcp_source::handle_receive(
+  const boost::system::error_code& error,
+  unsigned int u_bytes_trans)
+{
+  if (!error)
+  {
+    {
+      std::lock_guard<std::mutex> _l(out_mtx);
+      output_buffer.insert(output_buffer.end(),
+                           input_buffer.begin(),
+                           input_buffer.end());
+    }
+    receive();
+  }
+}
+
+
+tcp_sink::tcp_sink(
+  iq_stream *input_buffer,
+  std::mutex* in_mtx,
+  const std::string& s_host,
+  const std::string& s_port):
+  g_input_buffer(input_buffer),
+  g_th_run(true)
+{
+  // Get the mutex
+  p_in_mtx = in_mtx;
+
+  boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(s_host), std::stoi(s_port));
+
+  p_socket = std::make_unique<boost::asio::ip::tcp::socket>(io_service);
+  p_socket->connect(endpoint);
+
+  tx_udp_thread = std::make_unique<std::thread>(&tcp_sink::transmit, this);
+}
+
+// Assign the handle receive callback when a datagram is received
+void
+tcp_sink::transmit()
+{
+
+  std::vector< std::complex<float> > output_buffer;
+  while (g_th_run)
+  {
+    // If there is anything to transmit
+    if (g_input_buffer->size() > 0)
+    {
+      size_t n_elemns;
+
+      /* Local scope lock */
+      {
+        // Copy everything to output_buffer. Clear input
+        std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
+
+        output_buffer = std::vector< std::complex<float> >(g_input_buffer->begin(), g_input_buffer->end());
+        g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->end());
+      }
+
+      // Send from output_buffer
+      boost::asio::write(*p_socket,
+                         boost::asio::buffer(output_buffer)
+                         );
+    }
+    else
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds(1));
+    }
+  }
+}
+
 udp_source::udp_source(
   const std::string& s_host,
   const std::string& s_port)

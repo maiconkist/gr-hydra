@@ -163,7 +163,7 @@ Hypervisor::tx_run()
      }
      else
      {
-           std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
+       std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
      }
   }
 }
@@ -237,12 +237,7 @@ Hypervisor::get_tx_window(window &optr, size_t len)
          ++it)
     {
       if ((*it)->get_tx_enabled())
-      {
-         if (!(*it)->map_tx_samples(g_ifft_complex->get_inbuf()))
-         {
-            return 0;
-         }
-      }
+        (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
     }
   }
 

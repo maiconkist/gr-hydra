@@ -4,7 +4,7 @@
 #include "hydra/hydra_gr_client_sink.h"
 
 #include <hydra/hydra_client.h>
-#include <gnuradio/blocks/udp_sink.h>
+#include <gnuradio/blocks/tcp_server_sink.h>
 #include <chrono>
 
 using namespace hydra;
@@ -35,7 +35,7 @@ public:
   virtual bool stop();
 
 private:
-  gr::blocks::udp_sink::sptr d_udp_sink;
+  gr::blocks::tcp_server_sink::sptr d_tcp_sink;
   std::unique_ptr<hydra_client> client;
   std::string g_host;
 };

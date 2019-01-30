@@ -137,19 +137,19 @@ HydraServer::run()
       {
         // If the reservation succeeds, it will hold the UDP port
         unsigned int u_reserved = 0;
+        std::string client_ip = root.get(key + ".ip", "0.0.0.0");
 
         // If it is a receive request
         if (boost::iequals(key, "xvl_rrx"))
         {
           // Try to reserve RX resources
-          std::string client_ip = root.get(key + ".ip", "0.0.0.0");
           u_reserved = p_core->request_rx_resources(u_id, d_cf, d_bw, client_ip);
         }
-        else
+        else // key == "xvl_rtx"
         {
           bool bpad = root.get(key + ".padding", false);
           // Try to reserve TX resources
-          u_reserved = p_core->request_tx_resources(u_id, d_cf, d_bw, bpad);
+          u_reserved = p_core->request_tx_resources(u_id, d_cf, d_bw, client_ip, bpad);
         }
 
         // If not able to reserve resources

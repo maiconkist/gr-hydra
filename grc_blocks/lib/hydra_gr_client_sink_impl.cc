@@ -50,13 +50,13 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
 
   if (!err)
   {
-    d_udp_sink = gr::blocks::udp_sink::make(sizeof(gr_complex),
-                                                rx_conf.server_ip,
-                                                rx_conf.server_port,
-                                                u_payload,
-                                                true);
+    std::cout << boost::format("host: %s - port: %d") % g_host % rx_conf.server_port << std::endl;
+    d_tcp_sink = gr::blocks::tcp_server_sink::make(sizeof(gr_complex),
+                                            g_host,
+                                            rx_conf.server_port,
+                                            true);
 
-    connect(self(), 0, d_udp_sink, 0);
+    connect(self(), 0, d_tcp_sink, 0);
     std::cout << "Client Sink initialized successfully." << std::endl;
   }
   else

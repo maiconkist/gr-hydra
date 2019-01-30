@@ -48,6 +48,7 @@ public:
  int set_tx_chain(unsigned int u_tx_udp,
                   double d_tx_centre_freq,
                   double d_tx_bw,
+                  const std::string &remote_addr = "0.0.0.0",
                   bool b_pad = false);
 
   /** Return VRadio unique ID
@@ -105,7 +106,7 @@ private:
   double g_tx_bw;      // Bandwidth 
   sfft_complex g_fft_complex;
   RxBufferPtr tx_buffer;
-  udp_source_ptr tx_socket;
+  tcp_source_ptr tx_socket;
 
   int g_idx;        // Radio unique ID
   std::mutex g_mutex;

@@ -89,6 +89,7 @@ int
 VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
                            double d_tx_cf,
                            double d_tx_bw,
+                           const std::string &remote_addr,
                            bool b_pad)
 {
    // If already transmitting
@@ -104,7 +105,8 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
    g_tx_fft_size = p_hypervisor->get_tx_fft() * (d_tx_bw / p_hypervisor->get_tx_bandwidth());
 
    // Create UDP receiver
-   tx_socket = udp_source::make("0.0.0.0", std::to_string(u_tx_udp));
+   //tx_socket = udp_source::make("0.0.0.0", std::to_string(u_tx_udp));
+   tx_socket = tcp_source::make(remote_addr, std::to_string(u_tx_udp));
 
    // Create new timed buffer
    tx_buffer = std::make_shared<RxBuffer>(tx_socket->buffer(),
