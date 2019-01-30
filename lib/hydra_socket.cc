@@ -172,7 +172,6 @@ udp_source::handle_receive(
   const boost::system::error_code& error,
   unsigned int u_bytes_trans)
 {
-  std::cout << "u_bytes_trans:" << u_bytes_trans << std::endl;
 
   if (!error)
   {
@@ -272,7 +271,7 @@ udp_sink::transmit()
     // If there is anything to transmit
     if (g_input_buffer->size() > 0)
     {
-      size_t n_elemns;
+      size_t n_elemns = 0;
 
       /* Local scope lock */
       {

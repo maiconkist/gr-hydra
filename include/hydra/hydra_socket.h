@@ -251,7 +251,7 @@ public:
 
  private:
   // Default UDP buffer size
-  const size_t BUFFER_SIZE = 100000;
+  const size_t BUFFER_SIZE = 1300 / sizeof(gr_complex);
   // Default IQ samples size
   const size_t IQ_SIZE = sizeof(iq_sample);
 
