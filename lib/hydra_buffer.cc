@@ -159,7 +159,7 @@ TxBuffer::TxBuffer(window_stream* input_buffer,
 void
 TxBuffer::run()
 {
-  return;
+#if 0
 
   // Thread stop condition
   thr_stop = false;
@@ -198,6 +198,7 @@ TxBuffer::run()
 #endif
     } // End padding
   }
+#endif
 }
 
 void
@@ -207,7 +208,6 @@ TxBuffer::produce(const gr_complex *buf, size_t len)
   std::lock_guard<std::mutex> _l(*p_in_mtx);
   p_input_buffer->push_back(window(buf, buf + len));
 #endif
-
   std::lock_guard<std::mutex> _l(out_mtx);
   output_buffer.insert(output_buffer.end(), buf, buf + len);
 }

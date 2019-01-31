@@ -108,9 +108,7 @@ tcp_sink::transmit()
       }
 
       // Send from output_buffer
-      boost::asio::write(*p_socket,
-                         boost::asio::buffer(output_buffer)
-                         );
+      boost::asio::write(*p_socket, boost::asio::buffer(output_buffer));
     }
     else
     {
@@ -288,13 +286,12 @@ udp_sink::transmit()
 
       // Get the current size of the queue in bytes
       size_t bytes_sent = 0;
-      //size_t total_size_bytes = output_buffer.size() * IQ_SIZE;
       size_t total_size_bytes =  n_elemns * IQ_SIZE;
 
       // Send from output_buffer
       while (bytes_sent < total_size_bytes)
       {
-        size_t bytes_to_send = std::min((size_t)BUFFER_SIZE * IQ_SIZE, (total_size_bytes - bytes_sent));
+        size_t bytes_to_send = std::min(BUFFER_SIZE * IQ_SIZE, (total_size_bytes - bytes_sent));
         try
         {
           size_t r = p_socket->send_to(
@@ -306,6 +303,7 @@ udp_sink::transmit()
         {
           std::cerr << "error sending udp packet: " << e.what() << std::endl;
         }
+
       }
     }
     else

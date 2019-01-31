@@ -161,7 +161,7 @@ device_uhd::receive(window &buf, size_t len)
       break;
   }
 #else
-  return rx_stream->recv(&buf.front(), buf.size(), md, 0.001);
+  return rx_stream->recv(&buf.front(), buf.size(), md, 0.001024);
 #endif
 }
 

@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 1Tx 1Rx Pdu Gen
-# Generated: Wed Jan 23 19:00:43 2019
+# Generated: Thu Jan 31 12:36:44 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -104,7 +104,7 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
         self.blocks_random_pdu_0 = blocks.random_pdu(50, 100, chr(0xFF), 2)
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul1, ))
-        self.blocks_message_strobe_0 = blocks.message_strobe(pmt.intern("TEST"), 100)
+        self.blocks_message_strobe_0 = blocks.message_strobe(pmt.intern("TEST"), 10)
 
         ##################################################
         # Connections
