@@ -1,13 +1,13 @@
 #ifndef HYDRA_SERVER_INCLUDE_H
 #define HYDRA_SERVER_INCLUDE_H
 
+#include "hydra/hydra_core.h"
+
 #include <string>
 #include <iostream>
 #include <unistd.h>
-#include <zmq.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "hydra/hydra_core.h"
 
 namespace hydra {
 

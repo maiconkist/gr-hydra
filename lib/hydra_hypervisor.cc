@@ -25,7 +25,6 @@
 #include <functional>
 #include <iostream>
 #include <mutex>
-#include <numeric>
 
 namespace hydra {
 
@@ -157,14 +156,9 @@ Hypervisor::tx_run()
 
   while (true)
   {
-     if (get_tx_window(optr , get_tx_fft()))
-     {
-        g_tx_dev->send(optr, get_tx_fft());
-     }
-     else
-     {
-       std::this_thread::sleep_for(std::chrono::microseconds(g_tx_sleep_time));
-     }
+    get_tx_window(optr , get_tx_fft());
+    g_tx_dev->send(optr, get_tx_fft());
+    std::fill(optr.begin(), optr.end(), std::complex<float>(0,0));
   }
 }
 
@@ -239,12 +233,6 @@ Hypervisor::get_tx_window(window &optr, size_t len)
       if ((*it)->get_tx_enabled())
         (*it)->map_tx_samples(g_ifft_complex->get_inbuf());
     }
-  }
-
-  for (size_t i = 0; i < g_tx_subcarriers_map.size(); ++i)
-  {
-    if (g_tx_subcarriers_map[i] == -1)
-      g_ifft_complex->get_inbuf()[i] = gr_complex(0, 0);
   }
 
   g_ifft_complex->execute();

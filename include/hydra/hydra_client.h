@@ -1,8 +1,6 @@
 #ifndef HYDRA_CLIENT_INCLUDE_H
 #define HYDRA_CLIENT_INCLUDE_H
 
-
-#include <zmq.hpp>
 #include <string>
 #include <iostream>
 #include <sstream>

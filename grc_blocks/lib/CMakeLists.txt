@@ -61,6 +61,7 @@ target_link_libraries(gnuradio-hydra
   ${FFTW_LIBRARIES}
   fftw3f
   fftw3l
+  gnuradio-zeromq
 )
 set_target_properties(gnuradio-hydra PROPERTIES DEFINE_SYMBOL "gnuradio_hydra_EXPORTS")
 

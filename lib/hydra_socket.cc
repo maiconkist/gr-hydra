@@ -3,10 +3,10 @@
 #include <numeric>
 #include <complex>
 #include <boost/format.hpp>
+#include <zmq.hpp>
 
 namespace hydra
 {
-
 
 tcp_source::tcp_source(
   const std::string& host,
@@ -27,14 +27,47 @@ tcp_source::tcp_source(
 void
 tcp_source::connect()
 {
+#if 0
   std::this_thread::sleep_for(std::chrono::seconds(5));
   boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(s_host), std::stoi(s_port));
   p_socket = std::make_unique<boost::asio::ip::tcp::socket>(io_service);
   p_socket->connect(endpoint);
-  std::cout << boost::format("Source %s:%s connected successfully.") % s_host % s_port << std::endl;
 
   receive();
   io_service.run();
+#endif
+
+#if 1
+  std::string addr = "tcp://" + s_host + ":" + s_port;
+  zmq::context_t context;
+  zmq::message_t message;
+
+
+  std::cout << "addr: " << addr << std::endl;
+
+  zmq::socket_t socket(context, ZMQ_PULL);
+  socket.connect(addr.c_str());
+
+  while (1)
+  {
+    socket.recv(&message);
+
+    if (message.size() > 0)
+    {
+      std::lock_guard<std::mutex> _l(out_mtx);
+      iq_sample *tmp = static_cast<iq_sample *>(message.data());
+
+      if (message.size() % sizeof(iq_sample) != 0)
+        std::cout << "Error: message not complete" << std::endl;
+
+      output_buffer.insert(output_buffer.end(),
+                           tmp,
+                           tmp + (message.size()/sizeof(iq_sample)));
+    }
+
+    message.rebuild();
+  }
+#endif
 }
 
 void
@@ -56,6 +89,7 @@ tcp_source::handle_receive(
   if (!error)
   {
     {
+      std::cout << "received: " << u_bytes_trans << std::endl;
       std::lock_guard<std::mutex> _l(out_mtx);
       output_buffer.insert(output_buffer.end(),
                            input_buffer.begin(),

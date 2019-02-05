@@ -96,12 +96,6 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
 void
 device_uhd::send(const window &buf, size_t len)
 {
-  static window big_buf;
-
-  big_buf.insert(big_buf.end(), buf.begin(), buf.end());
-
- if (1)
- {
 #ifdef USE_USRP_STREAM_API
     uhd::tx_metadata_t md;
     md.start_of_burst = false;
@@ -119,10 +113,8 @@ device_uhd::send(const window &buf, size_t len)
     md.start_of_burst = false;
     md.end_of_burst = false;
     md.has_time_spec = false;
-    tx_stream->send(&big_buf.front(), big_buf.size(), md);
+    tx_stream->send(&buf.front(), buf.size(), md);
 #endif
-    big_buf.clear();
-  }
 }
 
 size_t

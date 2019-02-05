@@ -2,8 +2,10 @@
 #include "config.h"
 #endif
 
-#include <gnuradio/io_signature.h>
 #include "hydra_gr_client_sink_impl.h"
+
+#include <gnuradio/io_signature.h>
+#include <gnuradio/zeromq/push_sink.h>
 
 namespace gr {
   namespace hydra {
@@ -51,12 +53,24 @@ hydra_gr_client_sink_impl::start_client(double d_center_frequency,
   if (!err)
   {
     std::cout << boost::format("host: %s - port: %d") % g_host % rx_conf.server_port << std::endl;
+#if 0
     d_tcp_sink = gr::blocks::tcp_server_sink::make(sizeof(gr_complex),
-                                            g_host,
-                                            rx_conf.server_port,
-                                            true);
+                                                   g_host,
+                                                   rx_conf.server_port,
+                                                   true);
 
     connect(self(), 0, d_tcp_sink, 0);
+#endif
+
+#if 1
+    std::string addr = "tcp://" + g_host + ":" + std::to_string(rx_conf.server_port);
+    std::cout << "addr: " << addr << std::endl;
+    gr::zeromq::push_sink::sptr d_sink = gr::zeromq::push_sink::make(sizeof(gr_complex),
+                                                                     1,
+                                                                     const_cast<char *>(addr.c_str()));
+
+    connect(self(), 0, d_sink, 0);
+#endif
     std::cout << "Client Sink initialized successfully." << std::endl;
   }
   else

@@ -37,7 +37,6 @@ RxBuffer::consume()
     * storing the data want to be consumed by the hypervisor
     */
    std::lock_guard<std::mutex> _l(out_mtx);
-
    if (output_buffer.size())
    {
       never_delete = output_buffer.front();
@@ -87,37 +86,39 @@ RxBuffer::run()
         // Get the current size of the queue
         ll_cur_size = p_input_buffer->size();
         // Check whether the buffer has enough IQ samples
-        if (ll_cur_size >= u_fft_size)
+        while (ll_cur_size > 0)
         {
-           // Insert IQ samples from the input buffer into the window
-           window.assign(p_input_buffer->begin(),
-                         p_input_buffer->begin() + u_fft_size); // 0..C
+          if (ll_cur_size >= u_fft_size){
+            // Insert IQ samples from the input buffer into the window
+            window.assign(p_input_buffer->begin(),
+                          p_input_buffer->begin() + u_fft_size); // 0..C
 
-           // Erase the beginning of the queue
-           p_input_buffer->erase(p_input_buffer->begin(),
-                                 p_input_buffer->begin() + u_fft_size);
+            // Erase the beginning of the queue
+            p_input_buffer->erase(p_input_buffer->begin(),
+                                  p_input_buffer->begin() + u_fft_size);
 
-           std::lock_guard<std::mutex> _l(out_mtx);
-           output_buffer.push_back(window);
-        }
-        // Otherwise, the buffer is not ready yet
-        else if (b_pad)
-        {
-           // Copy the current amount of samples from the buffer to the window
-           window.assign(p_input_buffer->begin(),
-                         p_input_buffer->begin() + ll_cur_size); // 0..C-1
-           // Erase the beginning of the queue
-           p_input_buffer->erase(p_input_buffer->begin(),
-                                 p_input_buffer->begin() + ll_cur_size);
+          }
+          else
+          {
+            // Copy the current amount of samples from the buffer to the window
+            window.assign(p_input_buffer->begin(),
+                          p_input_buffer->begin() + ll_cur_size); // 0..C-1
+            // Erase the beginning of the queue
+            p_input_buffer->erase(p_input_buffer->begin(),
+                                  p_input_buffer->begin() + ll_cur_size);
 
-           // Fill the remainder of the window with complex zeroes
-           window.insert(window.begin() + ll_cur_size,
-                         u_fft_size - ll_cur_size,
-                         empty_iq); // C..F-1
+            // Fill the remainder of the window with complex zeroes
+            window.insert(window.begin() + ll_cur_size,
+                          u_fft_size - ll_cur_size,
+                          empty_iq); // C..F-1
+          }
 
-           // Add the window to the output buffer
-           std::lock_guard<std::mutex> _l(out_mtx);
-           output_buffer.push_back(window);
+          {
+            std::lock_guard<std::mutex> _l(out_mtx);
+            output_buffer.push_back(window);
+          }
+
+           ll_cur_size = p_input_buffer->size();
         }
 #if 0
         // Without padding, just transmit an empty window and wait for the next one
