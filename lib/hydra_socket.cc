@@ -8,40 +8,23 @@
 namespace hydra
 {
 
-tcp_source::tcp_source(
+zmq_source::zmq_source(
   const std::string& host,
   const std::string& port):
   s_host(host),
   s_port(port)
 {
-    // Reinterpret the cast to the input buffer to pass it to the output buffer
-    p_reinterpreted_cast = reinterpret_cast<iq_sample*>(&input_buffer);
-    // Set the remainder counter to zero
-    u_remainder = 0;
-
     // Create a thread to receive the data
-    rx_udp_thread = std::make_unique<std::thread>(&tcp_source::connect, this);
+    rx_thread = std::make_unique<std::thread>(&zmq_source::connect, this);
 }
 
 
 void
-tcp_source::connect()
+zmq_source::connect()
 {
-#if 0
-  std::this_thread::sleep_for(std::chrono::seconds(5));
-  boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(s_host), std::stoi(s_port));
-  p_socket = std::make_unique<boost::asio::ip::tcp::socket>(io_service);
-  p_socket->connect(endpoint);
-
-  receive();
-  io_service.run();
-#endif
-
-#if 1
   std::string addr = "tcp://" + s_host + ":" + s_port;
   zmq::context_t context;
   zmq::message_t message;
-
 
   std::cout << "addr: " << addr << std::endl;
 
@@ -67,38 +50,61 @@ tcp_source::connect()
 
     message.rebuild();
   }
-#endif
 }
 
-void
-tcp_source::receive()
+
+zmq_sink::zmq_sink(
+  iq_stream *input_buffer,
+  std::mutex* in_mtx,
+  const std::string& host,
+  const std::string& port): g_input_buffer(input_buffer),
+                            p_in_mtx(in_mtx),
+                            s_host(host),
+                            s_port(port),
+                            g_th_run(true)
 {
-  p_socket->async_receive(
-                          boost::asio::buffer(input_buffer, BUFFER_SIZE),
-                          boost::bind(&tcp_source::handle_receive, this,
-                                      boost::asio::placeholders::error,
-                                      boost::asio::placeholders::bytes_transferred)
-                          );
+  tx_thread = std::make_unique<std::thread>(&zmq_sink::transmit, this);
 }
 
+// Assign the handle receive callback when a datagram is received
 void
-tcp_source::handle_receive(
-  const boost::system::error_code& error,
-  unsigned int u_bytes_trans)
+zmq_sink::transmit()
 {
-  if (!error)
+  std::string addr = "tcp://" + s_host + ":" + s_port;
+  zmq::context_t context;
+
+  std::cout << "addr: " << addr << std::endl;
+
+  zmq::socket_t socket(context, ZMQ_PUSH);
+  socket.bind(addr.c_str());
+
+  zmq::message_t message;
+  while (g_th_run)
   {
+    // If there is anything to transmit
+    if (g_input_buffer->size() > 0)
     {
-      std::cout << "received: " << u_bytes_trans << std::endl;
-      std::lock_guard<std::mutex> _l(out_mtx);
-      output_buffer.insert(output_buffer.end(),
-                           input_buffer.begin(),
-                           input_buffer.end());
-    }
-    receive();
-  }
-}
+      /* Local scope lock */
+      {
+        // Copy everything to output_buffer. Clear input
+        std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
 
+        message.rebuild(g_input_buffer->size() * sizeof(gr_complex));
+        iq_sample *tmp = static_cast<iq_sample *>(message.data());
+        for (size_t i = 0; i < g_input_buffer->size(); ++i)
+          tmp[i] = (*g_input_buffer)[i];
+
+        g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->begin() + g_input_buffer->size());
+      }
+
+      size_t n = socket.send(message);
+    }
+    else
+    {
+      std::this_thread::sleep_for(std::chrono::microseconds(1));
+    }
+  } // while
+}
 
 tcp_sink::tcp_sink(
   iq_stream *input_buffer,

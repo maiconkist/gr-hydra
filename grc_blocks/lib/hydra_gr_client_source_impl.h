@@ -2,10 +2,11 @@
 #define INCLUDED_HYDRA_GR_CLIENT_SOURCE_IMPL_H
 
 #include "hydra/hydra_gr_client_source.h"
+#include "hydra/hydra_client.h"
 
-#include <hydra/hydra_client.h>
-#include <gnuradio/blocks/udp_source.h>
 
+#include <thread>
+#include <zmq.hpp>
 
 using namespace hydra;
 
@@ -26,7 +27,8 @@ class hydra_gr_client_source_impl : public hydra_gr_client_source
    */
   ~hydra_gr_client_source_impl();
 
-
+  /**
+   */
   virtual void start_client(double d_center_frequency,
                             double d_samp_rate,
                             size_t u_payload);
@@ -36,8 +38,10 @@ class hydra_gr_client_source_impl : public hydra_gr_client_source
   virtual bool stop();
 
  private:
-  gr::blocks::udp_source::sptr d_udp_source;
   std::unique_ptr<hydra_client> client;
+  std::unique_ptr<std::thread> rx_thread;
+
+  void test();
 };
 
   } /* namespace hydra */

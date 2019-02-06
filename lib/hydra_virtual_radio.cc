@@ -66,11 +66,10 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                                          g_rx_fft_size);
 
   /* Create UDP transmitter */
-  rx_socket = udp_sink::make(rx_buffer->stream(),
+  rx_socket = zmq_sink::make(rx_buffer->stream(),
                              rx_buffer->mutex(),
                              remote_addr,
                              std::to_string(u_rx_udp));
-
 
   /* Always in the end. */
   p_hypervisor->notify(*this, Hypervisor::SET_RX_MAP);
@@ -106,7 +105,7 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
 
    // Create UDP receiver
    //tx_socket = udp_source::make("0.0.0.0", std::to_string(u_tx_udp));
-   tx_socket = tcp_source::make(remote_addr, std::to_string(u_tx_udp));
+   tx_socket = zmq_source::make(remote_addr, std::to_string(u_tx_udp));
 
    // Create new timed buffer
    tx_buffer = std::make_shared<RxBuffer>(tx_socket->buffer(),

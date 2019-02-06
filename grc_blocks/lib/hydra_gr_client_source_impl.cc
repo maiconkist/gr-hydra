@@ -2,8 +2,10 @@
 #include "config.h"
 #endif
 
-#include <gnuradio/io_signature.h>
 #include "hydra_gr_client_source_impl.h"
+
+#include <gnuradio/io_signature.h>
+#include <gnuradio/zeromq/pull_source.h>
 
 namespace gr {
   namespace hydra {
@@ -46,20 +48,28 @@ void hydra_gr_client_source_impl::start_client(double d_center_frequency,
                                                double d_samp_rate,
                                                size_t u_payload)
 {
-
   rx_configuration rx_config{d_center_frequency, d_samp_rate, false};
   int err = client->request_rx_resources(rx_config);
 
   if (!err)
   {
+#if 0
     std::cout << boost::format("Creating GNURadio UDP source block: (%1%: %2%)") % "0.0.0.0" % rx_config.server_port << std::endl;
-    d_udp_source = gr::blocks::udp_source::make(sizeof(gr_complex),
+    d_source = gr::blocks::udp_source::make(sizeof(gr_complex),
                                                 "0.0.0.0",
                                                 rx_config.server_port,
                                                 u_payload,
                                                 false);
+#endif
 
-    connect(d_udp_source, 0, self(), 0);
+#if 1
+    std::string addr = "tcp://" + rx_config.server_ip + ":" + std::to_string(rx_config.server_port);
+    std::cout << "addr: " << addr << std::endl;
+    gr::zeromq::pull_source::sptr d_source = gr::zeromq::pull_source::make(sizeof(gr_complex),
+                                             1,
+                                             const_cast<char *>(addr.c_str()));
+#endif
+    connect(d_source, 0, self(), 0);
   }
   else
   {
@@ -68,5 +78,24 @@ void hydra_gr_client_source_impl::start_client(double d_center_frequency,
   }
 }
 
-} /* namespace hydra */
+void hydra_gr_client_source_impl::test()
+{
+  std::string addr = "tcp://192.168.5.77:33000";
+  zmq::context_t context;
+  zmq::message_t message;
+
+  std::cout << "addr: " << addr << std::endl;
+
+  zmq::socket_t socket(context, ZMQ_PULL);
+  socket.connect(addr.c_str());
+
+  while (1)
+  {
+    socket.recv(&message);
+    std::cout << "received: " << message.size() << std::endl;
+    message.rebuild();
+  }
+}
+
+  } /* namespace hydra */
 } /* namespace gr */

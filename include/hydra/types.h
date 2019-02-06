@@ -26,6 +26,9 @@
 #include <memory>
 #include <complex>
 
+
+#define PRINT_DEBUG(txt) std::cout << #txt ": " << txt << std::endl;
+
 namespace hydra {
   class abstract_device;
   class Hypervisor;

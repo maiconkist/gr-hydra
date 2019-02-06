@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 1Tx 1Rx Pdu Gen
-# Generated: Thu Jan 31 12:36:44 2019
+# Generated: Tue Feb  5 17:23:46 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -92,6 +92,9 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
         self.top_layout.addWidget(self._mul1_win)
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, hydraClient, 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, hydraClient, hydraClient, 5000)
+        self.hydra_gr__source_0_0.start_client(freqtx + vr1offset, samp_rate * 2, 5000)
+
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
         	  packet_length_tag_key="len" ,
@@ -101,6 +104,16 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
+        self.digital_ofdm_rx_0 = digital.ofdm_rx(
+        	  fft_len=64, cp_len=16,
+        	  frame_length_tag_key='frame_'+"len",
+        	  packet_length_tag_key="len",
+        	  bps_header=1,
+        	  bps_payload=1,
+        	  debug_log=False,
+        	  scramble_bits=False
+        	 )
+        self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_random_pdu_0 = blocks.random_pdu(50, 100, chr(0xFF), 2)
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul1, ))
@@ -113,7 +126,9 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
         self.msg_connect((self.blocks_random_pdu_0, 'pdus'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))
         self.connect((self.blocks_pdu_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
+        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
+        self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_1rx_pdu_gen")

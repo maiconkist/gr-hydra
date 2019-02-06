@@ -79,9 +79,9 @@ hydra_client::discover_server(std::string client_ip,
    send_udp(client_ip, client_ip, true, 5001);
 
    char msg[MAX_MSG];
-   if (recv_udp(msg, MAX_MSG, false, 5002, {2, 0}))
+   if (recv_udp(msg, MAX_MSG, false, 5002, {4, 0}))
    {
-      std::cout << "some error occurred" << std::endl;
+      std::cout << "Error occurred. Timeout Exceeded" << std::endl;
       return -1;
    }
    else
