@@ -24,13 +24,16 @@ class zmq_source
  public:
   /* CTOR
    */
-  zmq_source(const std::string& host, const std::string& port);
+  zmq_source(const std::string &server_addr,
+             const std::string &remote_addr,
+             const std::string& port);
 
-  static std::unique_ptr<zmq_source> make(const std::string& host, const std::string& port)
+  static std::unique_ptr<zmq_source> make(const std::string &server_addr,
+                                          const std::string &remote_addr,
+                                          const std::string& port)
   {
-    return std::make_unique<zmq_source>(host, port);
+    return std::make_unique<zmq_source>(server_addr, remote_addr, port);
   }
-
 
   // Returns pointer to the output buffer
   iq_stream* buffer(){ return &output_buffer; };
@@ -62,15 +65,17 @@ public:
    */
   zmq_sink(iq_stream *p_input_buffer,
            std::mutex *in_mtx,
-           const std::string& host,
+           const std::string& server_addr,
+           const std::string& remote_addr,
            const std::string& port);
 
   static std::unique_ptr<zmq_sink> make(iq_stream *p_input_buffer,
                                         std::mutex *in_mtx,
-                                        const std::string& host,
+                                        const std::string& server_addr,
+                                        const std::string& remote_addr,
                                         const std::string& port)
   {
-    return std::make_unique<zmq_sink>(p_input_buffer, in_mtx, host, port);
+    return std::make_unique<zmq_sink>(p_input_buffer, in_mtx, server_addr, remote_addr, port);
   }
 
   void transmit();

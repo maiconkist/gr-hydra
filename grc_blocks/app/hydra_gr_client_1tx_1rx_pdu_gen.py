@@ -3,66 +3,26 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 1Tx 1Rx Pdu Gen
-# Generated: Tue Feb  5 17:23:46 2019
+# Generated: Thu Feb  7 10:50:01 2019
 ##################################################
 
-from distutils.version import StrictVersion
 
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print "Warning: failed to XInitThreads()"
-
-from PyQt5 import Qt, QtCore
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
 from gnuradio import gr
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
-from gnuradio.qtgui import Range, RangeWidget
 from optparse import OptionParser
 import hydra
 import pmt
-import sys
 import threading
-from gnuradio import qtgui
 
 
-class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
+class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block):
 
     def __init__(self, freqrx=1.1e9, freqtx=1.1e9, hydraClient='192.168.5.77', samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Hydra Gr Client 1Tx 1Rx Pdu Gen")
-        Qt.QWidget.__init__(self)
-        self.setWindowTitle("Hydra Gr Client 1Tx 1Rx Pdu Gen")
-        qtgui.util.check_set_qss()
-        try:
-            self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except:
-            pass
-        self.top_scroll_layout = Qt.QVBoxLayout()
-        self.setLayout(self.top_scroll_layout)
-        self.top_scroll = Qt.QScrollArea()
-        self.top_scroll.setFrameStyle(Qt.QFrame.NoFrame)
-        self.top_scroll_layout.addWidget(self.top_scroll)
-        self.top_scroll.setWidgetResizable(True)
-        self.top_widget = Qt.QWidget()
-        self.top_scroll.setWidget(self.top_widget)
-        self.top_layout = Qt.QVBoxLayout(self.top_widget)
-        self.top_grid_layout = Qt.QGridLayout()
-        self.top_layout.addLayout(self.top_grid_layout)
-
-        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_1rx_pdu_gen")
-
-        if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-            self.restoreGeometry(self.settings.value("geometry").toByteArray())
-        else:
-            self.restoreGeometry(self.settings.value("geometry", type=QtCore.QByteArray))
 
         ##################################################
         # Parameters
@@ -82,14 +42,10 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
         self.pilot_symbols = pilot_symbols = ((1, 1, 1, -1,),)
         self.pilot_carriers = pilot_carriers = ((-21, -7, 7, 21,),)
         self.occupied_carriers = occupied_carriers = (range(-26, -21) + range(-20, -7) + range(-6, 0) + range(1, 7) + range(8, 21) + range(22, 27),)
-        self.mul1 = mul1 = 0.06
 
         ##################################################
         # Blocks
         ##################################################
-        self._mul1_range = Range(0, 1, 0.01, 0.06, 200)
-        self._mul1_win = RangeWidget(self._mul1_range, self.set_mul1, 'mul1', "counter_slider", float)
-        self.top_layout.addWidget(self._mul1_win)
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, hydraClient, 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1000)
         self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, hydraClient, hydraClient, 5000)
@@ -116,8 +72,8 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_random_pdu_0 = blocks.random_pdu(50, 100, chr(0xFF), 2)
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul1, ))
-        self.blocks_message_strobe_0 = blocks.message_strobe(pmt.intern("TEST"), 10)
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.06, ))
+        self.blocks_message_strobe_0 = blocks.message_strobe(pmt.intern("TEST"), 1000)
 
         ##################################################
         # Connections
@@ -129,11 +85,6 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
         self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
-
-    def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "hydra_gr_client_1tx_1rx_pdu_gen")
-        self.settings.setValue("geometry", self.saveGeometry())
-        event.accept()
 
     def get_freqrx(self):
         return self.freqrx
@@ -201,13 +152,6 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
     def set_occupied_carriers(self, occupied_carriers):
         self.occupied_carriers = occupied_carriers
 
-    def get_mul1(self):
-        return self.mul1
-
-    def set_mul1(self, mul1):
-        self.mul1 = mul1
-        self.blocks_multiply_const_vxx_0.set_k((self.mul1, ))
-
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
@@ -221,20 +165,9 @@ def main(top_block_cls=hydra_gr_client_1tx_1rx_pdu_gen, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-        style = gr.prefs().get_string('qtgui', 'style', 'raster')
-        Qt.QApplication.setGraphicsSystem(style)
-    qapp = Qt.QApplication(sys.argv)
-
     tb = top_block_cls(hydraClient=options.hydraClient)
     tb.start()
-    tb.show()
-
-    def quitting():
-        tb.stop()
-        tb.wait()
-    qapp.aboutToQuit.connect(quitting)
-    qapp.exec_()
+    tb.wait()
 
 
 if __name__ == '__main__':

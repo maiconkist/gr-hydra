@@ -44,11 +44,18 @@ HydraServer::run()
   // Change the server status
   server_info.s_status = "Enabled";
 
-
   std::thread autod = std::thread(&HydraServer::auto_discovery, this);
 
   // Message type object
   zmq::message_t request;
+
+
+  std::string server_addr_no_port;
+  {
+    std::vector<std::string> tokens;
+    boost::algorithm::split(tokens, s_server_addr, boost::is_any_of(":"));
+    server_addr_no_port = tokens[0];
+  }
 
   // Even loop
   while (true)
@@ -137,19 +144,19 @@ HydraServer::run()
       {
         // If the reservation succeeds, it will hold the UDP port
         unsigned int u_reserved = 0;
-        std::string client_ip = root.get(key + ".ip", "0.0.0.0");
+        std::string remote_addr = root.get(key + ".ip", "0.0.0.0");
 
         // If it is a receive request
         if (boost::iequals(key, "xvl_rrx"))
         {
           // Try to reserve RX resources
-          u_reserved = p_core->request_rx_resources(u_id, d_cf, d_bw, client_ip);
+          u_reserved = p_core->request_rx_resources(u_id, d_cf, d_bw, server_addr_no_port, remote_addr);
         }
         else // key == "xvl_rtx"
         {
           bool bpad = root.get(key + ".padding", false);
           // Try to reserve TX resources
-          u_reserved = p_core->request_tx_resources(u_id, d_cf, d_bw, client_ip, bpad);
+          u_reserved = p_core->request_tx_resources(u_id, d_cf, d_bw, server_addr_no_port, remote_addr, bpad);
         }
 
         // If not able to reserve resources

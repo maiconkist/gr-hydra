@@ -10,7 +10,7 @@
     </param>
     <param>
       <key>window_size</key>
-      <value></value>
+      <value>1400,1400</value>
     </param>
     <param>
       <key>category</key>
@@ -30,7 +30,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(0, 20)</value>
+      <value>(0, 4)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -93,7 +93,7 @@
     </param>
     <param>
       <key>const</key>
-      <value>0.1</value>
+      <value>0.06</value>
     </param>
     <param>
       <key>affinity</key>
@@ -105,7 +105,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(902, 203)</value>
+      <value>(984, 240)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -152,7 +152,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(239, 195)</value>
+      <value>(240, 228)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -207,7 +207,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(719, 203)</value>
+      <value>(768, 240)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -262,7 +262,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 182)</value>
+      <value>(0, 220)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -329,7 +329,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(495, 155)</value>
+      <value>(496, 180)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -408,7 +408,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(480, 20)</value>
+      <value>(480, 4)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -432,7 +432,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1.2e9</value>
+      <value>1.1e9</value>
     </param>
   </block>
   <block>
@@ -451,7 +451,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(376, 20)</value>
+      <value>(376, 4)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -479,6 +479,49 @@
     </param>
   </block>
   <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(640, 4)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>hydraClient</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>192.168.5.77</value>
+    </param>
+  </block>
+  <block>
     <key>hydra_gr_sink</key>
     <param>
       <key>alias</key>
@@ -487,6 +530,10 @@
     <param>
       <key>center_frequency</key>
       <value>freqtx + vr2offset</value>
+    </param>
+    <param>
+      <key>host</key>
+      <value>hydraClient</value>
     </param>
     <param>
       <key>comment</key>
@@ -502,15 +549,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1104, 164)</value>
+      <value>(1168, 188)</value>
     </param>
     <param>
       <key>_rotation</key>
       <value>0</value>
-    </param>
-    <param>
-      <key>host</key>
-      <value>10.194.38.201</value>
     </param>
     <param>
       <key>id</key>
@@ -549,7 +592,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(248, 20)</value>
+      <value>(216, 4)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -616,7 +659,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>-100e3</value>
+      <value>-300e3</value>
     </param>
   </block>
   <block>
@@ -635,7 +678,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(480, 84)</value>
+      <value>(488, 84)</value>
     </param>
     <param>
       <key>_rotation</key>

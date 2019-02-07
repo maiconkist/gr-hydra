@@ -49,6 +49,7 @@ int
 HydraCore::request_rx_resources(unsigned int u_id,
                                 double d_centre_freq,
                                 double d_bandwidth,
+                                const std::string &server_addr,
                                 const std::string &remote_addr)
 {
   std::lock_guard<std::mutex> _p(g_mutex);
@@ -95,7 +96,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
       p_hypervisor->attach_virtual_radio(vr);
   }
 
-  vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth, remote_addr);
+  vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth, server_addr, remote_addr);
 
    // If able to create all of it, return the port number
   std::cout << "RX Resources allocated successfully." << std::endl;
@@ -106,6 +107,7 @@ int
 HydraCore::request_tx_resources(unsigned int u_id,
                                 double d_centre_freq,
                                 double d_bandwidth,
+                                const std::string &server_addr,
                                 const std::string &remote_addr,
                                 bool bpad)
 {
@@ -126,7 +128,6 @@ HydraCore::request_tx_resources(unsigned int u_id,
     // requesting tx resources for a VR already existing 
     if (p_resource_manager->check_tx_free(d_centre_freq, d_bandwidth, u_id))
     {
-
       p_resource_manager->free_tx_resources(u_id);
       p_resource_manager->reserve_tx_resources(u_id, d_centre_freq, d_bandwidth);
 
@@ -148,12 +149,12 @@ HydraCore::request_tx_resources(unsigned int u_id,
   if (vr == nullptr)
   {
      vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
-     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, remote_addr, bpad);
+     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, server_addr, remote_addr, bpad);
      p_hypervisor->attach_virtual_radio(vr);
   }
   else
   {
-    vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, remote_addr, bpad);
+    vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, server_addr, remote_addr, bpad);
   }
 
   // If able to create all of it, return the port number

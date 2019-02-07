@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 2Tx
-# Generated: Thu Nov 29 19:30:36 2018
+# Generated: Thu Feb  7 11:38:25 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -25,7 +25,6 @@ from gnuradio import eng_notation
 from gnuradio import gr
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
-from gnuradio.qtgui import Range, RangeWidget
 from optparse import OptionParser
 import hydra
 import sys
@@ -35,7 +34,7 @@ from gnuradio import qtgui
 
 class hydra_gr_client_2tx(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freqtx=1.1e9, samp_rate=200e3, vr1offset=-100e3, vr2offset=700e3):
+    def __init__(self, freqtx=1.1e9, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3, hydraClient='192.168.5.77'):
         gr.top_block.__init__(self, "Hydra Gr Client 2Tx")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Hydra Gr Client 2Tx")
@@ -70,30 +69,15 @@ class hydra_gr_client_2tx(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
-
-        ##################################################
-        # Variables
-        ##################################################
-        self.mul2 = mul2 = 0.1
-        self.mul1 = mul1 = 0.1
-        self.freq1 = freq1 = freqtx +vr1offset
+        self.hydraClient = hydraClient
 
         ##################################################
         # Blocks
         ##################################################
-        self._mul2_range = Range(0, 1, 0.01, 0.1, 200)
-        self._mul2_win = RangeWidget(self._mul2_range, self.set_mul2, 'mul2', "counter_slider", float)
-        self.top_layout.addWidget(self._mul2_win)
-        self._mul1_range = Range(0, 1, 0.01, 0.1, 200)
-        self._mul1_win = RangeWidget(self._mul1_range, self.set_mul1, 'mul1', "counter_slider", float)
-        self.top_layout.addWidget(self._mul1_win)
-        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, '134.226.55.93', 5000)
+        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, hydraClient, 5000)
         self.hydra_gr_sink_0_0.start_client(freqtx + vr2offset, samp_rate, 1024)
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '134.226.55.93', 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, hydraClient, 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
-        self._freq1_range = Range(freqtx - 1e6, freqtx + 1e6, 100e3, freqtx +vr1offset, 200)
-        self._freq1_win = RangeWidget(self._freq1_range, self.set_freq1, 'freq1', "counter_slider", float)
-        self.top_layout.addWidget(self._freq1_win)
         self.digital_ofdm_tx_0_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
         	  packet_length_tag_key="len",
@@ -118,8 +102,8 @@ class hydra_gr_client_2tx(gr.top_block, Qt.QWidget):
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate * 2,True)
         self.blocks_stream_to_tagged_stream_0_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul2, ))
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul1, ))
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((0.06, ))
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.06, ))
 
         ##################################################
         # Connections
@@ -145,7 +129,6 @@ class hydra_gr_client_2tx(gr.top_block, Qt.QWidget):
 
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
-        self.set_freq1(self.freqtx +self.vr1offset)
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -160,7 +143,6 @@ class hydra_gr_client_2tx(gr.top_block, Qt.QWidget):
 
     def set_vr1offset(self, vr1offset):
         self.vr1offset = vr1offset
-        self.set_freq1(self.freqtx +self.vr1offset)
 
     def get_vr2offset(self):
         return self.vr2offset
@@ -168,29 +150,18 @@ class hydra_gr_client_2tx(gr.top_block, Qt.QWidget):
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
 
-    def get_mul2(self):
-        return self.mul2
+    def get_hydraClient(self):
+        return self.hydraClient
 
-    def set_mul2(self, mul2):
-        self.mul2 = mul2
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul2, ))
-
-    def get_mul1(self):
-        return self.mul1
-
-    def set_mul1(self, mul1):
-        self.mul1 = mul1
-        self.blocks_multiply_const_vxx_0.set_k((self.mul1, ))
-
-    def get_freq1(self):
-        return self.freq1
-
-    def set_freq1(self, freq1):
-        self.freq1 = freq1
+    def set_hydraClient(self, hydraClient):
+        self.hydraClient = hydraClient
 
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
+    parser.add_option(
+        "", "--hydraClient", dest="hydraClient", type="string", default='192.168.5.77',
+        help="Set hydraClient [default=%default]")
     return parser
 
 
@@ -203,7 +174,7 @@ def main(top_block_cls=hydra_gr_client_2tx, options=None):
         Qt.QApplication.setGraphicsSystem(style)
     qapp = Qt.QApplication(sys.argv)
 
-    tb = top_block_cls()
+    tb = top_block_cls(hydraClient=options.hydraClient)
     tb.start()
     tb.show()
 

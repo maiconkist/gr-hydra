@@ -43,6 +43,7 @@ int
 VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                            double d_rx_freq,
                            double d_rx_bw,
+                           const std::string &server_addr,
                            const std::string &remote_addr)
 {
   // If already receiving
@@ -68,6 +69,7 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   /* Create UDP transmitter */
   rx_socket = zmq_sink::make(rx_buffer->stream(),
                              rx_buffer->mutex(),
+                             server_addr,
                              remote_addr,
                              std::to_string(u_rx_udp));
 
@@ -88,6 +90,7 @@ int
 VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
                            double d_tx_cf,
                            double d_tx_bw,
+                           const std::string &server_addr,
                            const std::string &remote_addr,
                            bool b_pad)
 {
@@ -105,7 +108,7 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
 
    // Create UDP receiver
    //tx_socket = udp_source::make("0.0.0.0", std::to_string(u_tx_udp));
-   tx_socket = zmq_source::make(remote_addr, std::to_string(u_tx_udp));
+   tx_socket = zmq_source::make(server_addr, remote_addr, std::to_string(u_tx_udp));
 
    // Create new timed buffer
    tx_buffer = std::make_shared<RxBuffer>(tx_socket->buffer(),

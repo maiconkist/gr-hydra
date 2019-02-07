@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Tue Dec  4 10:45:16 2018
+# Generated: Thu Feb  7 13:16:37 2019
 ##################################################
 
 
@@ -15,12 +15,13 @@ from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from optparse import OptionParser
 import hydra
+import pmt
 import threading
 
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-200e3, vr2offset=700e3):
+    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -35,40 +36,17 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, 'hydraServerIP', 5000)
-        self.hydra_gr_sink_0_0.start_client(freqtx + vr2offset, samp_rate, 1024)
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, 'hydraServerIP', 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, 'hydraClientIP', 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
-        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, 'hydraClientIP', 'hydraServerIP', 5000)
-        self.hydra_gr__source_0_0_0.start_client(freqrx + vr2offset, samp_rate, 10000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, 'hydraClientIP', 'hydraClientIP', 5000)
+        self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 10000)
 
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, 'hydraClientIP', 'hydraServerIP', 5000)
-        self.hydra_gr__source_0_0.start_client(freqrx - vr1offset, samp_rate * 2, 10000)
-
-        self.digital_ofdm_tx_0_0 = digital.ofdm_tx(
-        	  fft_len=64, cp_len=16,
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
-        	  rolloff=0,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
         	  packet_length_tag_key="len",
         	  bps_header=1,
         	  bps_payload=1,
         	  rolloff=0,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
-        self.digital_ofdm_rx_0_0 = digital.ofdm_rx(
-        	  fft_len=64, cp_len=16,
-        	  frame_length_tag_key='frame_'+"len",
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
         	  debug_log=False,
         	  scramble_bits=False
         	 )
@@ -81,42 +59,24 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_vector_source_x_0_0 = blocks.vector_source_b([x for x in range(0,128)], True, 1, [])
-        self.blocks_vector_source_x_0 = blocks.vector_source_b([x for x in range(0,256)], True, 1, [])
-        self.blocks_throttle_0_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate * 2,True)
-        self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR2 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
+        self.blocks_tagged_stream_to_pdu_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
-        self.blocks_stream_to_tagged_stream_0_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
-        self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 100, "len")
-        self.blocks_null_sink_1 = blocks.null_sink(gr.sizeof_float*1)
-        self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_float*1)
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((0.03, ))
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.03, ))
-        self.blocks_char_to_float_0_0 = blocks.char_to_float(1, 1)
-        self.blocks_char_to_float_0 = blocks.char_to_float(1, 1)
+        self.blocks_random_pdu_0 = blocks.random_pdu(50, 60, chr(0xFF), 2)
+        self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.06, ))
+        self.blocks_message_strobe_0 = blocks.message_strobe(pmt.intern("TEST"), 1000)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_char_to_float_0, 0), (self.blocks_null_sink_1, 0))
-        self.connect((self.blocks_char_to_float_0_0, 0), (self.blocks_null_sink_0, 0))
+        self.msg_connect((self.blocks_message_strobe_0, 'strobe'), (self.blocks_random_pdu_0, 'generate'))
+        self.msg_connect((self.blocks_random_pdu_0, 'pdus'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.hydra_gr_sink_0_0, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0_0, 0), (self.digital_ofdm_tx_0_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.blocks_multiply_const_vxx_0, 0))
-        self.connect((self.blocks_throttle_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
-        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
-        self.connect((self.blocks_vector_source_x_0_0, 0), (self.blocks_stream_to_tagged_stream_0_0, 0))
-        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_char_to_float_0, 0))
+        self.connect((self.blocks_pdu_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
-        self.connect((self.digital_ofdm_rx_0_0, 0), (self.blocks_char_to_float_0_0, 0))
-        self.connect((self.digital_ofdm_rx_0_0, 0), (self.blocks_tag_debug_0_0, 0))
-        self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_throttle_0, 0))
-        self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_throttle_0_0, 0))
+        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tagged_stream_to_pdu_0, 0))
+        self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
         self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
-        self.connect((self.hydra_gr__source_0_0_0, 0), (self.digital_ofdm_rx_0_0, 0))
 
     def get_freqrx(self):
         return self.freqrx
@@ -135,8 +95,6 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.blocks_throttle_0_0.set_sample_rate(self.samp_rate)
-        self.blocks_throttle_0.set_sample_rate(self.samp_rate * 2)
 
     def get_vr1offset(self):
         return self.vr1offset

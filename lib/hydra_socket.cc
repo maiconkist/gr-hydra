@@ -8,10 +8,10 @@
 namespace hydra
 {
 
-zmq_source::zmq_source(
-  const std::string& host,
-  const std::string& port):
-  s_host(host),
+zmq_source::zmq_source(const std::string& server_addr,
+                       const std::string& remote_addr,
+                       const std::string& port):
+  s_host(remote_addr),
   s_port(port)
 {
     // Create a thread to receive the data
@@ -56,10 +56,11 @@ zmq_source::connect()
 zmq_sink::zmq_sink(
   iq_stream *input_buffer,
   std::mutex* in_mtx,
-  const std::string& host,
+  const std::string& server_addr,
+  const std::string& remote_addr,
   const std::string& port): g_input_buffer(input_buffer),
                             p_in_mtx(in_mtx),
-                            s_host(host),
+                            s_host(server_addr),
                             s_port(port),
                             g_th_run(true)
 {
