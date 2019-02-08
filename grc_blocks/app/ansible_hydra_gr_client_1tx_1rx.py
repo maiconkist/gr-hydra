@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 1Tx 1Rx
-# Generated: Fri Feb  8 12:19:38 2019
+# Generated: Fri Feb  8 17:43:53 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, hydraClient='192.168.5.77', samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, freqrx=1.1e9 + 5e6, freqtx=1.1e9, hydraClient='192.168.5.77', samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 1Tx 1Rx")
 
         ##################################################
@@ -59,9 +59,9 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_tuntap_pdu_1 = blocks.tuntap_pdu('tap0', 10000, False)
+        self.blocks_tuntap_pdu_1 = blocks.tuntap_pdu('tap0', 1000, False)
+        (self.blocks_tuntap_pdu_1).set_max_output_buffer(100000)
         self.blocks_tagged_stream_to_pdu_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
-        self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.06, ))
 
@@ -72,7 +72,6 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
         self.msg_connect((self.blocks_tuntap_pdu_1, 'pdus'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))
         self.connect((self.blocks_pdu_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
-        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tagged_stream_to_pdu_0, 0))
         self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
         self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))

@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Server
-# Generated: Mon Jan 21 11:55:55 2019
+# Generated: Fri Feb  8 17:39:54 2019
 ##################################################
 
 
@@ -18,7 +18,7 @@ import threading
 
 class ansible_hydra_gr_server(gr.top_block):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, hydraServerIP='192.168.5.64:5000'):
+    def __init__(self, freqrx=1.1e9+5e6, freqtx=1.1e9, hydraServerIP='192.168.5.77:5000'):
         gr.top_block.__init__(self, "Ansible Hydra Gr Server")
 
         ##################################################
@@ -62,13 +62,13 @@ class ansible_hydra_gr_server(gr.top_block):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--freqrx", dest="freqrx", type="eng_float", default=eng_notation.num_to_str(1.2e9),
+        "", "--freqrx", dest="freqrx", type="eng_float", default=eng_notation.num_to_str(1.1e9+5e6),
         help="Set freqrx [default=%default]")
     parser.add_option(
         "", "--freqtx", dest="freqtx", type="eng_float", default=eng_notation.num_to_str(1.1e9),
         help="Set freqtx [default=%default]")
     parser.add_option(
-        "", "--hydraServerIP", dest="hydraServerIP", type="string", default='192.168.5.64:5000',
+        "", "--hydraServerIP", dest="hydraServerIP", type="string", default='192.168.5.77:5000',
         help="Set hydraServerIP [default=%default]")
     return parser
 

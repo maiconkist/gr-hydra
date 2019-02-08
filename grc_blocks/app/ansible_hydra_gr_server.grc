@@ -156,7 +156,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(536, 36)</value>
+      <value>(432, 40)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -180,7 +180,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1.2e9</value>
+      <value>1.1e9+5e6</value>
     </param>
   </block>
   <block>
@@ -199,7 +199,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(432, 36)</value>
+      <value>(328, 40)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -266,7 +266,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>192.168.5.64:5000</value>
+      <value>192.168.5.77:5000</value>
     </param>
   </block>
 </flow_graph>

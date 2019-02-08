@@ -264,10 +264,8 @@ Hypervisor::rx_run()
 
   while (true)
   {
-     if (g_rx_dev->receive(optr, get_rx_fft()))
-     {
-        forward_rx_window(optr, get_rx_fft());
-     }
+    if (g_rx_dev->receive(optr, get_rx_fft()))
+      forward_rx_window(optr, get_rx_fft());
   }
 }
 
@@ -339,17 +337,17 @@ Hypervisor::forward_rx_window(window &buf, size_t len)
 {
   if (g_vradios.size() == 0) return;
 
-  g_fft_complex->set_data(&buf.front(), len);
-  g_fft_complex->execute();
+    g_fft_complex->set_data(&buf.front(), len);
+    g_fft_complex->execute();
 
-  std::lock_guard<std::mutex> _l(vradios_mtx);
-  for (vradio_vec::iterator it = g_vradios.begin();
-       it != g_vradios.end();
-       ++it)
-  {
-    if ((*it)->get_rx_enabled())
-      (*it)->demap_iq_samples(g_fft_complex->get_outbuf(), get_rx_fft());
-  }
+    std::lock_guard<std::mutex> _l(vradios_mtx);
+    for (vradio_vec::iterator it = g_vradios.begin();
+         it != g_vradios.end();
+         ++it)
+      {
+        if ((*it)->get_rx_enabled())
+          (*it)->demap_iq_samples(g_fft_complex->get_outbuf(), get_rx_fft());
+      }
 }
 
 } /* namespace hydra */

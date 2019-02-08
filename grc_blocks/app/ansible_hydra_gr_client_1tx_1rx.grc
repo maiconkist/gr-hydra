@@ -199,7 +199,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -321,11 +321,11 @@
     </param>
     <param>
       <key>mtu</key>
-      <value>10000</value>
+      <value>1000</value>
     </param>
     <param>
       <key>maxoutbuf</key>
-      <value>0</value>
+      <value>100000</value>
     </param>
     <param>
       <key>minoutbuf</key>
@@ -550,7 +550,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1.2e9</value>
+      <value>1.1e9 + 5e6</value>
     </param>
   </block>
   <block>

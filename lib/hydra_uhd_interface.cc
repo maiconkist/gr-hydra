@@ -153,8 +153,24 @@ device_uhd::receive(window &buf, size_t len)
       break;
   }
 #else
-  return rx_stream->recv(&buf.front(), buf.size(), md, 0.001024);
+      rx_stream->recv(&buf.front(), buf.size(), md, 0.001024);
 #endif
+      switch(md.error_code)
+      {
+        case uhd::rx_metadata_t::ERROR_CODE_NONE:
+          return 1;
+          break;
+
+        case uhd::rx_metadata_t::ERROR_CODE_TIMEOUT:
+          std::cout << "U" << std::endl;
+          return 0;
+          break;
+
+        default:
+          std::cout << "D" << std::endl;
+          return 0;
+          break;
+      }
 }
 
 device_image_gen::device_image_gen(std::string device_args)
