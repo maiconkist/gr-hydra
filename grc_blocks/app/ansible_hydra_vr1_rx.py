@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr1 Rx
-# Generated: Thu Feb  7 12:12:31 2019
+# Generated: Fri Feb  8 12:19:40 2019
 ##################################################
 
 
@@ -75,9 +75,9 @@ class ansible_hydra_vr1_rx(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap1', 10000, False)
+        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap0', 10000, False)
         self.blocks_tagged_stream_to_pdu_0_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
-        self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR2 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
+        self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((0.06, ))
 

@@ -12,7 +12,6 @@
 
 #include "hydra/types.h"
 
-
 // Using name space UDP
 using boost::asio::ip::udp;
 

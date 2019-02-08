@@ -105,7 +105,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(800, 280)</value>
+      <value>(848, 276)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -152,7 +152,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(264, 280)</value>
+      <value>(328, 276)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -223,7 +223,7 @@
     </param>
     <param>
       <key>name</key>
-      <value>VR2 RX</value>
+      <value>VR1 RX</value>
     </param>
     <param>
       <key>num_inputs</key>
@@ -254,7 +254,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(216, 480)</value>
+      <value>(216, 484)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -305,7 +305,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 268)</value>
+      <value>(64, 256)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -317,7 +317,7 @@
     </param>
     <param>
       <key>ifn</key>
-      <value>tap1</value>
+      <value>tap0</value>
     </param>
     <param>
       <key>mtu</key>
@@ -360,7 +360,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(512, 428)</value>
+      <value>(528, 436)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -447,7 +447,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(520, 228)</value>
+      <value>(584, 216)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2646,7 +2646,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(832, 448)</value>
+      <value>(912, 456)</value>
     </param>
     <param>
       <key>_rotation</key>
