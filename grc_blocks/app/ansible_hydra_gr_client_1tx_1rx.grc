@@ -651,7 +651,7 @@
     </param>
     <param>
       <key>c_host</key>
-      <value>hydraClient</value>
+      <value>ansibleIP</value>
     </param>
     <param>
       <key>comment</key>
@@ -714,7 +714,7 @@
     </param>
     <param>
       <key>host</key>
-      <value>hydraClient</value>
+      <value>ansibleIP</value>
     </param>
     <param>
       <key>comment</key>

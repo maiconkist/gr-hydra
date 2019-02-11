@@ -82,6 +82,37 @@
     </param>
   </block>
   <block>
+    <key>blocks_message_debug</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(336, 444)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>blocks_message_debug_0</value>
+    </param>
+  </block>
+  <block>
     <key>blocks_multiply_const_vxx</key>
     <param>
       <key>alias</key>
@@ -105,7 +136,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(864, 332)</value>
+      <value>(840, 332)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -152,7 +183,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 332)</value>
+      <value>(344, 332)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -203,7 +234,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(296, 604)</value>
+      <value>(296, 760)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -254,7 +285,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(232, 532)</value>
+      <value>(232, 660)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -305,7 +336,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(72, 312)</value>
+      <value>(56, 312)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -317,7 +348,7 @@
     </param>
     <param>
       <key>ifn</key>
-      <value>tap1</value>
+      <value>tap0</value>
     </param>
     <param>
       <key>mtu</key>
@@ -360,7 +391,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(520, 484)</value>
+      <value>(536, 612)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -447,7 +478,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(592, 272)</value>
+      <value>(584, 272)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -526,7 +557,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(552, 12)</value>
+      <value>(584, 12)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -550,7 +581,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1.2e9</value>
+      <value>1.1e9</value>
     </param>
   </block>
   <block>
@@ -593,7 +624,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1.1e9</value>
+      <value>1.1e9+5e6</value>
     </param>
   </block>
   <block>
@@ -655,7 +686,7 @@
     </param>
     <param>
       <key>center_freq0</key>
-      <value>freqrx + vr2offset</value>
+      <value>freqtx + vr2offset</value>
     </param>
     <param>
       <key>norm_gain0</key>
@@ -663,7 +694,7 @@
     </param>
     <param>
       <key>gain0</key>
-      <value>0.7</value>
+      <value>0.6</value>
     </param>
     <param>
       <key>ant10</key>
@@ -1311,7 +1342,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1048, 268)</value>
+      <value>(1032, 268)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1478,7 +1509,7 @@
     </param>
     <param>
       <key>center_freq0</key>
-      <value>freqtx + vr2offset</value>
+      <value>freqrx + vr2offset</value>
     </param>
     <param>
       <key>dc_offs_enb0</key>
@@ -2646,7 +2677,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(904, 504)</value>
+      <value>(1032, 632)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2904,6 +2935,12 @@
     <sink_block_id>blocks_tuntap_pdu_1_0</sink_block_id>
     <source_key>pdus</source_key>
     <sink_key>pdus</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_tuntap_pdu_1_0</source_block_id>
+    <sink_block_id>blocks_message_debug_0</sink_block_id>
+    <source_key>pdus</source_key>
+    <sink_key>print_pdu</sink_key>
   </connection>
   <connection>
     <source_block_id>blocks_tuntap_pdu_1_0</source_block_id>

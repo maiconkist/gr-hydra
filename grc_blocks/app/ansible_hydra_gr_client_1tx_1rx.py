@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 1Tx 1Rx
-# Generated: Fri Feb  8 17:43:53 2019
+# Generated: Fri Feb  8 18:54:44 2019
 ##################################################
 
 
@@ -36,9 +36,9 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, hydraClient, 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '192.168.5.77', 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, hydraClient, hydraClient, 5000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '192.168.5.77', '192.168.5.77', 5000)
         self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 10000)
 
         self.digital_ofdm_tx_0 = digital.ofdm_tx(

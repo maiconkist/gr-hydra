@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Fri Feb  8 16:27:43 2019
+# Generated: Mon Feb 11 13:21:56 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, hydraClient='192.168.5.77', samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, freqrx=1.1e9+5e6, freqtx=1.1e9, hydraClient='192.168.5.77', samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -36,14 +36,14 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(1, hydraClient, 5000)
+        self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, 'ansibleIP', 5000)
         self.hydra_gr_sink_0_0.start_client(freqtx + vr2offset, samp_rate, 1024)
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, hydraClient, 5000)
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, 'ansibleIP', 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
-        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(1, hydraClient, hydraClient, 5000)
-        self.hydra_gr__source_0_0_0.start_client(freqrx + vr2offset, samp_rate * 2, 10000)
+        self.hydra_gr__source_0_0_0 = hydra.hydra_gr_client_source(2, 'ansibleIP', 'ansibleIP', 5000)
+        self.hydra_gr__source_0_0_0.start_client(freqrx + vr2offset, samp_rate, 10000)
 
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, hydraClient, hydraClient, 5000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, 'ansibleIP', 'ansibleIP', 5000)
         self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 10000)
 
         self.digital_ofdm_tx_0_0 = digital.ofdm_tx(

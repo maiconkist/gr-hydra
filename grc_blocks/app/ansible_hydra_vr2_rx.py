@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr2 Rx
-# Generated: Fri Feb  8 12:19:03 2019
+# Generated: Mon Feb 11 13:17:17 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import time
 
 class ansible_hydra_vr2_rx(gr.top_block):
 
-    def __init__(self, freqrx=1.2e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, freqrx=1.1e9, freqtx=1.1e9+5e6, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Vr2 Rx")
 
         ##################################################
@@ -43,7 +43,7 @@ class ansible_hydra_vr2_rx(gr.top_block):
         	),
         )
         self.uhd_usrp_source_0.set_samp_rate(samp_rate)
-        self.uhd_usrp_source_0.set_center_freq(freqtx + vr2offset, 0)
+        self.uhd_usrp_source_0.set_center_freq(freqrx + vr2offset, 0)
         self.uhd_usrp_source_0.set_gain(0, 0)
         self.uhd_usrp_source_0.set_antenna('RX2', 0)
         self.uhd_usrp_sink_0 = uhd.usrp_sink(
@@ -54,8 +54,8 @@ class ansible_hydra_vr2_rx(gr.top_block):
         	),
         )
         self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
-        self.uhd_usrp_sink_0.set_center_freq(freqrx + vr2offset, 0)
-        self.uhd_usrp_sink_0.set_normalized_gain(0.7, 0)
+        self.uhd_usrp_sink_0.set_center_freq(freqtx + vr2offset, 0)
+        self.uhd_usrp_sink_0.set_normalized_gain(0.6, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
         self.digital_ofdm_tx_0_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
@@ -75,16 +75,18 @@ class ansible_hydra_vr2_rx(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap1', 10000, False)
+        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap0', 10000, False)
         self.blocks_tagged_stream_to_pdu_0_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
         self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR2 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((0.06, ))
+        self.blocks_message_debug_0 = blocks.message_debug()
 
         ##################################################
         # Connections
         ##################################################
         self.msg_connect((self.blocks_tagged_stream_to_pdu_0_0, 'pdus'), (self.blocks_tuntap_pdu_1_0, 'pdus'))
+        self.msg_connect((self.blocks_tuntap_pdu_1_0, 'pdus'), (self.blocks_message_debug_0, 'print_pdu'))
         self.msg_connect((self.blocks_tuntap_pdu_1_0, 'pdus'), (self.blocks_pdu_to_tagged_stream_0_0, 'pdus'))
         self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.uhd_usrp_sink_0, 0))
         self.connect((self.blocks_pdu_to_tagged_stream_0_0, 0), (self.digital_ofdm_tx_0_0, 0))
@@ -98,14 +100,14 @@ class ansible_hydra_vr2_rx(gr.top_block):
 
     def set_freqrx(self, freqrx):
         self.freqrx = freqrx
-        self.uhd_usrp_sink_0.set_center_freq(self.freqrx + self.vr2offset, 0)
+        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
 
     def get_freqtx(self):
         return self.freqtx
 
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
-        self.uhd_usrp_source_0.set_center_freq(self.freqtx + self.vr2offset, 0)
+        self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -126,8 +128,8 @@ class ansible_hydra_vr2_rx(gr.top_block):
 
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
-        self.uhd_usrp_source_0.set_center_freq(self.freqtx + self.vr2offset, 0)
-        self.uhd_usrp_sink_0.set_center_freq(self.freqrx + self.vr2offset, 0)
+        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
+        self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
 
 
 def argument_parser():

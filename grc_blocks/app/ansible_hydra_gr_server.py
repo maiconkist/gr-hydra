@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Server
-# Generated: Fri Feb  8 17:39:54 2019
+# Generated: Fri Feb  8 18:54:41 2019
 ##################################################
 
 
@@ -31,7 +31,7 @@ class ansible_hydra_gr_server(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.ahydra_gr_server_0 = hydra.hydra_gr_server(hydraServerIP)
+        self.ahydra_gr_server_0 = hydra.hydra_gr_server('192.168.5.77:5000')
         if freqtx > 0 and 2e6 > 0 and 2048 > 0:
            self.ahydra_gr_server_0.set_tx_config(freqtx, 2e6, 2048, "USRP")
         if freqrx > 0 and 2e6 > 0 and 2048 > 0:
