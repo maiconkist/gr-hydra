@@ -42,8 +42,6 @@ class hydra_gr_server_impl : public hydra_gr_server
   HydraMain *main;
   uhd_hydra_sptr g_usrp;
 
-
-
   void init_usrp(std::string mode);
 };
 
