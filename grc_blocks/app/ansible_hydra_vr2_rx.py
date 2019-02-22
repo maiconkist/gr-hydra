@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr2 Rx
-# Generated: Thu Feb 14 18:25:51 2019
+# Generated: Fri Feb 22 14:29:07 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import time
 
 class ansible_hydra_vr2_rx(gr.top_block):
 
-    def __init__(self, freqrx=1.1e9, freqtx=1.1e9+5e6, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, freqrx=2.1e9, freqtx=2.1e9+5e6, gain=0.85, mul=0.06, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Vr2 Rx")
 
         ##################################################
@@ -28,6 +28,8 @@ class ansible_hydra_vr2_rx(gr.top_block):
         ##################################################
         self.freqrx = freqrx
         self.freqtx = freqtx
+        self.gain = gain
+        self.mul = mul
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
@@ -55,7 +57,7 @@ class ansible_hydra_vr2_rx(gr.top_block):
         )
         self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
         self.uhd_usrp_sink_0.set_center_freq(freqtx + vr2offset, 0)
-        self.uhd_usrp_sink_0.set_normalized_gain(0.6, 0)
+        self.uhd_usrp_sink_0.set_normalized_gain(gain, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
         self.digital_ofdm_tx_0_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
@@ -79,7 +81,7 @@ class ansible_hydra_vr2_rx(gr.top_block):
         self.blocks_tagged_stream_to_pdu_0_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
         self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR2 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((0.06, ))
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul, ))
         self.blocks_message_debug_0 = blocks.message_debug()
 
         ##################################################
@@ -108,6 +110,21 @@ class ansible_hydra_vr2_rx(gr.top_block):
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
         self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
+
+    def get_gain(self):
+        return self.gain
+
+    def set_gain(self, gain):
+        self.gain = gain
+        self.uhd_usrp_sink_0.set_normalized_gain(self.gain, 0)
+
+
+    def get_mul(self):
+        return self.mul
+
+    def set_mul(self, mul):
+        self.mul = mul
+        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
 
     def get_samp_rate(self):
         return self.samp_rate
