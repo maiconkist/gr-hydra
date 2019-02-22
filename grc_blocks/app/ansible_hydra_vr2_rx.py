@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr2 Rx
-# Generated: Fri Feb 22 14:29:07 2019
+# Generated: Fri Feb 22 15:13:31 2019
 ##################################################
 
 
@@ -77,9 +77,9 @@ class ansible_hydra_vr2_rx(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap0', 10000, False)
+        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap0', 1000, False)
         self.blocks_tagged_stream_to_pdu_0_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
-        self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR2 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
+        self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, 'VR2 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul, ))
         self.blocks_message_debug_0 = blocks.message_debug()
@@ -87,14 +87,14 @@ class ansible_hydra_vr2_rx(gr.top_block):
         ##################################################
         # Connections
         ##################################################
+        self.msg_connect((self.blocks_tagged_stream_to_pdu_0_0, 'pdus'), (self.blocks_message_debug_0, 'print_pdu'))
         self.msg_connect((self.blocks_tagged_stream_to_pdu_0_0, 'pdus'), (self.blocks_tuntap_pdu_1_0, 'pdus'))
-        self.msg_connect((self.blocks_tuntap_pdu_1_0, 'pdus'), (self.blocks_message_debug_0, 'print_pdu'))
         self.msg_connect((self.blocks_tuntap_pdu_1_0, 'pdus'), (self.blocks_pdu_to_tagged_stream_0_0, 'pdus'))
         self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.uhd_usrp_sink_0, 0))
         self.connect((self.blocks_pdu_to_tagged_stream_0_0, 0), (self.digital_ofdm_tx_0_0, 0))
-        self.connect((self.digital_ofdm_rx_0_0, 0), (self.blocks_tag_debug_0_0, 0))
         self.connect((self.digital_ofdm_rx_0_0, 0), (self.blocks_tagged_stream_to_pdu_0_0, 0))
         self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
+        self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_tag_debug_0_0, 0))
         self.connect((self.uhd_usrp_source_0, 0), (self.digital_ofdm_rx_0_0, 0))
 
     def get_freqrx(self):

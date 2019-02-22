@@ -227,11 +227,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(344, 384)</value>
+      <value>(112, 600)</value>
     </param>
     <param>
       <key>_rotation</key>
-      <value>0</value>
+      <value>180</value>
     </param>
     <param>
       <key>id</key>
@@ -360,11 +360,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(184, 600)</value>
+      <value>(872, 176)</value>
     </param>
     <param>
       <key>_rotation</key>
-      <value>180</value>
+      <value>0</value>
     </param>
     <param>
       <key>id</key>
@@ -372,7 +372,7 @@
     </param>
     <param>
       <key>type</key>
-      <value>byte</value>
+      <value>complex</value>
     </param>
     <param>
       <key>filter</key>
@@ -411,7 +411,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(112, 544)</value>
+      <value>(328, 544)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -478,7 +478,7 @@
     </param>
     <param>
       <key>mtu</key>
-      <value>10000</value>
+      <value>1000</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -517,7 +517,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(400, 504)</value>
+      <value>(584, 504)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2889,7 +2889,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(664, 520)</value>
+      <value>(880, 520)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3144,27 +3144,21 @@
   </connection>
   <connection>
     <source_block_id>blocks_tagged_stream_to_pdu_0_0</source_block_id>
+    <sink_block_id>blocks_message_debug_0</sink_block_id>
+    <source_key>pdus</source_key>
+    <sink_key>print_pdu</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_tagged_stream_to_pdu_0_0</source_block_id>
     <sink_block_id>blocks_tuntap_pdu_1_0</sink_block_id>
     <source_key>pdus</source_key>
     <sink_key>pdus</sink_key>
   </connection>
   <connection>
     <source_block_id>blocks_tuntap_pdu_1_0</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>pdus</source_key>
-    <sink_key>print_pdu</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_tuntap_pdu_1_0</source_block_id>
     <sink_block_id>blocks_pdu_to_tagged_stream_0_0</sink_block_id>
     <source_key>pdus</source_key>
     <sink_key>pdus</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>digital_ofdm_rx_0_0</source_block_id>
-    <sink_block_id>blocks_tag_debug_0_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>digital_ofdm_rx_0_0</source_block_id>
@@ -3175,6 +3169,12 @@
   <connection>
     <source_block_id>digital_ofdm_tx_0_0</source_block_id>
     <sink_block_id>blocks_multiply_const_vxx_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>digital_ofdm_tx_0_0</source_block_id>
+    <sink_block_id>blocks_tag_debug_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
