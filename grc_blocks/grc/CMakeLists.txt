@@ -17,9 +17,6 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 install(FILES
-    #hydra_sink.xml
-    #hydra_async_sink.xml
-    #hydra_source.xml
     hydra_gr_client_sink.xml
     hydra_gr_client_source.xml
     hydra_gr_server.xml

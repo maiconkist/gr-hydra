@@ -33,6 +33,11 @@ self.$(id).start_client($center_frequency, $samp_rate, $payload)
     <type>int</type>
   </param>
   <param>
+    <name>Server IP</name>
+    <key>server_addr</key>
+    <type>string</type>
+  </param>
+  <param>
     <name>Payload Size</name>
     <key>payload</key>
     <type>int</type>
