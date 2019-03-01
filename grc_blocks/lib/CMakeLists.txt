@@ -42,6 +42,9 @@ list(APPEND hydra_sources
     hydra_gr_client_sink_impl.cc
     hydra_gr_client_source_impl.cc
     hydra_gr_server_impl.cc
+    hydra_gr_client_network_sink_impl.cc
+    hydra_gr_client_network_source_impl.cc
+    hydra_gr_server_network_impl.cc
 )
 
 set(hydra_sources "${hydra_sources}" PARENT_SCOPE)

@@ -1,7 +1,7 @@
 #include "hydra/hydra_server.h"
 #include "hydra/util/udp.h"
-#include <boost/algorithm/string.hpp>
 
+#include <boost/algorithm/string.hpp>
 
 namespace hydra {
 
@@ -31,13 +31,12 @@ HydraServer::auto_discovery()
    }
 }
 
-
 // Run the server
 int
 HydraServer::run()
 {
   //  Prepare our context and socket
-  zmq::context_t context (1);
+  zmq::context_t context;
   zmq::socket_t socket (context, ZMQ_REP);
   socket.bind (("tcp://" + s_server_addr).c_str());
 
@@ -48,7 +47,6 @@ HydraServer::run()
 
   // Message type object
   zmq::message_t request;
-
 
   std::string server_addr_no_port;
   {

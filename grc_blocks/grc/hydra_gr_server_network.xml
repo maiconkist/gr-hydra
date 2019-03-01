@@ -1,14 +1,14 @@
 <block>
-  <name>HyDRA-AAS</name>
-  <key>hydra_gr_server</key>
+  <name>HyDRA-AAS Network</name>
+  <key>hydra_gr_server_network</key>
   <category>[HyDRA]</category>
   <import>import threading</import>
   <import>import hydra</import>
-  <make>hydra.hydra_gr_server($ip)
+  <make>hydra.hydra_gr_server_network($ip)
 if $(tx_center_frequency) > 0 and $(tx_samp_rate) > 0 and $(tx_fft_size) > 0:
-   self.$(id).set_tx_config($tx_center_frequency, $tx_samp_rate, $tx_fft_size, $mode)
+   self.$(id).set_tx_config($tx_center_frequency, $tx_samp_rate, $tx_fft_size, $server_ip, $remote_ip)
 if $(rx_center_frequency) > 0 and $(rx_samp_rate) > 0 and $(rx_fft_size) > 0:
-   self.$(id).set_rx_config($rx_center_frequency, $rx_samp_rate, $rx_fft_size, $mode)
+   self.$(id).set_rx_config($rx_center_frequency, $rx_samp_rate, $rx_fft_size, $server_ip, $remote_ip)
 self.$(id)_thread = threading.Thread(target=self.$(id).start_server)
 self.$(id)_thread.daemon = True
 self.$(id)_thread.start()</make>
@@ -27,7 +27,6 @@ self.$(id)_thread.start()</make>
     <key>tx_fft_size</key>
     <type>int</type>
   </param>
-
   <param>
     <name>RX Centre Frequency</name>
     <key>rx_center_frequency</key>
@@ -45,30 +44,12 @@ self.$(id)_thread.start()</make>
   </param>
   <param>
     <name>Server IP:PORT</name>
-    <key>ip</key>
+    <key>server_ip</key>
     <type>string</type>
   </param>
   <param>
-    <name>Mode</name>
-    <key>mode</key>
-    <value>USRP</value>
-    <type>enum</type>
-    <option>
-      <name>USRP</name>
-      <key>"USRP"</key>
-    </option>
-    <option>
-      <name>Image Generation</name>
-      <key>"IMG_GEN"</key>
-    </option>
-    <option>
-      <name>Loopback</name>
-      <key>"LOOPBACK"</key>
-    </option>
-    <option>
-      <name>Network</name>
-      <key>"NETWORK"</key>
-    </option>
+    <name>Remote IP:PORT</name>
+    <key>remote_ip</key>
+    <type>string</type>
   </param>
-
 </block>

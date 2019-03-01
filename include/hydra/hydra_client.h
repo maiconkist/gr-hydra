@@ -26,7 +26,6 @@ struct rx_configuration
 class hydra_client
 {
 public:
-
    /* CTOR
     */
    hydra_client(std::string client_ip = "localhost",
@@ -52,6 +51,9 @@ public:
 
    /* Free resources */
    std::string free_resources();
+
+
+   void override_server_host(std::string s){ s_server_host = s; };
 
 private:
    /* Base message methods */

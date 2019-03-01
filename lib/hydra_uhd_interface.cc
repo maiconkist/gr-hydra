@@ -72,7 +72,7 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
   usrp->set_rx_rate(rate);
   std::cout << "Actual RX Rate: " << usrp->get_rx_rate() << std::endl;
 
-  // no gain for reception. 
+  // no gain for reception.
   std::cout << "Setting RX Gain: " << gain << std::endl;
   usrp->set_normalized_rx_gain(0.0);
   std::cout << "Actual RX Gain: " << usrp->get_rx_gain() << std::endl;
@@ -268,5 +268,65 @@ device_loopback::receive(window &buf, size_t len)
 
    return buf.size();
 }
+
+
+device_network::device_network(std::string host_addr, std::string remote_addr):
+  g_host_addr(host_addr),
+  g_remote_addr(remote_addr)
+{
+}
+
+void
+device_network::send(const window &buf, size_t len)
+{
+  if (!init_tx)
+  {
+    zmq::context_t context;
+    socket_tx = std::make_unique<zmq::socket_t>(context, ZMQ_PUSH);
+    socket_tx->connect("tcp://" + g_host_addr);
+    init_tx = true;
+  }
+
+  zmq::message_t message(buf.size() * sizeof(gr_complex));
+
+  iq_sample *tmp = static_cast<iq_sample *>(message.data());
+  for (size_t i = 0; i < buf.size(); ++i)
+    tmp[i] = buf[i];
+
+  socket_tx->send(message);
+}
+
+size_t
+device_network::receive(window &buf, size_t len)
+{
+   if (!init_rx)
+   {
+     zmq::context_t context;
+     socket_rx = std::make_unique<zmq::socket_t>(context, ZMQ_PULL);
+     socket_rx->connect("tcp://" + g_remote_addr);
+     init_rx = true;
+   }
+
+   zmq::message_t message;
+   socket_rx->recv(&message);
+
+   if  (message.size() != len)
+     std::cout << "Error: message size does not equal to len" << std::endl;
+
+   if (message.size() > 0)
+   {
+     iq_sample *tmp = static_cast<iq_sample *>(message.data());
+
+      if (message.size() % sizeof(iq_sample) != 0)
+        std::cout << "Error: message not complete" << std::endl;
+
+      buf.insert(buf.begin(),
+          tmp,
+          tmp + (message.size()/sizeof(iq_sample)));
+   }
+
+   return message.size();
+}
+
 
 } /* namespace hydra */

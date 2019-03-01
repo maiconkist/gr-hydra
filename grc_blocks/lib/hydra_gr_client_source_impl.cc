@@ -53,15 +53,6 @@ void hydra_gr_client_source_impl::start_client(double d_center_frequency,
 
   if (!err)
   {
-#if 0
-    std::cout << boost::format("Creating GNURadio UDP source block: (%1%: %2%)") % "0.0.0.0" % rx_config.server_port << std::endl;
-    d_source = gr::blocks::udp_source::make(sizeof(gr_complex),
-                                                "0.0.0.0",
-                                                rx_config.server_port,
-                                                u_payload,
-                                                false);
-#endif
-
 #if 1
     std::string addr = "tcp://" + rx_config.server_ip + ":" + std::to_string(rx_config.server_port);
     std::cout << "addr: " << addr << std::endl;

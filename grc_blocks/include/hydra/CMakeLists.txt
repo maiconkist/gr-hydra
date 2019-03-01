@@ -4,12 +4,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3, or (at your option)
 # any later version.
-# 
+#
 # HyDRA is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this software; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
@@ -20,11 +20,10 @@
 ########################################################################
 install(FILES
    api.h
-   hydra_block.h
-   hydra_source.h
-   hydra_sink.h
-   hydra_async_sink.h
    hydra_gr_client_sink.h
    hydra_gr_client_source.h
    hydra_gr_server.h
+   hydra_gr_client_network_sink.h
+   hydra_gr_client_network_source.h
+   hydra_gr_server_network.h
    DESTINATION include/hydra)

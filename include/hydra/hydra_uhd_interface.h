@@ -2,8 +2,10 @@
 #define INCLUDED_HYDRA_UHD_INTERFACE_H
 
 #include "hydra/types.h"
-#include <uhd/usrp/multi_usrp.hpp>
 
+#include <uhd/usrp/multi_usrp.hpp>
+#include <zmq.hpp>
+#include <memory>
 #include <mutex>
 
 namespace hydra {
@@ -79,6 +81,19 @@ private:
    window_stream g_windows_vec;
 };
 
+class device_network: public abstract_device
+{
+public:
+   device_network(std::string host_add, std::string remote_addr);
+   void send(const window &buf, size_t len);
+   size_t receive(window &buf, size_t len);
+
+private:
+   bool init_tx, init_rx;
+
+   std::string g_host_addr, g_remote_addr;
+   std::unique_ptr<zmq::socket_t> socket_tx, socket_rx;
+};
 
 
 } // namespace hydra
