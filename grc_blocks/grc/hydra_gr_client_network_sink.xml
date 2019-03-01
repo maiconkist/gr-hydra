@@ -5,7 +5,7 @@
   <import>import threading</import>
   <import>import hydra</import>
   <make>hydra.hydra_gr_client_network_sink($u_id, $host_addr, $port, $server_addr)
-    self.$(id).start_client($center_frequency, $samp_rate, $payload)
+self.$(id).start_client($center_frequency, $samp_rate, $payload)
 </make>
   <param>
     <name>Centre Frequency</name>
