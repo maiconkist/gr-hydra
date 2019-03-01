@@ -6,9 +6,9 @@
   <import>import hydra</import>
   <make>hydra.hydra_gr_server_network($host_addr)
 if $(tx_center_frequency) > 0 and $(tx_samp_rate) > 0 and $(tx_fft_size) > 0:
-   self.$(id).set_tx_config($tx_center_frequency, $tx_samp_rate, $tx_fft_size, $host_addr, $remote_addr)
+   self.$(id).set_tx_config($tx_center_frequency, $tx_samp_rate, $tx_fft_size, $host_addr, $remote_ip)
 if $(rx_center_frequency) > 0 and $(rx_samp_rate) > 0 and $(rx_fft_size) > 0:
-   self.$(id).set_rx_config($rx_center_frequency, $rx_samp_rate, $rx_fft_size, $host_addr, $remote_addr)
+   self.$(id).set_rx_config($rx_center_frequency, $rx_samp_rate, $rx_fft_size, $host_addr, $remote_ip)
 self.$(id)_thread = threading.Thread(target=self.$(id).start_server)
 self.$(id)_thread.daemon = True
 self.$(id)_thread.start()</make>
@@ -48,8 +48,8 @@ self.$(id)_thread.start()</make>
     <type>string</type>
   </param>
   <param>
-    <name>Remote IP:PORT</name>
-    <key>remote_addr</key>
+    <name>Remote IP</name>
+    <key>remote_ip</key>
     <type>string</type>
   </param>
 </block>

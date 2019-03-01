@@ -281,9 +281,14 @@ device_network::send(const window &buf, size_t len)
 {
   if (!init_tx)
   {
+    const size_t PORT = 5556;
     zmq::context_t context;
     socket_tx = std::make_unique<zmq::socket_t>(context, ZMQ_PUSH);
-    socket_tx->connect("tcp://" + g_host_addr);
+
+    std::string addr = "tcp://" + g_host_addr + ":" + std::to_string(PORT);
+    std::cout << "device_network recv:" << addr << std:endl;
+
+    socket_tx->connect("tcp://" + addr);
     init_tx = true;
   }
 
@@ -299,33 +304,38 @@ device_network::send(const window &buf, size_t len)
 size_t
 device_network::receive(window &buf, size_t len)
 {
-   if (!init_rx)
-   {
-     zmq::context_t context;
-     socket_rx = std::make_unique<zmq::socket_t>(context, ZMQ_PULL);
-     socket_rx->connect("tcp://" + g_remote_addr);
-     init_rx = true;
-   }
+  if (!init_rx)
+  {
+    const size_t PORT = 5556;
+    zmq::context_t context;
+    socket_rx = std::make_unique<zmq::socket_t>(context, ZMQ_PULL);
 
-   zmq::message_t message;
-   socket_rx->recv(&message);
+    std::string addr = "tcp://" + g_remote_addr + ":" + std::to_string(PORT);
+    std::cout << "device_network recv:" << addr << std:endl;
 
-   if  (message.size() != len)
-     std::cout << "Error: message size does not equal to len" << std::endl;
+    socket_rx->connect(addr);
+    init_rx = true;
+  }
 
-   if (message.size() > 0)
-   {
-     iq_sample *tmp = static_cast<iq_sample *>(message.data());
+  zmq::message_t message;
+  socket_rx->recv(&message);
 
-      if (message.size() % sizeof(iq_sample) != 0)
-        std::cout << "Error: message not complete" << std::endl;
+  if  (message.size() != len)
+    std::cout << "Error: message size does not equal to len" << std::endl;
 
-      buf.insert(buf.begin(),
-          tmp,
-          tmp + (message.size()/sizeof(iq_sample)));
-   }
+  if (message.size() > 0)
+  {
+    iq_sample *tmp = static_cast<iq_sample *>(message.data());
 
-   return message.size();
+    if (message.size() % sizeof(iq_sample) != 0)
+      std::cout << "Error: message not complete" << std::endl;
+
+    buf.insert(buf.begin(),
+        tmp,
+        tmp + (message.size()/sizeof(iq_sample)));
+  }
+
+  return message.size();
 }
 
 
