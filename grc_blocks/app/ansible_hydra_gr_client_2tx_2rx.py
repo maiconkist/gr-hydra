@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Fri Feb 22 15:10:56 2019
+# Generated: Mon Mar 11 15:03:50 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, ansibleIP='192.168.5.78', freqrx=2.1e9+5e6, freqtx=2.1e9, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3, mul=0.06):
+    def __init__(self, ansibleIP='192.168.5.73', freqrx=2.1e9+5e6, freqtx=2.1e9, mul=0.06, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -29,10 +29,10 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         self.ansibleIP = ansibleIP
         self.freqrx = freqrx
         self.freqtx = freqtx
+        self.mul = mul
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
-        self.mul = mul
 
         ##################################################
         # Blocks
@@ -136,6 +136,14 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
 
+    def get_mul(self):
+        return self.mul
+
+    def set_mul(self, mul):
+        self.mul = mul
+        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
+        self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
+
     def get_samp_rate(self):
         return self.samp_rate
 
@@ -154,19 +162,11 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
 
-    def get_mul(self):
-        return self.mul
-
-    def set_mul(self, mul):
-        self.mul = mul
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
-        self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
-
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--ansibleIP", dest="ansibleIP", type="string", default='192.168.5.78',
+        "", "--ansibleIP", dest="ansibleIP", type="string", default='192.168.5.73',
         help="Set ansibleIP [default=%default]")
     return parser
 

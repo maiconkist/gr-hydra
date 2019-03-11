@@ -184,7 +184,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>192.168.5.78</value>
+      <value>192.168.5.73</value>
     </param>
   </block>
   <block>
@@ -1441,7 +1441,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
