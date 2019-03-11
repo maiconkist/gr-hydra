@@ -23,7 +23,4 @@ install(FILES
    hydra_gr_client_sink.h
    hydra_gr_client_source.h
    hydra_gr_server.h
-   hydra_gr_client_network_sink.h
-   hydra_gr_client_network_source.h
-   hydra_gr_server_network.h
    DESTINATION include/hydra)

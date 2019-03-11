@@ -20,9 +20,6 @@ install(FILES
     hydra_gr_client_sink.xml
     hydra_gr_client_source.xml
     hydra_gr_server.xml
-    hydra_gr_server_network.xml
-    hydra_gr_client_network_sink.xml
-    hydra_gr_client_network_source.xml
     DESTINATION share/gnuradio/grc/blocks
 )
 
