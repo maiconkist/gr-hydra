@@ -42,7 +42,6 @@ zmq_source::connect()
 
     if (message.size() > 0)
     {
-      std::cout << "got samples " << std::endl;
       std::lock_guard<std::mutex> _l(out_mtx);
       iq_sample *tmp = static_cast<iq_sample *>(message.data());
 
@@ -52,10 +51,6 @@ zmq_source::connect()
       output_buffer.insert(output_buffer.end(),
                            tmp,
                            tmp + (message.size()/sizeof(iq_sample)));
-    }
-    else
-    {
-      std::cout << "timeouted " << std::endl;
     }
 
     message.rebuild();
