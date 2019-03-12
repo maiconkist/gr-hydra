@@ -62,11 +62,7 @@ xvl_resource_manager::reserve_rx_resources(unsigned int u_id,
 
   // Lock the mutex
   mtx.lock();
-
-  // Try to allocate the RX chunks
   int result = rx_resources.create_chunks(d_centre_freq, d_bandwidth, u_id);
-
-  // Unlock the mutex
   mtx.unlock();
 
   return result;
@@ -86,11 +82,7 @@ xvl_resource_manager::reserve_tx_resources(unsigned int u_id,
 
   // Lock the mutex
   mtx.lock();
-
-  // Try to allocate the RX chunks
   int result = tx_resources.create_chunks(d_centre_freq, d_bandwidth, u_id);
-
-  // Unlock the mutex
   mtx.unlock();
 
   return result;
@@ -138,7 +130,7 @@ xvl_resource_manager::free_tx_resources(size_t u_id)
 
   // Lock the mutex
   mtx.lock();
-  rx_resources.delete_chunks(u_id);
+  tx_resources.delete_chunks(u_id);
   mtx.unlock();
 
   // Return false if succeeded
@@ -326,7 +318,7 @@ rf_front_end::delete_chunks(unsigned int u_id)
   for (auto it = resources.begin(); it != resources.end(); it++)
   {
     // Jumps to next chunk if the current chunk isn't the right one
-    if (it->u_id != u_id) {continue;}
+    if (it->u_id != u_id) { continue; }
 
     // Iterators to the previous and next chunks
     auto pv = std::prev(it, 1);
@@ -340,6 +332,7 @@ rf_front_end::delete_chunks(unsigned int u_id)
     {
       // Create a new free the chunk
       (*it) = (chunk) {it->d_centre_freq, it->d_bandwidth, 0};
+
       // Jump to next iteration
       continue;
     }
@@ -377,12 +370,12 @@ rf_front_end::delete_chunks(unsigned int u_id)
 } // namespace hydra
 
 // Test module
-#ifdef TEST_RESOURCE
+#if 1
 int main(int argv, char **argc)
 {
   using namespace hydra;
 
-  double cf = 950e6;
+  double cf = 1.1e6;
   double bw = 2e6;
   int workd;
 
@@ -400,29 +393,29 @@ int main(int argv, char **argc)
   std::cout << es.str() << std::endl;
 
   es.str("");
-  std::cout << boost::format("Allocated first chunk @%1%, %2%") % (cf+200e3) % 200e3 << std::endl;
-  workd = rm.reserve_rx_resources(1, cf + 200e3, 200e3);
+  std::cout << boost::format("Allocated first chunk @%1%, %2%") % (cf-200e3) % 200e3 << std::endl;
+  workd = rm.reserve_rx_resources(90, cf - 200e3, 200e3);
   output_tree = rm.query_resources();
   boost::property_tree::json_parser::write_json(es, output_tree);
   std::cout << es.str() << std::endl;
 
   es.str("");
-  std::cout << boost::format("Allocated second chunk @%1%, %2%") % (cf-200e3) % 100e3 << std::endl;
-  workd = rm.reserve_rx_resources(2, cf - 200e3, 100e3);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
-
-  es.str("");
-  std::cout << "\nFreed first chunk" << std::endl;
-  workd = rm.free_rx_resources(1);
+  std::cout << boost::format("Allocated second chunk @%1%, %2%") % (cf+200e3) % 100e3 << std::endl;
+  workd = rm.reserve_rx_resources(91, cf + 200e3, 100e3);
   output_tree = rm.query_resources();
   boost::property_tree::json_parser::write_json(es, output_tree);
   std::cout << es.str() << std::endl;
 
   es.str("");
   std::cout << "\nFreed first chunk" << std::endl;
-  workd = rm.free_rx_resources(2);
+  workd = rm.free_rx_resources(90);
+  output_tree = rm.query_resources();
+  boost::property_tree::json_parser::write_json(es, output_tree);
+  std::cout << es.str() << std::endl;
+
+  es.str("");
+  std::cout << "\nFreed first chunk" << std::endl;
+  workd = rm.free_rx_resources(91);
   output_tree = rm.query_resources();
   boost::property_tree::json_parser::write_json(es, output_tree);
   std::cout << es.str() << std::endl;
