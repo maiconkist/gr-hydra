@@ -3,65 +3,25 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Tue Mar 12 15:22:32 2019
+# Generated: Tue Mar 12 17:01:41 2019
 ##################################################
 
-from distutils.version import StrictVersion
 
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print "Warning: failed to XInitThreads()"
-
-from PyQt5 import Qt, QtCore
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
 from gnuradio import gr
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
-from gnuradio.qtgui import Range, RangeWidget
 from optparse import OptionParser
 import hydra
-import sys
 import threading
-from gnuradio import qtgui
 
 
-class ansible_hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
+class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, ansibleIP='192.168.5.73', freqrx=2.22e9+3e6, freqtx=2.22e9, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, ansibleIP='192.168.5.73', freqrx=2.22e9+3e6, freqtx=2.22e9, mul=0.01, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
-        Qt.QWidget.__init__(self)
-        self.setWindowTitle("Ansible Hydra Gr Client 2Tx 2Rx")
-        qtgui.util.check_set_qss()
-        try:
-            self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except:
-            pass
-        self.top_scroll_layout = Qt.QVBoxLayout()
-        self.setLayout(self.top_scroll_layout)
-        self.top_scroll = Qt.QScrollArea()
-        self.top_scroll.setFrameStyle(Qt.QFrame.NoFrame)
-        self.top_scroll_layout.addWidget(self.top_scroll)
-        self.top_scroll.setWidgetResizable(True)
-        self.top_widget = Qt.QWidget()
-        self.top_scroll.setWidget(self.top_widget)
-        self.top_layout = Qt.QVBoxLayout(self.top_widget)
-        self.top_grid_layout = Qt.QGridLayout()
-        self.top_layout.addLayout(self.top_grid_layout)
-
-        self.settings = Qt.QSettings("GNU Radio", "ansible_hydra_gr_client_2tx_2rx")
-
-        if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-            self.restoreGeometry(self.settings.value("geometry").toByteArray())
-        else:
-            self.restoreGeometry(self.settings.value("geometry", type=QtCore.QByteArray))
 
         ##################################################
         # Parameters
@@ -69,21 +29,14 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
         self.ansibleIP = ansibleIP
         self.freqrx = freqrx
         self.freqtx = freqtx
+        self.mul = mul
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
 
         ##################################################
-        # Variables
-        ##################################################
-        self.mul = mul = 0.01
-
-        ##################################################
         # Blocks
         ##################################################
-        self._mul_range = Range(0, 1.0, 0.01, 0.01, 200)
-        self._mul_win = RangeWidget(self._mul_range, self.set_mul, 'mul', "counter_slider", float)
-        self.top_layout.addWidget(self._mul_win)
         self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, ansibleIP, 5000)
         self.hydra_gr_sink_0_0.start_client(freqtx + vr2offset, samp_rate, 1024)
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, ansibleIP, 5000)
@@ -161,11 +114,6 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
         self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
         self.connect((self.hydra_gr__source_0_0_0, 0), (self.digital_ofdm_rx_0_0, 0))
 
-    def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "ansible_hydra_gr_client_2tx_2rx")
-        self.settings.setValue("geometry", self.saveGeometry())
-        event.accept()
-
     def get_ansibleIP(self):
         return self.ansibleIP
 
@@ -183,6 +131,14 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
 
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
+
+    def get_mul(self):
+        return self.mul
+
+    def set_mul(self, mul):
+        self.mul = mul
+        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
+        self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -202,14 +158,6 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block, Qt.QWidget):
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
 
-    def get_mul(self):
-        return self.mul
-
-    def set_mul(self, mul):
-        self.mul = mul
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
-        self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
-
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
@@ -223,20 +171,9 @@ def main(top_block_cls=ansible_hydra_gr_client_2tx_2rx, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-        style = gr.prefs().get_string('qtgui', 'style', 'raster')
-        Qt.QApplication.setGraphicsSystem(style)
-    qapp = Qt.QApplication(sys.argv)
-
     tb = top_block_cls(ansibleIP=options.ansibleIP)
     tb.start()
-    tb.show()
-
-    def quitting():
-        tb.stop()
-        tb.wait()
-    qapp.aboutToQuit.connect(quitting)
-    qapp.exec_()
+    tb.wait()
 
 
 if __name__ == '__main__':
