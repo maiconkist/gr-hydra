@@ -67,7 +67,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
 
   if(vr != nullptr and vr->get_rx_enabled())
   {
-    // requesting tx resources for a VR already existing 
+    // requesting tx resources for a VR already existing
     if (p_resource_manager->check_rx_free(d_centre_freq, d_bandwidth, u_id))
     {
       p_resource_manager->free_rx_resources(u_id);
@@ -125,7 +125,7 @@ HydraCore::request_tx_resources(unsigned int u_id,
 
   if(vr != nullptr and vr->get_tx_enabled())
   {
-    // requesting tx resources for a VR already existing 
+    // requesting tx resources for a VR already existing
     if (p_resource_manager->check_tx_free(d_centre_freq, d_bandwidth, u_id))
     {
       p_resource_manager->free_tx_resources(u_id);
@@ -232,10 +232,12 @@ HydraCore::query_resources()
 int
 HydraCore::free_resources(size_t radio_id)
 {
+  std::cout << "CORE: freeing resources for radio: " << radio_id << std::endl;
   p_resource_manager->free_rx_resources(radio_id);
   p_resource_manager->free_tx_resources(radio_id);
   p_hypervisor->detach_virtual_radio(radio_id);
 
+  std::cout << "CORE: DONE freeing resources for radio: " << radio_id << std::endl;
   return 1;
 }
 
