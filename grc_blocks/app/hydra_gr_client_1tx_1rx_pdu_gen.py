@@ -3,7 +3,11 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 1Tx 1Rx Pdu Gen
+<<<<<<< HEAD
 # Generated: Tue Mar 12 19:04:05 2019
+=======
+# Generated: Tue Mar 12 19:01:37 2019
+>>>>>>> 62d66a8a4794cde64857a1b53c7b85b3651a7250
 ##################################################
 
 from distutils.version import StrictVersion
@@ -36,7 +40,11 @@ from gnuradio import qtgui
 
 class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
 
+<<<<<<< HEAD
     def __init__(self, freqrx=2.32e9 + 3e6, freqtx=2.32e9, hydraClient='192.168.5.241', samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+=======
+    def __init__(self, freqrx=2.32e9 + 3e6, freqtx=2.32e9, hydraClient='192.168.5.73', samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+>>>>>>> 62d66a8a4794cde64857a1b53c7b85b3651a7250
         gr.top_block.__init__(self, "Hydra Gr Client 1Tx 1Rx Pdu Gen")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Hydra Gr Client 1Tx 1Rx Pdu Gen")

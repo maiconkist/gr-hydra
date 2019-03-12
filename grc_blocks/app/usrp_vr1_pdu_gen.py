@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Usrp Vr1 Pdu Gen
-# Generated: Tue Mar 12 17:19:49 2019
+# Generated: Tue Mar 12 19:07:51 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -39,7 +39,7 @@ from gnuradio import qtgui
 
 class usrp_vr1_pdu_gen(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freqrx=2.22e9, freqtx=2.22e9+3e6 , samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, freqrx=2.32e9, freqtx=2.32e9+3e6 , samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Usrp Vr1 Pdu Gen")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Usrp Vr1 Pdu Gen")
