@@ -13,7 +13,8 @@ zmq_source::zmq_source(const std::string& server_addr,
                        const std::string& port):
   s_host(remote_addr),
   s_port(port),
-  socket(context, ZMQ_PULL)
+  socket(context, ZMQ_PULL),
+  g_th_run(true)
 {
     // Create a thread to receive the data
     g_rx_thread = std::make_unique<std::thread>(&zmq_source::connect, this);
@@ -41,6 +42,7 @@ zmq_source::connect()
 
     if (message.size() > 0)
     {
+      std::cout << "got samples " << std::endl;
       std::lock_guard<std::mutex> _l(out_mtx);
       iq_sample *tmp = static_cast<iq_sample *>(message.data());
 
@@ -50,6 +52,10 @@ zmq_source::connect()
       output_buffer.insert(output_buffer.end(),
                            tmp,
                            tmp + (message.size()/sizeof(iq_sample)));
+    }
+    else
+    {
+      std::cout << "timeouted " << std::endl;
     }
 
     message.rebuild();
