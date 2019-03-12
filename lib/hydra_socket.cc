@@ -13,7 +13,8 @@ zmq_source::zmq_source(const std::string& server_addr,
                        const std::string& port):
   s_host(remote_addr),
   s_port(port),
-  socket(context, ZMQ_PULL)
+  socket(context, ZMQ_PULL),
+  g_th_run(true)
 {
     // Create a thread to receive the data
     g_rx_thread = std::make_unique<std::thread>(&zmq_source::connect, this);
