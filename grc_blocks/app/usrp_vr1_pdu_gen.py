@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Usrp Vr1 Pdu Gen
-# Generated: Tue Mar 12 13:41:08 2019
+# Generated: Tue Mar 12 17:19:49 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -84,12 +84,12 @@ class usrp_vr1_pdu_gen(gr.top_block, Qt.QWidget):
         self.pilot_symbols = pilot_symbols = ((1, 1, 1, -1,),)
         self.pilot_carriers = pilot_carriers = ((-21, -7, 7, 21,),)
         self.occupied_carriers = occupied_carriers = (range(-26, -21) + range(-20, -7) + range(-6, 0) + range(1, 7) + range(8, 21) + range(22, 27),)
-        self.mul1 = mul1 = 0.1
+        self.mul1 = mul1 = 0.04
 
         ##################################################
         # Blocks
         ##################################################
-        self._mul1_range = Range(0, 1, 0.01, 0.1, 200)
+        self._mul1_range = Range(0, 1, 0.01, 0.04, 200)
         self._mul1_win = RangeWidget(self._mul1_range, self.set_mul1, 'mul1', "counter_slider", float)
         self.top_layout.addWidget(self._mul1_win)
         self.uhd_usrp_source_0 = uhd.usrp_source(
