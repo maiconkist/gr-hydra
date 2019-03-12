@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Mon Mar 11 15:03:50 2019
+# Generated: Tue Mar 12 13:13:08 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, ansibleIP='192.168.5.73', freqrx=2.1e9+5e6, freqtx=2.1e9, mul=0.06, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, ansibleIP='192.168.5.73', freqrx=2.22e9+3e6, freqtx=2.22e9, mul=0.06, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
