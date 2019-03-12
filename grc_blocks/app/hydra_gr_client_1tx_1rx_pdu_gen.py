@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 1Tx 1Rx Pdu Gen
-# Generated: Tue Mar 12 13:13:13 2019
+# Generated: Tue Mar 12 14:59:54 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -82,18 +82,18 @@ class hydra_gr_client_1tx_1rx_pdu_gen(gr.top_block, Qt.QWidget):
         self.pilot_symbols = pilot_symbols = ((1, 1, 1, -1,),)
         self.pilot_carriers = pilot_carriers = ((-21, -7, 7, 21,),)
         self.occupied_carriers = occupied_carriers = (range(-26, -21) + range(-20, -7) + range(-6, 0) + range(1, 7) + range(8, 21) + range(22, 27),)
-        self.mul = mul = 0.07
+        self.mul = mul = 0.01
 
         ##################################################
         # Blocks
         ##################################################
-        self._mul_range = Range(0, 1, 0.01, 0.07, 200)
+        self._mul_range = Range(0, 1, 0.01, 0.01, 200)
         self._mul_win = RangeWidget(self._mul_range, self.set_mul, 'mul', "counter_slider", float)
         self.top_layout.addWidget(self._mul_win)
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, hydraClient, 5000)
         self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1000)
         self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, hydraClient, hydraClient, 5000)
-        self.hydra_gr__source_0_0.start_client(freqtx + vr1offset, samp_rate * 2, 5000)
+        self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 5000)
 
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
