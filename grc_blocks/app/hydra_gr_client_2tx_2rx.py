@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 2Tx 2Rx
-# Generated: Thu Feb  7 11:36:00 2019
+# Generated: Tue Mar 12 15:13:46 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, freqrx=1.1e9, freqtx=1.1e9, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3, hydraClient='192.168.5.77'):
+    def __init__(self, freqrx=1.1e9, freqtx=1.1e9, hydraClient='192.168.5.73', samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -28,10 +28,10 @@ class hydra_gr_client_2tx_2rx(gr.top_block):
         ##################################################
         self.freqrx = freqrx
         self.freqtx = freqtx
+        self.hydraClient = hydraClient
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
-        self.hydraClient = hydraClient
 
         ##################################################
         # Blocks
@@ -123,6 +123,12 @@ class hydra_gr_client_2tx_2rx(gr.top_block):
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
 
+    def get_hydraClient(self):
+        return self.hydraClient
+
+    def set_hydraClient(self, hydraClient):
+        self.hydraClient = hydraClient
+
     def get_samp_rate(self):
         return self.samp_rate
 
@@ -143,17 +149,11 @@ class hydra_gr_client_2tx_2rx(gr.top_block):
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
 
-    def get_hydraClient(self):
-        return self.hydraClient
-
-    def set_hydraClient(self, hydraClient):
-        self.hydraClient = hydraClient
-
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--hydraClient", dest="hydraClient", type="string", default='192.168.5.77',
+        "", "--hydraClient", dest="hydraClient", type="string", default='192.168.5.73',
         help="Set hydraClient [default=%default]")
     return parser
 
