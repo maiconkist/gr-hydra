@@ -75,6 +75,7 @@ int
 hydra_client::discover_server(std::string client_ip,
                 std::string &server_ip)
 {
+  std::cout <<  "discover_server" << std::endl;;
    const int MAX_MSG = 1000;
    send_udp(client_ip, client_ip, true, 5001);
 
@@ -145,6 +146,7 @@ hydra_client::request_tx_resources(rx_configuration &tx_conf)
 std::string
 hydra_client::check_connection()
 {
+   std::cout << "check_connection" << std::endl;
    while (discover_server(s_client_host, s_server_host) < 0) sleep(1);
 
    // Set message type
@@ -174,6 +176,8 @@ hydra_client::free_resources()
 std::string
 hydra_client::factory(const std::string &s_message)
 {
+  std::cout << s_message << std::endl;
+
   //  Prepare our context and socket
   zmq::context_t context(1);
   zmq::socket_t socket (context, ZMQ_REQ);

@@ -12,10 +12,18 @@ zmq_source::zmq_source(const std::string& server_addr,
                        const std::string& remote_addr,
                        const std::string& port):
   s_host(remote_addr),
-  s_port(port)
+  s_port(port),
+  socket(context, ZMQ_PULL)
 {
     // Create a thread to receive the data
-    rx_thread = std::make_unique<std::thread>(&zmq_source::connect, this);
+    g_rx_thread = std::make_unique<std::thread>(&zmq_source::connect, this);
+}
+
+
+zmq_source::~zmq_source()
+{
+  g_th_run = false;
+  g_rx_thread->join();
 }
 
 
@@ -23,17 +31,13 @@ void
 zmq_source::connect()
 {
   std::string addr = "tcp://" + s_host + ":" + s_port;
-  zmq::context_t context;
-  zmq::message_t message;
+  std::cout << "zmq_source addr: " << addr << std::endl;
 
-  std::cout << "addr: " << addr << std::endl;
-
-  zmq::socket_t socket(context, ZMQ_PULL);
   socket.connect(addr.c_str());
 
-  while (1)
+  while (g_th_run)
   {
-    socket.recv(&message);
+    socket.recv(&message, ZMQ_NOBLOCK);
 
     if (message.size() > 0)
     {
@@ -50,6 +54,8 @@ zmq_source::connect()
 
     message.rebuild();
   }
+
+  std::cout << "exiting zmq_source" << std::endl;
 }
 
 
@@ -62,24 +68,27 @@ zmq_sink::zmq_sink(
                             p_in_mtx(in_mtx),
                             s_host(server_addr),
                             s_port(port),
-                            g_th_run(true)
+                            g_th_run(true),
+                            socket(context, ZMQ_PUSH)
 {
-  tx_thread = std::make_unique<std::thread>(&zmq_sink::transmit, this);
+  g_tx_thread = std::make_unique<std::thread>(&zmq_sink::transmit, this);
 }
+
+zmq_sink::~zmq_sink()
+{
+  g_th_run = false;
+  g_tx_thread->join();
+}
+
 
 // Assign the handle receive callback when a datagram is received
 void
 zmq_sink::transmit()
 {
   std::string addr = "tcp://" + s_host + ":" + s_port;
-  zmq::context_t context;
-
-  std::cout << "addr: " << addr << std::endl;
-
-  zmq::socket_t socket(context, ZMQ_PUSH);
+  std::cout << "zmq_sink addr: " << addr << std::endl;
   socket.bind(addr.c_str());
 
-  zmq::message_t message;
   while (g_th_run)
   {
     // If there is anything to transmit
@@ -98,13 +107,15 @@ zmq_sink::transmit()
         g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->begin() + g_input_buffer->size());
       }
 
-      size_t n = socket.send(message);
+      if (g_th_run) socket.send(message);
     }
     else
     {
       std::this_thread::sleep_for(std::chrono::microseconds(1));
     }
   } // while
+
+  std::cout << "Leaving zmq_sink::transmit thread" << std::endl;
 }
 
 tcp_sink::tcp_sink(

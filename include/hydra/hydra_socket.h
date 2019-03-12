@@ -9,6 +9,7 @@
 #include <mutex>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <zmq.hpp>
 
 #include "hydra/types.h"
 
@@ -27,6 +28,10 @@ class zmq_source
              const std::string &remote_addr,
              const std::string& port);
 
+  /** DTOR
+   */
+  ~zmq_source();
+
   static std::unique_ptr<zmq_source> make(const std::string &server_addr,
                                           const std::string &remote_addr,
                                           const std::string& port)
@@ -43,9 +48,14 @@ class zmq_source
  private:
   std::string s_host;
   std::string s_port;
+  bool g_th_run;
+
 
   // UDP thread to handle the receiving of datagrams
-  std::unique_ptr<std::thread> rx_thread;
+  std::unique_ptr<std::thread> g_rx_thread;
+  zmq::context_t context;
+  zmq::message_t message;
+  zmq::socket_t socket;
 
   // Create output buffer
   iq_stream output_buffer;
@@ -68,6 +78,10 @@ public:
            const std::string& remote_addr,
            const std::string& port);
 
+  /** DTOR
+   */
+  ~zmq_sink();
+
   static std::unique_ptr<zmq_sink> make(iq_stream *p_input_buffer,
                                         std::mutex *in_mtx,
                                         const std::string& server_addr,
@@ -84,7 +98,10 @@ private:
   std::string s_port;
 
   // UDP thread to handle the receiving of datagrams
-  std::unique_ptr<std::thread> tx_thread;
+  std::unique_ptr<std::thread> g_tx_thread;
+  zmq::context_t context;
+  zmq::message_t message;
+  zmq::socket_t socket;
 
   bool g_th_run;
   iq_stream * g_input_buffer;
