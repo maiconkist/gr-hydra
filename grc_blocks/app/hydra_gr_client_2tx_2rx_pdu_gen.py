@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Hydra Gr Client 2Tx 2Rx Pdu Gen
-# Generated: Tue Mar 12 13:45:48 2019
+# Generated: Tue Mar 12 14:58:10 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -77,12 +77,12 @@ class hydra_gr_client_2tx_2rx_pdu_gen(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.mul = mul = 0.06
+        self.mul = mul = 0.01
 
         ##################################################
         # Blocks
         ##################################################
-        self._mul_range = Range(0, 1, 0.01, 0.06, 200)
+        self._mul_range = Range(0, 1, 0.01, 0.01, 200)
         self._mul_win = RangeWidget(self._mul_range, self.set_mul, 'mul', "counter_slider", float)
         self.top_layout.addWidget(self._mul_win)
         self.hydra_gr_sink_0_0 = hydra.hydra_gr_client_sink(2, hydraClient, 5000)
