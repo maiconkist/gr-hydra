@@ -89,7 +89,6 @@ zmq_sink::transmit()
   std::cout << "zmq_sink addr: " << addr << std::endl;
   socket.bind(addr.c_str());
   socket.setsockopt(ZMQ_SNDTIMEO, 2000);
-  std::cout << "BINDED " << std::endl;
 
   while (g_th_run)
   {
@@ -100,20 +99,18 @@ zmq_sink::transmit()
       {
         // Copy everything to output_buffer. Clear input
         //
-        std::cout << "LOCKED " << std::endl;
         std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
 
         if (!g_th_run) return;
 
         message.rebuild(g_input_buffer->size() * sizeof(gr_complex));
         iq_sample *tmp = static_cast<iq_sample *>(message.data());
-        for (size_t i = 0; i < g_input_buffer->size(); ++i)
+        for (size_t i = 0; i < g_input_buffer->size() && g_th_run; ++i)
           tmp[i] = (*g_input_buffer)[i];
 
         g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->begin() + g_input_buffer->size());
       }
 
-     std::cout << "UNLOCKED " << std::endl;
      if (g_th_run) socket.send(message);
     }
     else
