@@ -329,7 +329,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(360, 560)</value>
+      <value>(448, 560)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -486,7 +486,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(672, 440)</value>
+      <value>(736, 436)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -676,7 +676,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9</value>
+      <value>2.32e9</value>
     </param>
   </block>
   <block>
@@ -719,7 +719,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9+3e6</value>
+      <value>2.32e9+3e6</value>
     </param>
   </block>
   <block>
@@ -1746,7 +1746,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1120, 216)</value>
+      <value>(1128, 212)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3081,7 +3081,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1120, 456)</value>
+      <value>(1120, 452)</value>
     </param>
     <param>
       <key>_rotation</key>

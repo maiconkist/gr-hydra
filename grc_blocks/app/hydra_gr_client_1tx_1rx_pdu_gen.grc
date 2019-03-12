@@ -752,7 +752,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9 + 3e6</value>
+      <value>2.32e9 + 3e6</value>
     </param>
   </block>
   <block>
@@ -795,7 +795,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9</value>
+      <value>2.32e9</value>
     </param>
   </block>
   <block>
@@ -838,7 +838,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>192.168.5.73</value>
+      <value>192.168.5.241</value>
     </param>
   </block>
   <block>
