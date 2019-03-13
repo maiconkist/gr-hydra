@@ -38,7 +38,7 @@
     </param>
     <param>
       <key>generate_options</key>
-      <value>no_gui</value>
+      <value>qt_gui</value>
     </param>
     <param>
       <key>hier_block_src_path</key>
@@ -93,7 +93,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -156,7 +156,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -447,7 +447,7 @@
     </param>
     <param>
       <key>mtu</key>
-      <value>1000</value>
+      <value>1500</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -676,7 +676,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.32e9</value>
+      <value>1.42e9</value>
     </param>
   </block>
   <block>
@@ -719,7 +719,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.32e9+3e6</value>
+      <value>1.42e9+3e6</value>
     </param>
   </block>
   <block>
@@ -734,7 +734,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -777,7 +777,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>

@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Usrp Vr1 Pdu Gen
-# Generated: Tue Mar 12 19:07:51 2019
+# Generated: Wed Mar 13 00:12:28 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -39,7 +39,7 @@ from gnuradio import qtgui
 
 class usrp_vr1_pdu_gen(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freqrx=2.32e9, freqtx=2.32e9+3e6 , samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, freqrx=1.42e9, freqtx=1.42e9+3e6 , samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Usrp Vr1 Pdu Gen")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Usrp Vr1 Pdu Gen")
@@ -112,7 +112,7 @@ class usrp_vr1_pdu_gen(gr.top_block, Qt.QWidget):
         )
         self.uhd_usrp_sink_0.set_samp_rate(samp_rate * 2)
         self.uhd_usrp_sink_0.set_center_freq(freqtx + vr1offset, 0)
-        self.uhd_usrp_sink_0.set_normalized_gain(0.7, 0)
+        self.uhd_usrp_sink_0.set_normalized_gain(0.85, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
         self.qtgui_waterfall_sink_x_0 = qtgui.waterfall_sink_c(
         	1024, #size

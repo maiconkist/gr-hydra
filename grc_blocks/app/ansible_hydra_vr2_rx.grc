@@ -208,37 +208,6 @@
     </param>
   </block>
   <block>
-    <key>blocks_message_debug</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(112, 600)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>180</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_message_debug_0</value>
-    </param>
-  </block>
-  <block>
     <key>blocks_multiply_const_vxx</key>
     <param>
       <key>alias</key>
@@ -262,7 +231,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(840, 320)</value>
+      <value>(856, 320)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -360,11 +329,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(872, 176)</value>
+      <value>(264, 608)</value>
     </param>
     <param>
       <key>_rotation</key>
-      <value>0</value>
+      <value>180</value>
     </param>
     <param>
       <key>id</key>
@@ -372,7 +341,7 @@
     </param>
     <param>
       <key>type</key>
-      <value>complex</value>
+      <value>byte</value>
     </param>
     <param>
       <key>filter</key>
@@ -411,7 +380,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 544)</value>
+      <value>(80, 544)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -517,7 +486,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(584, 504)</value>
+      <value>(584, 500)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -604,7 +573,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(584, 272)</value>
+      <value>(608, 268)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -707,7 +676,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.32e9</value>
+      <value>1.42e9</value>
     </param>
   </block>
   <block>
@@ -750,7 +719,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.32e9+3e6</value>
+      <value>1.42e9+3e6</value>
     </param>
   </block>
   <block>
@@ -836,7 +805,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>0.06</value>
+      <value>0.04</value>
     </param>
   </block>
   <block>
@@ -2889,7 +2858,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(880, 520)</value>
+      <value>(880, 516)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3144,12 +3113,6 @@
   </connection>
   <connection>
     <source_block_id>blocks_tagged_stream_to_pdu_0_0</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>pdus</source_key>
-    <sink_key>print_pdu</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_tagged_stream_to_pdu_0_0</source_block_id>
     <sink_block_id>blocks_tuntap_pdu_1_0</sink_block_id>
     <source_key>pdus</source_key>
     <sink_key>pdus</sink_key>
@@ -3162,6 +3125,12 @@
   </connection>
   <connection>
     <source_block_id>digital_ofdm_rx_0_0</source_block_id>
+    <sink_block_id>blocks_tag_debug_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>digital_ofdm_rx_0_0</source_block_id>
     <sink_block_id>blocks_tagged_stream_to_pdu_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -3169,12 +3138,6 @@
   <connection>
     <source_block_id>digital_ofdm_tx_0_0</source_block_id>
     <sink_block_id>blocks_multiply_const_vxx_0_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>digital_ofdm_tx_0_0</source_block_id>
-    <sink_block_id>blocks_tag_debug_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
