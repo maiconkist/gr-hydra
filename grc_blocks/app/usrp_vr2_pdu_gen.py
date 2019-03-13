@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Usrp Vr2 Pdu Gen
-# Generated: Tue Mar 12 19:59:35 2019
+# Generated: Wed Mar 13 02:29:25 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -39,7 +39,7 @@ from gnuradio import qtgui
 
 class usrp_vr2_pdu_gen(gr.top_block, Qt.QWidget):
 
-    def __init__(self, freqrx=1.42e9, freqtx=1.42e9+3e6 , samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, freqrx=1.42e9, freqtx=1.42e9+3e6 , samp_rate=200e3, vr1offset=-300e3, vr2offset=400e3):
         gr.top_block.__init__(self, "Usrp Vr2 Pdu Gen")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Usrp Vr2 Pdu Gen")
@@ -84,14 +84,14 @@ class usrp_vr2_pdu_gen(gr.top_block, Qt.QWidget):
         self.pilot_symbols = pilot_symbols = ((1, 1, 1, -1,),)
         self.pilot_carriers = pilot_carriers = ((-21, -7, 7, 21,),)
         self.occupied_carriers = occupied_carriers = (range(-26, -21) + range(-20, -7) + range(-6, 0) + range(1, 7) + range(8, 21) + range(22, 27),)
-        self.mul1 = mul1 = 0.1
+        self.mul = mul = 0.04
 
         ##################################################
         # Blocks
         ##################################################
-        self._mul1_range = Range(0, 1, 0.01, 0.1, 200)
-        self._mul1_win = RangeWidget(self._mul1_range, self.set_mul1, 'mul1', "counter_slider", float)
-        self.top_layout.addWidget(self._mul1_win)
+        self._mul_range = Range(0, 1, 0.01, 0.04, 200)
+        self._mul_win = RangeWidget(self._mul_range, self.set_mul, 'mul', "counter_slider", float)
+        self.top_layout.addWidget(self._mul_win)
         self.uhd_usrp_source_0 = uhd.usrp_source(
         	",".join(("", "")),
         	uhd.stream_args(
@@ -99,8 +99,8 @@ class usrp_vr2_pdu_gen(gr.top_block, Qt.QWidget):
         		channels=range(1),
         	),
         )
-        self.uhd_usrp_source_0.set_samp_rate(samp_rate * 2)
-        self.uhd_usrp_source_0.set_center_freq(freqrx + vr1offset, 0)
+        self.uhd_usrp_source_0.set_samp_rate(samp_rate)
+        self.uhd_usrp_source_0.set_center_freq(freqrx + vr2offset, 0)
         self.uhd_usrp_source_0.set_gain(0, 0)
         self.uhd_usrp_source_0.set_antenna('RX2', 0)
         self.uhd_usrp_sink_0 = uhd.usrp_sink(
@@ -110,9 +110,9 @@ class usrp_vr2_pdu_gen(gr.top_block, Qt.QWidget):
         		channels=range(1),
         	),
         )
-        self.uhd_usrp_sink_0.set_samp_rate(samp_rate * 2)
-        self.uhd_usrp_sink_0.set_center_freq(freqtx + vr1offset, 0)
-        self.uhd_usrp_sink_0.set_normalized_gain(0.7, 0)
+        self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
+        self.uhd_usrp_sink_0.set_center_freq(freqtx + vr2offset, 0)
+        self.uhd_usrp_sink_0.set_normalized_gain(0.85, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
         self.qtgui_waterfall_sink_x_0 = qtgui.waterfall_sink_c(
         	1024, #size
@@ -171,7 +171,7 @@ class usrp_vr2_pdu_gen(gr.top_block, Qt.QWidget):
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_random_pdu_0 = blocks.random_pdu(50, 100, chr(0xFF), 2)
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul1, ))
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul, ))
         self.blocks_message_strobe_0 = blocks.message_strobe(pmt.intern("TEST"), 1000)
 
         ##################################################
@@ -196,22 +196,22 @@ class usrp_vr2_pdu_gen(gr.top_block, Qt.QWidget):
 
     def set_freqrx(self, freqrx):
         self.freqrx = freqrx
-        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr1offset, 0)
+        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
 
     def get_freqtx(self):
         return self.freqtx
 
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
-        self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr1offset, 0)
+        self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
 
     def get_samp_rate(self):
         return self.samp_rate
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate * 2)
-        self.uhd_usrp_sink_0.set_samp_rate(self.samp_rate * 2)
+        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
+        self.uhd_usrp_sink_0.set_samp_rate(self.samp_rate)
         self.qtgui_waterfall_sink_x_0.set_frequency_range(0, self.samp_rate)
 
     def get_vr1offset(self):
@@ -219,14 +219,14 @@ class usrp_vr2_pdu_gen(gr.top_block, Qt.QWidget):
 
     def set_vr1offset(self, vr1offset):
         self.vr1offset = vr1offset
-        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr1offset, 0)
-        self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr1offset, 0)
 
     def get_vr2offset(self):
         return self.vr2offset
 
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
+        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
+        self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
 
     def get_sync_word2(self):
         return self.sync_word2
@@ -258,12 +258,12 @@ class usrp_vr2_pdu_gen(gr.top_block, Qt.QWidget):
     def set_occupied_carriers(self, occupied_carriers):
         self.occupied_carriers = occupied_carriers
 
-    def get_mul1(self):
-        return self.mul1
+    def get_mul(self):
+        return self.mul
 
-    def set_mul1(self, mul1):
-        self.mul1 = mul1
-        self.blocks_multiply_const_vxx_0.set_k((self.mul1, ))
+    def set_mul(self, mul):
+        self.mul = mul
+        self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
 
 
 def argument_parser():
