@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Wed Mar 13 01:42:05 2019
+# Generated: Wed Mar 13 02:36:08 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, ansibleIP='192.168.5.241', freqrx=1.42e9+3e6, freqtx=1.42e9, mul=0.01, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, ansibleIP='192.168.5.241', freqrx=1.42e9+3e6, freqtx=1.42e9, mul=0.01, samp_rate=200e3, vr1offset=-300e3, vr2offset=400e3, mul2=0.04):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -33,6 +33,7 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
+        self.mul2 = mul2
 
         ##################################################
         # Blocks
@@ -91,7 +92,7 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul, ))
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul2, ))
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul, ))
 
         ##################################################
@@ -137,7 +138,6 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
     def set_mul(self, mul):
         self.mul = mul
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
         self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
 
     def get_samp_rate(self):
@@ -157,6 +157,13 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
+
+    def get_mul2(self):
+        return self.mul2
+
+    def set_mul2(self, mul2):
+        self.mul2 = mul2
+        self.blocks_multiply_const_vxx_0_0.set_k((self.mul2, ))
 
 
 def argument_parser():

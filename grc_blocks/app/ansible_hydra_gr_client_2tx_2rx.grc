@@ -145,6 +145,69 @@
     </param>
   </block>
   <block>
+    <key>variable_qtgui_range</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0.04</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1032, 116)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>mul2</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>mul2</value>
+    </param>
+    <param>
+      <key>min_len</key>
+      <value>200</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.Horizontal</value>
+    </param>
+    <param>
+      <key>start</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>step</key>
+      <value>0.01</value>
+    </param>
+    <param>
+      <key>stop</key>
+      <value>1.0</value>
+    </param>
+    <param>
+      <key>rangeType</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>counter_slider</value>
+    </param>
+  </block>
+  <block>
     <key>parameter</key>
     <param>
       <key>alias</key>
@@ -250,7 +313,7 @@
     </param>
     <param>
       <key>const</key>
-      <value>mul</value>
+      <value>mul2</value>
     </param>
     <param>
       <key>affinity</key>
@@ -1383,7 +1446,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(952, 16)</value>
+      <value>(880, 16)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1408,6 +1471,49 @@
     <param>
       <key>value</key>
       <value>0.01</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(904, 136)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>mul2</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>mul2</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0.04</value>
     </param>
   </block>
   <block>
@@ -1536,7 +1642,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>700e3</value>
+      <value>400e3</value>
     </param>
   </block>
   <connection>
