@@ -1,3 +1,8 @@
+# gr-hydra
+
+[![Build Status](https://travis-ci.org/maiconkist/gr-hydra.svg?branch=bleeding)](https://travis-ci.org/maiconkist/gr-hydra)
+
+
 == REQUIRED LIBS ==
 
 swig
