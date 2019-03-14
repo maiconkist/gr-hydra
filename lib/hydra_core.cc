@@ -21,8 +21,6 @@ HydraCore::set_rx_resources(uhd_hydra_sptr usrp,
 {
   // Initialise the RX resources
   p_resource_manager->set_rx_resources(d_centre_freq, d_bandwidth);
-
-  usrp->set_rx_config(d_centre_freq, d_bandwidth, 0);
   p_hypervisor->set_rx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
   // Toggle flag
@@ -37,8 +35,6 @@ HydraCore::set_tx_resources(uhd_hydra_sptr usrp,
 {
    // Initialise the RX resources
    p_resource_manager->set_tx_resources(d_centre_freq, d_bandwidth);
-
-   usrp->set_tx_config(d_centre_freq, d_bandwidth, 0.6);
    p_hypervisor->set_tx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
    // Toggle flag
@@ -67,7 +63,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
 
   if(vr != nullptr and vr->get_rx_enabled())
   {
-    // requesting tx resources for a VR already existing 
+    // requesting tx resources for a VR already existing
     if (p_resource_manager->check_rx_free(d_centre_freq, d_bandwidth, u_id))
     {
       p_resource_manager->free_rx_resources(u_id);
@@ -125,7 +121,7 @@ HydraCore::request_tx_resources(unsigned int u_id,
 
   if(vr != nullptr and vr->get_tx_enabled())
   {
-    // requesting tx resources for a VR already existing 
+    // requesting tx resources for a VR already existing
     if (p_resource_manager->check_tx_free(d_centre_freq, d_bandwidth, u_id))
     {
       p_resource_manager->free_tx_resources(u_id);

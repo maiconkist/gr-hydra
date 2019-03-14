@@ -4,7 +4,6 @@
 #include "hydra/hydra_gr_client_sink.h"
 #include "hydra/hydra_client.h"
 
-#include <gnuradio/blocks/tcp_server_sink.h>
 #include <chrono>
 
 using namespace hydra;
@@ -35,7 +34,6 @@ class hydra_gr_client_sink_impl : public hydra_gr_client_sink
    virtual bool stop();
 
  private:
-  gr::blocks::tcp_server_sink::sptr d_tcp_sink;
   std::unique_ptr<hydra_client> client;
   std::string g_host;
 };
