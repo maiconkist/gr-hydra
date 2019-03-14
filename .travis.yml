@@ -3,7 +3,7 @@ sudo: required
 
 before_script:
      - sudo apt-get -qq update
-     - sudo apt-get install -qq build-essential cmake libfftw3-dev uhd-host libuhd-dev gnuradio-dev libopencv-dev libzmqpp-dev
+     - sudo apt-get install -qq build-essential cmake libfftw3-dev uhd-host libuhd-dev gnuradio-dev libopencv-dev libzmqpp-dev swig
 language: cpp
 script:
   - mkdir build
