@@ -13,7 +13,8 @@ zmq_source::zmq_source(const std::string& server_addr,
                        const std::string& port):
   s_host(remote_addr),
   s_port(port),
-  socket(context, ZMQ_PULL)
+  socket(context, ZMQ_PULL),
+  g_th_run(true)
 {
     // Create a thread to receive the data
     g_rx_thread = std::make_unique<std::thread>(&zmq_source::connect, this);
@@ -88,6 +89,7 @@ zmq_sink::transmit()
   std::string addr = "tcp://" + s_host + ":" + s_port;
   std::cout << "zmq_sink addr: " << addr << std::endl;
   socket.bind(addr.c_str());
+  socket.setsockopt(ZMQ_SNDTIMEO, 2000);
 
   while (g_th_run)
   {
@@ -97,17 +99,20 @@ zmq_sink::transmit()
       /* Local scope lock */
       {
         // Copy everything to output_buffer. Clear input
+        //
         std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
+
+        if (!g_th_run) return;
 
         message.rebuild(g_input_buffer->size() * sizeof(gr_complex));
         iq_sample *tmp = static_cast<iq_sample *>(message.data());
-        for (size_t i = 0; i < g_input_buffer->size(); ++i)
+        for (size_t i = 0; i < g_input_buffer->size() && g_th_run; ++i)
           tmp[i] = (*g_input_buffer)[i];
 
         g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->begin() + g_input_buffer->size());
       }
 
-      if (g_th_run) socket.send(message);
+     if (g_th_run) socket.send(message);
     }
     else
     {

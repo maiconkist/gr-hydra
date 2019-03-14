@@ -228,10 +228,12 @@ HydraCore::query_resources()
 int
 HydraCore::free_resources(size_t radio_id)
 {
+  std::cout << "CORE: freeing resources for radio: " << radio_id << std::endl;
   p_resource_manager->free_rx_resources(radio_id);
   p_resource_manager->free_tx_resources(radio_id);
   p_hypervisor->detach_virtual_radio(radio_id);
 
+  std::cout << "CORE: DONE freeing resources for radio: " << radio_id << std::endl;
   return 1;
 }
 

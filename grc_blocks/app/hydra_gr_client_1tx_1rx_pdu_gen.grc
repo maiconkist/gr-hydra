@@ -38,7 +38,7 @@
     </param>
     <param>
       <key>generate_options</key>
-      <value>no_gui</value>
+      <value>qt_gui</value>
     </param>
     <param>
       <key>hier_block_src_path</key>
@@ -79,6 +79,69 @@
     <param>
       <key>title</key>
       <value></value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_range</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0.01</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(984, 0)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>mul</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>mul</value>
+    </param>
+    <param>
+      <key>min_len</key>
+      <value>200</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.Horizontal</value>
+    </param>
+    <param>
+      <key>start</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>step</key>
+      <value>0.01</value>
+    </param>
+    <param>
+      <key>stop</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>rangeType</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>counter_slider</value>
     </param>
   </block>
   <block>
@@ -275,7 +338,7 @@
     </param>
     <param>
       <key>const</key>
-      <value>0.06</value>
+      <value>mul</value>
     </param>
     <param>
       <key>affinity</key>
@@ -689,7 +752,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1.1e9</value>
+      <value>2.22e9 + 3e6</value>
     </param>
   </block>
   <block>
@@ -732,7 +795,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1.1e9</value>
+      <value>2.22e9</value>
     </param>
   </block>
   <block>
@@ -775,7 +838,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>192.168.5.77</value>
+      <value>192.168.5.73</value>
     </param>
   </block>
   <block>
@@ -786,7 +849,7 @@
     </param>
     <param>
       <key>center_frequency</key>
-      <value>freqtx + vr1offset</value>
+      <value>freqrx + vr1offset</value>
     </param>
     <param>
       <key>c_host</key>

@@ -186,9 +186,12 @@ HydraServer::run()
       // Extract the request arguments
       unsigned int u_id = root.get("xvl_fre.id", 0);
 
+      std::cout << "SERVER: u_id:" << u_id << std::endl;
+
       // Check if they are invalid
       if (not u_id)
       {
+        std::cout << "SERVER: not u_id:" << u_id << std::endl;
         // Add the content
         content.put("status", false);
         content.put("message","Missing or invalid parameters.");
@@ -199,6 +202,7 @@ HydraServer::run()
       else
       {
         // Try to reserve resources
+        std::cout << "SERVER: calling p_core->free_resources" << std::endl;
         if ( not p_core->free_resources(u_id))
         {
           // Add the content
