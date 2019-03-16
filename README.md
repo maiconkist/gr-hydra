@@ -48,6 +48,69 @@ sudo make install
 
 ## RUNNING THE EXAMPLES
 
+### NOMENCLATURE
+
+For all examples we:
+
+- We associate a terminal ID to a all terminals open in the form **T_n**, where **n** is the terminal number. Wherewer needed we are going to refer to a specific terminal by specifying its ID.
+
+- refer to **USRP_n** as a pair of **PC+USRP**, where **n** indentifies one of the pair. Ex: USRP_1 is what you consider your 1st PC+USRP, while **USRP_2** is your second. Whenever we refer to **USRP_1** you execute the instructions in that machine. 
+
+
+### EXAMPLE 1
+#### HARDWARE REQUIREMENTS: 2x [USRP] -- IDEAL: 3x [USRP]
+
+
+1. Open a terminal in USRP_1 (**T1**). Start the Hydra-Server flowgraph:
+```
+python grc_blocks/app/hydra_gr_server_example.py
+```
+2. Open a terminal in USRP_1 (**T2**). Start the client that request 2 end-to-end TX/RX slices:
+```
+python grc_blocks/app/hydra_gr_client_2tx_2rx_pdu_gen.py
+```
+3. Open a terminal in USRP_2 (**T3**). Start the flowgraph that receives the messages (PDU) transmitted in slice 1:
+```
+python grc_blocks/app/usrp_vr1_pdu_gen.grc
+```
+4. In **T3** you should see the log of messages being received from USRP_1: 
+```
+LOG
+LOG
+LOG
+LOG
+```
+5. In **T2** you should see the log of messages being received from USRP_2:
+```
+LOG
+LOG
+LOG
+LOG
+```
+6. If you have only 2 USRP: stop the flowgraph in **T3**. Otherwise go to next step.
+7.  Open a terminal (**T4**) in USRP_3 (or USRP_2 if you have only 2 USRPs).  Start the flowgraph that receives the messages (PDU) transmitted in slice 2:
+```
+python grc_blocks/app/usrp_vr2_pdu_gen.grc
+```
+8. In **T2** you should see the log of messages being received from **USRP_3** (or **USRP_2**):
+```
+LOG
+LOG
+LOG
+LOG
+```
+9. In **T4** you should see the log of messages being received from USRP_1:
+```
+LOG
+LOG
+LOG
+LOG
+```
+
+
+### EXAMPLE 2
+#### HARDWARE REQUIREMENTS: 
+
 
 ## LICENSE
 
