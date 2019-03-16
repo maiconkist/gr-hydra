@@ -53,7 +53,7 @@ sudo make install
 
 ## ACKNOWLEDGEMENTS
 
-## TROUBLESHOOTING ==
+## TROUBLESHOOTING
 
 * Cmake cannot find FFTW ? 
 
