@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Tue Mar 12 17:38:22 2019
+# Generated: Wed Mar 13 03:03:11 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, ansibleIP='192.168.5.73', freqrx=2.22e9+3e6, freqtx=2.22e9, mul=0.01, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, ansibleIP='192.168.5.73', freqrx=2.22e9+3e6, freqtx=2.22e9, mul=0.01, mul2=0.03, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -30,6 +30,7 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         self.freqrx = freqrx
         self.freqtx = freqtx
         self.mul = mul
+        self.mul2 = mul2
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
@@ -91,7 +92,7 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul, ))
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul2, ))
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul, ))
 
         ##################################################
@@ -137,8 +138,14 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
     def set_mul(self, mul):
         self.mul = mul
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
         self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
+
+    def get_mul2(self):
+        return self.mul2
+
+    def set_mul2(self, mul2):
+        self.mul2 = mul2
+        self.blocks_multiply_const_vxx_0_0.set_k((self.mul2, ))
 
     def get_samp_rate(self):
         return self.samp_rate
