@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr2 Rx
-# Generated: Tue Mar 12 13:16:10 2019
+# Generated: Tue Mar 12 18:05:37 2019
 ##################################################
 
 
@@ -20,19 +20,19 @@ import time
 
 class ansible_hydra_vr2_rx(gr.top_block):
 
-    def __init__(self, gain=0.85, mul=0.06, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3, freqrx=2.22e9, freqtx=2.22e9+3e6):
+    def __init__(self, freqrx=2.22e9, freqtx=2.22e9+3e6, gain=0.85, mul=0.03, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Vr2 Rx")
 
         ##################################################
         # Parameters
         ##################################################
+        self.freqrx = freqrx
+        self.freqtx = freqtx
         self.gain = gain
         self.mul = mul
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
-        self.freqrx = freqrx
-        self.freqtx = freqtx
 
         ##################################################
         # Blocks
@@ -97,6 +97,20 @@ class ansible_hydra_vr2_rx(gr.top_block):
         self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_tag_debug_0_0, 0))
         self.connect((self.uhd_usrp_source_0, 0), (self.digital_ofdm_rx_0_0, 0))
 
+    def get_freqrx(self):
+        return self.freqrx
+
+    def set_freqrx(self, freqrx):
+        self.freqrx = freqrx
+        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
+
+    def get_freqtx(self):
+        return self.freqtx
+
+    def set_freqtx(self, freqtx):
+        self.freqtx = freqtx
+        self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
+
     def get_gain(self):
         return self.gain
 
@@ -132,20 +146,6 @@ class ansible_hydra_vr2_rx(gr.top_block):
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
         self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
-        self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
-
-    def get_freqrx(self):
-        return self.freqrx
-
-    def set_freqrx(self, freqrx):
-        self.freqrx = freqrx
-        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
-
-    def get_freqtx(self):
-        return self.freqtx
-
-    def set_freqtx(self, freqtx):
-        self.freqtx = freqtx
         self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
 
 
