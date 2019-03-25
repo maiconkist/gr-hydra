@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Wed Mar 13 02:36:08 2019
+# Generated: Mon Mar 25 17:04:36 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, ansibleIP='192.168.5.241', freqrx=1.42e9+3e6, freqtx=1.42e9, mul=0.01, samp_rate=200e3, vr1offset=-300e3, vr2offset=400e3, mul2=0.04):
+    def __init__(self, ansibleIP='192.168.5.241', freqrx=1.42e9+3e6, freqtx=1.42e9, mul=0.02, mul2=0.04, samp_rate=200e3, vr1offset=-300e3, vr2offset=400e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -30,10 +30,10 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         self.freqrx = freqrx
         self.freqtx = freqtx
         self.mul = mul
+        self.mul2 = mul2
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
-        self.mul2 = mul2
 
         ##################################################
         # Blocks
@@ -140,6 +140,13 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         self.mul = mul
         self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
 
+    def get_mul2(self):
+        return self.mul2
+
+    def set_mul2(self, mul2):
+        self.mul2 = mul2
+        self.blocks_multiply_const_vxx_0_0.set_k((self.mul2, ))
+
     def get_samp_rate(self):
         return self.samp_rate
 
@@ -157,13 +164,6 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
-
-    def get_mul2(self):
-        return self.mul2
-
-    def set_mul2(self, mul2):
-        self.mul2 = mul2
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul2, ))
 
 
 def argument_parser():
