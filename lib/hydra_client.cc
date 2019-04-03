@@ -146,15 +146,18 @@ std::string
 hydra_client::check_connection(size_t max_tries)
 {
    size_t tries = 0;
-   size_t status;
+   int status;
 
    while ( (status = discover_server(s_client_host, s_server_host)) < 0 &&
            (tries++ < max_tries))
    {
+     std::cout << boost::format("status: %d -- tries: %d") % status % tries << std::endl;
      if (status < 0 && tries >= max_tries) return std::string("");
 
      sleep(1);
    }
+
+   std::cout << boost::format("status: %d -- tries: %d") % status % tries << std::endl;
 
    // Set message type
    std::string message = "{\"xvl_syn\":\"\"}";
