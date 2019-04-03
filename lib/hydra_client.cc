@@ -162,8 +162,6 @@ hydra_client::check_connection(size_t max_tries)
      sleep(1);
    }
 
-   std::cout << boost::format("status: %d -- tries: %d") % status % tries << std::endl;
-
    // Set message type
    std::string message = "{\"xvl_syn\":\"\"}";
    // Send message and return acknowledgement
