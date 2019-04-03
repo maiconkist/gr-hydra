@@ -44,7 +44,7 @@ public:
    int request_tx_resources(rx_configuration &tx_conf);
 
    /* Check whether the hypervisor is alive */
-   std::string check_connection();
+   std::string check_connection(size_t max_tries = 10);
 
    /* Query the available resources */
    std::string query_resources();

@@ -75,7 +75,6 @@ int
 hydra_client::discover_server(std::string client_ip,
                 std::string &server_ip)
 {
-  std::cout <<  "discover_server" << std::endl;;
    const int MAX_MSG = 1000;
    send_udp(client_ip, client_ip, true, 5001);
 
@@ -144,10 +143,18 @@ hydra_client::request_tx_resources(rx_configuration &tx_conf)
 }
 
 std::string
-hydra_client::check_connection()
+hydra_client::check_connection(size_t max_tries)
 {
-   std::cout << "check_connection" << std::endl;
-   while (discover_server(s_client_host, s_server_host) < 0) sleep(1);
+   size_t tries = 0;
+   size_t status;
+
+   while ( (status = discover_server(s_client_host, s_server_host)) < 0 &&
+           (tries++ < max_tries))
+   {
+     if (status < 0 && tries >= max_tries) return std::string("");
+
+     sleep(1);
+   }
 
    // Set message type
    std::string message = "{\"xvl_syn\":\"\"}";
