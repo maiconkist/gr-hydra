@@ -30,7 +30,12 @@ hydra_gr_client_source_impl::hydra_gr_client_source_impl(unsigned int u_id,
                   gr::io_signature::make(1, 1, sizeof(gr_complex)))
 {
   client = std::make_unique<hydra_client>(c_host, u_port, u_id, true);
-  client->check_connection();
+
+  if (client->check_connection(3) == std::string(""))
+  {
+    std::cout << "Could not connect to server. Aborting" << std::endl;
+    assert(1 == 0);
+  }
 }
 
 hydra_gr_client_source_impl::~hydra_gr_client_source_impl()

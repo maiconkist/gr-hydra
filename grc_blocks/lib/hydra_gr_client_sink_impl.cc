@@ -34,7 +34,11 @@ hydra_gr_client_sink_impl::hydra_gr_client_sink_impl(
   g_host = s_host;
   client = std::make_unique<hydra_client>(g_host, u_port, u_id, true);
 
-  client->check_connection();
+  if (client->check_connection(3) == std::string(""))
+  {
+    std::cout << "Could not connect to server. Aborting" << std::endl;
+    assert (1 == 0);
+  }
 }
 
 hydra_gr_client_sink_impl::~hydra_gr_client_sink_impl()

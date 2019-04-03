@@ -9,12 +9,13 @@ namespace hydra {
 hydra_client::hydra_client(std::string client_ip,
                            unsigned int u_port,
                            unsigned int u_client_id,
-                           bool b_debug)
+                           bool b_debug):
+  s_server_host(""),
+  s_client_host(client_ip),
+  u_id(u_client_id),
+  b_debug_flag(b_debug)
 {
-  s_client_host = client_ip;
   s_server_port = std::to_string(u_port);
-  u_id = u_client_id;
-  b_debug_flag = b_debug;
 
   std::cout << boost::format("s_client_host: %s -  s_server_host: %s") % s_client_host % s_server_host << std::endl;
 }
@@ -28,9 +29,10 @@ int
 hydra_client::request_rx_resources(rx_configuration &rx_conf)
 {
   // If ill defined one of the parameters
-   if (not bool(rx_conf.center_freq) or not bool(rx_conf.bandwidth))
+  if (not bool(rx_conf.center_freq) or not bool(rx_conf.bandwidth) or s_server_host == "")
   {
     std::cerr << "Missing RX information!" << std::endl;
+    return -1;
   }
 
   // Set message type
@@ -101,9 +103,10 @@ int
 hydra_client::request_tx_resources(rx_configuration &tx_conf)
 {
   // If ill defined one of the parameters
-  if (not bool(tx_conf.center_freq) or not bool(tx_conf.bandwidth))
+  if (not bool(tx_conf.center_freq) or not bool(tx_conf.bandwidth) or s_server_host == "")
   {
     std::cerr << "Missing TX information!" << std::endl;
+    return -1;
   }
 
   // Set message type
@@ -177,6 +180,9 @@ hydra_client::query_resources()
 std::string
 hydra_client::free_resources()
 {
+  if (s_server_host == "")
+    return "";
+
   // Set message type
   std::string message = "{\"xvl_fre\":{\"id\":" + std::to_string(u_id) + "}}";
   // Send message and return acknowledgement
