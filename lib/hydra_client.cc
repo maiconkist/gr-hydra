@@ -146,7 +146,7 @@ std::string
 hydra_client::check_connection(size_t max_tries)
 {
    size_t tries = 0;
-   size_t status;
+   int status;
 
    while ( (status = discover_server(s_client_host, s_server_host)) < 0 &&
            (tries++ < max_tries))
