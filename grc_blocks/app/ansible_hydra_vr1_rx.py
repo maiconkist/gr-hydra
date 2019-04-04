@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr1 Rx
-# Generated: Tue Mar 12 17:39:50 2019
+# Generated: Thu Apr  4 13:09:54 2019
 ##################################################
 
 
@@ -15,12 +15,14 @@ from gnuradio import uhd
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from optparse import OptionParser
+import SimpleXMLRPCServer
+import threading
 import time
 
 
 class ansible_hydra_vr1_rx(gr.top_block):
 
-    def __init__(self, freqrx=2.22e9, freqtx=2.22e9+3e6, gain=0.85, mul=0.04, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, freqrx=2.43e9, freqtx=2.43e9+3e6, gain=0.85, mul=0.04, samp_rate=400e3, vr1offset=-300e3, vr2offset=700e3, ansibleIP='192.168.5.78'):
         gr.top_block.__init__(self, "Ansible Hydra Vr1 Rx")
 
         ##################################################
@@ -33,10 +35,16 @@ class ansible_hydra_vr1_rx(gr.top_block):
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
+        self.ansibleIP = ansibleIP
 
         ##################################################
         # Blocks
         ##################################################
+        self.xmlrpc_server_0 = SimpleXMLRPCServer.SimpleXMLRPCServer((ansibleIP, 8080), allow_none=True)
+        self.xmlrpc_server_0.register_instance(self)
+        self.xmlrpc_server_0_thread = threading.Thread(target=self.xmlrpc_server_0.serve_forever)
+        self.xmlrpc_server_0_thread.daemon = True
+        self.xmlrpc_server_0_thread.start()
         self.uhd_usrp_source_0 = uhd.usrp_source(
         	",".join(("", "")),
         	uhd.stream_args(
@@ -44,7 +52,7 @@ class ansible_hydra_vr1_rx(gr.top_block):
         		channels=range(1),
         	),
         )
-        self.uhd_usrp_source_0.set_samp_rate(samp_rate*2)
+        self.uhd_usrp_source_0.set_samp_rate(samp_rate)
         self.uhd_usrp_source_0.set_center_freq(freqrx + vr1offset, 0)
         self.uhd_usrp_source_0.set_gain(0, 0)
         self.uhd_usrp_source_0.set_antenna('RX2', 0)
@@ -55,7 +63,7 @@ class ansible_hydra_vr1_rx(gr.top_block):
         		channels=range(1),
         	),
         )
-        self.uhd_usrp_sink_0.set_samp_rate(samp_rate*2)
+        self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
         self.uhd_usrp_sink_0.set_center_freq(freqtx + vr1offset, 0)
         self.uhd_usrp_sink_0.set_normalized_gain(gain, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
@@ -77,7 +85,7 @@ class ansible_hydra_vr1_rx(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap0', 1000, False)
+        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap0', 200, False)
         self.blocks_tagged_stream_to_pdu_0_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
@@ -129,8 +137,8 @@ class ansible_hydra_vr1_rx(gr.top_block):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate*2)
-        self.uhd_usrp_sink_0.set_samp_rate(self.samp_rate*2)
+        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
+        self.uhd_usrp_sink_0.set_samp_rate(self.samp_rate)
 
     def get_vr1offset(self):
         return self.vr1offset
@@ -146,9 +154,18 @@ class ansible_hydra_vr1_rx(gr.top_block):
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
 
+    def get_ansibleIP(self):
+        return self.ansibleIP
+
+    def set_ansibleIP(self, ansibleIP):
+        self.ansibleIP = ansibleIP
+
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
+    parser.add_option(
+        "", "--ansibleIP", dest="ansibleIP", type="string", default='192.168.5.78',
+        help="Set ansibleIP [default=%default]")
     return parser
 
 
@@ -156,7 +173,7 @@ def main(top_block_cls=ansible_hydra_vr1_rx, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls()
+    tb = top_block_cls(ansibleIP=options.ansibleIP)
     tb.start()
     tb.wait()
 
