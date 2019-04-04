@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Server
-# Generated: Tue Mar 12 13:16:42 2019
+# Generated: Wed Apr  3 15:37:03 2019
 ##################################################
 
 
@@ -18,7 +18,7 @@ import threading
 
 class ansible_hydra_gr_server(gr.top_block):
 
-    def __init__(self, ansibleIPPort='192.168.5.74:5000', freqrx=2.22e9+3e6, freqtx=2.22e9):
+    def __init__(self, ansibleIPPort='192.168.5.54:5000', freqrx=2.43e9+3e6, freqtx=2.43e9):
         gr.top_block.__init__(self, "Ansible Hydra Gr Server")
 
         ##################################################
@@ -62,13 +62,13 @@ class ansible_hydra_gr_server(gr.top_block):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--ansibleIPPort", dest="ansibleIPPort", type="string", default='192.168.5.74:5000',
+        "", "--ansibleIPPort", dest="ansibleIPPort", type="string", default='192.168.5.54:5000',
         help="Set ansibleIPPort [default=%default]")
     parser.add_option(
-        "", "--freqrx", dest="freqrx", type="eng_float", default=eng_notation.num_to_str(2.22e9+3e6),
+        "", "--freqrx", dest="freqrx", type="eng_float", default=eng_notation.num_to_str(2.43e9+3e6),
         help="Set freqrx [default=%default]")
     parser.add_option(
-        "", "--freqtx", dest="freqtx", type="eng_float", default=eng_notation.num_to_str(2.22e9),
+        "", "--freqtx", dest="freqtx", type="eng_float", default=eng_notation.num_to_str(2.43e9),
         help="Set freqtx [default=%default]")
     return parser
 

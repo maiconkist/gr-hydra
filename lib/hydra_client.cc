@@ -9,11 +9,11 @@ namespace hydra {
 hydra_client::hydra_client(std::string client_ip,
                            unsigned int u_port,
                            unsigned int u_client_id,
-                           bool b_debug):
+                           bool disable_dtor):
   s_server_host(""),
   s_client_host(client_ip),
   u_id(u_client_id),
-  b_debug_flag(b_debug)
+  b_disable_dtor(disable_dtor)
 {
   s_server_port = std::to_string(u_port);
 
@@ -22,6 +22,8 @@ hydra_client::hydra_client(std::string client_ip,
 
 hydra_client::~hydra_client()
 {
+  if (b_disable_dtor) return;
+
   free_resources();
 }
 
@@ -199,18 +201,12 @@ hydra_client::factory(const std::string &s_message)
   zmq::socket_t socket (context, ZMQ_REQ);
 
   // If printing debug messages
-  if (b_debug_flag)
-  {
-     std::cout << boost::format("Connecting to XVL server: %s:%s") % s_server_host % s_server_port << std::endl;
-  }
+  std::cout << boost::format("Connecting to XVL server: %s:%s") % s_server_host % s_server_port << std::endl;
   // Connect to the XVL Server
   socket.connect (("tcp://" + s_server_host + ":" + s_server_port).c_str());
 
   // If printing debug messages
-  if (b_debug_flag)
-  {
-    std::cout << "Sending:\t" << s_message.data() << std::endl;
-  }
+  std::cout << "Sending:\t" << s_message.data() << std::endl;
 
   // Create ZMQ message type and copy the message to it
   zmq::message_t request (s_message.size());
@@ -227,11 +223,8 @@ hydra_client::factory(const std::string &s_message)
                                        reply.size());
 
   // If printing debug messages
-  if (b_debug_flag)
-  {
-    // Print the response data
-    std::cout << s_response << std::endl;
-  }
+  // Print the response data
+  std::cout << s_response << std::endl;
 
   // Return the reply data
   return s_response.data();

@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 2Tx 2Rx
-# Generated: Wed Mar 13 03:03:11 2019
+# Generated: Wed Apr  3 17:57:53 2019
 ##################################################
 
 
@@ -20,7 +20,7 @@ import threading
 
 class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 
-    def __init__(self, ansibleIP='192.168.5.73', freqrx=2.22e9+3e6, freqtx=2.22e9, mul=0.01, mul2=0.03, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
+    def __init__(self, ansibleIP='192.168.5.70', freqrx=2.43e9+3e6, freqtx=2.43e9, mul=0.04, mul2=0.04, samp_rate=200e3, vr1offset=-300e3, vr2offset=200e3):
         gr.top_block.__init__(self, "Ansible Hydra Gr Client 2Tx 2Rx")
 
         ##################################################
@@ -84,8 +84,8 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
         	  debug_log=False,
         	  scramble_bits=False
         	 )
-        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap1', 10000, False)
-        self.blocks_tuntap_pdu_1 = blocks.tuntap_pdu('tap0', 10000, False)
+        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap1', 200, False)
+        self.blocks_tuntap_pdu_1 = blocks.tuntap_pdu('tap0', 200, False)
         self.blocks_tagged_stream_to_pdu_0_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
         self.blocks_tagged_stream_to_pdu_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
         self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR2 RX', ""); self.blocks_tag_debug_0_0.set_display(True)
@@ -169,7 +169,7 @@ class ansible_hydra_gr_client_2tx_2rx(gr.top_block):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--ansibleIP", dest="ansibleIP", type="string", default='192.168.5.73',
+        "", "--ansibleIP", dest="ansibleIP", type="string", default='192.168.5.70',
         help="Set ansibleIP [default=%default]")
     return parser
 

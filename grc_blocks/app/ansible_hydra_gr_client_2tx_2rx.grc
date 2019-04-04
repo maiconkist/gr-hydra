@@ -89,7 +89,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>0.01</value>
+      <value>0.04</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -247,7 +247,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>192.168.5.73</value>
+      <value>192.168.5.70</value>
     </param>
   </block>
   <block>
@@ -274,7 +274,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(832, 300)</value>
+      <value>(832, 308)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -325,7 +325,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(776, 832)</value>
+      <value>(768, 828)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -372,7 +372,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(320, 300)</value>
+      <value>(304, 308)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -470,7 +470,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(360, 608)</value>
+      <value>(360, 564)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -525,7 +525,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(288, 1152)</value>
+      <value>(288, 1108)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -576,7 +576,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(304, 552)</value>
+      <value>(304, 508)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -623,7 +623,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(256, 1096)</value>
+      <value>(256, 1052)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -674,7 +674,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(36, 352)</value>
+      <value>(68, 360)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -690,7 +690,7 @@
     </param>
     <param>
       <key>mtu</key>
-      <value>10000</value>
+      <value>200</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -741,7 +741,7 @@
     </param>
     <param>
       <key>mtu</key>
-      <value>10000</value>
+      <value>200</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -780,7 +780,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(664, 512)</value>
+      <value>(664, 468)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -867,7 +867,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(528, 1056)</value>
+      <value>(528, 1012)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -954,7 +954,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(576, 252)</value>
+      <value>(576, 260)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1148,7 +1148,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9+3e6</value>
+      <value>2.43e9+3e6</value>
     </param>
   </block>
   <block>
@@ -1191,7 +1191,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9</value>
+      <value>2.43e9</value>
     </param>
   </block>
   <block>
@@ -1222,7 +1222,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(992, 512)</value>
+      <value>(992, 468)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1285,7 +1285,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(848, 1056)</value>
+      <value>(848, 1012)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1348,7 +1348,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1024, 264)</value>
+      <value>(1024, 268)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1403,7 +1403,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(960, 788)</value>
+      <value>(952, 788)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1470,7 +1470,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>0.01</value>
+      <value>0.04</value>
     </param>
   </block>
   <block>
@@ -1489,7 +1489,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(952, 128)</value>
+      <value>(952, 100)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1513,7 +1513,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>0.03</value>
+      <value>0.04</value>
     </param>
   </block>
   <block>
@@ -1642,7 +1642,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>700e3</value>
+      <value>200e3</value>
     </param>
   </block>
   <connection>

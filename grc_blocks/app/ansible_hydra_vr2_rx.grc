@@ -38,7 +38,7 @@
     </param>
     <param>
       <key>generate_options</key>
-      <value>no_gui</value>
+      <value>qt_gui</value>
     </param>
     <param>
       <key>hier_block_src_path</key>
@@ -93,7 +93,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -156,7 +156,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -192,7 +192,7 @@
     </param>
     <param>
       <key>step</key>
-      <value>0.01</value>
+      <value>0.001</value>
     </param>
     <param>
       <key>stop</key>
@@ -227,7 +227,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(112, 600)</value>
+      <value>(112, 520)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -360,7 +360,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(872, 176)</value>
+      <value>(840, 244)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -380,7 +380,7 @@
     </param>
     <param>
       <key>name</key>
-      <value>VR2 RX</value>
+      <value>VR2 TX</value>
     </param>
     <param>
       <key>num_inputs</key>
@@ -411,7 +411,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 544)</value>
+      <value>(328, 468)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -517,7 +517,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(584, 504)</value>
+      <value>(584, 428)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -707,7 +707,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9</value>
+      <value>2.43e9</value>
     </param>
   </block>
   <block>
@@ -750,7 +750,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9+3e6</value>
+      <value>2.43e9+3e6</value>
     </param>
   </block>
   <block>
@@ -765,11 +765,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1032, 80)</value>
+      <value>(992, 76)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -808,11 +808,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(768, 80)</value>
+      <value>(768, 76)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2889,7 +2889,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(880, 520)</value>
+      <value>(880, 444)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3103,7 +3103,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(552, 100)</value>
+      <value>(536, 100)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3127,7 +3127,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>700e3</value>
+      <value>200e3</value>
     </param>
   </block>
   <connection>

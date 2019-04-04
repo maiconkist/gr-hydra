@@ -208,6 +208,49 @@
     </param>
   </block>
   <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(224, 88)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ansibleIP</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>192.168.5.78</value>
+    </param>
+  </block>
+  <block>
     <key>blocks_multiply_const_vxx</key>
     <param>
       <key>alias</key>
@@ -447,7 +490,7 @@
     </param>
     <param>
       <key>mtu</key>
-      <value>1000</value>
+      <value>200</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -652,7 +695,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(416, 8)</value>
+      <value>(472, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -676,7 +719,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9</value>
+      <value>2.43e9</value>
     </param>
   </block>
   <block>
@@ -695,7 +738,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(528, 8)</value>
+      <value>(584, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -719,7 +762,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.22e9+3e6</value>
+      <value>2.43e9+3e6</value>
     </param>
   </block>
   <block>
@@ -1047,7 +1090,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(264, 12)</value>
+      <value>(224, 16)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1071,7 +1114,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>200e3</value>
+      <value>400e3</value>
     </param>
   </block>
   <block>
@@ -1866,7 +1909,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>samp_rate*2</value>
+      <value>samp_rate</value>
     </param>
     <param>
       <key>hide_cmd_port</key>
@@ -3209,7 +3252,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>samp_rate*2</value>
+      <value>samp_rate</value>
     </param>
     <param>
       <key>hide_cmd_port</key>
@@ -3252,7 +3295,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(400, 92)</value>
+      <value>(472, 88)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3295,7 +3338,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(512, 92)</value>
+      <value>(560, 88)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3320,6 +3363,41 @@
     <param>
       <key>value</key>
       <value>700e3</value>
+    </param>
+  </block>
+  <block>
+    <key>xmlrpc_server</key>
+    <param>
+      <key>addr</key>
+      <value>ansibleIP</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(656, 88)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>xmlrpc_server_0</value>
+    </param>
+    <param>
+      <key>port</key>
+      <value>8080</value>
     </param>
   </block>
   <connection>

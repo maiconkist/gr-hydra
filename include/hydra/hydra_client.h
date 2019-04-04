@@ -17,7 +17,7 @@ struct rx_configuration
    double center_freq;
    double bandwidth;
    bool bpad;
-   int         server_port;
+   int  server_port;
    std::string server_ip;
 };
 
@@ -31,7 +31,7 @@ public:
    hydra_client(std::string client_ip = "localhost",
                 unsigned int u_port = 5000,
                 unsigned int u_client_id = 10,
-                bool b_debug = false);
+                bool disable_dtor = false);
 
    /* DTOR
     */
@@ -68,8 +68,8 @@ private:
    /* Client ID -- TODO need a better way to define it */
    int u_id;
 
-   /* Debug flag */
-   bool b_debug_flag;
+   /* Flat to disable DTOR cleanup. Used when managing slices from a external script  */
+   bool b_disable_dtor;
 };
 
 
