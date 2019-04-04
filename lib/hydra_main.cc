@@ -22,6 +22,7 @@ HydraMain::set_rx_config(uhd_hydra_sptr usrp,
                          unsigned int u_fft_size)
 {
   // Configure receiver resources
+  usrp->set_rx_config(d_cf, d_bw, 0);
   core->set_rx_resources(usrp, d_cf, d_bw, u_fft_size);
 }
 
@@ -32,6 +33,7 @@ void HydraMain::set_tx_config(uhd_hydra_sptr usrp,
 
 {
   // Configure transmitter resources
+  usrp->set_tx_config(d_cf, d_bw, 0.6);
   core->set_tx_resources(usrp, d_cf, d_bw, u_fft_size);
 }
 

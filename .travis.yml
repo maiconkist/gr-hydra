@@ -1,0 +1,21 @@
+dist: xenial
+sudo: required
+
+before_script:
+     - sudo apt-get -qq update
+     - sudo apt-get install -qq build-essential cmake libfftw3-dev uhd-host libuhd-dev gnuradio-dev libopencv-dev libzmqpp-dev swig
+language: cpp
+script:
+  - mkdir build
+  - pushd build
+  - cmake ..
+  - make
+  - sudo make install
+  - sudo ldconfig
+  - popd
+  - mkdir grc_blocks/build/
+  - cd grc_blocks/build/
+  - cmake ../
+  - make
+  - sudo make install
+  - sudo ldconfig
