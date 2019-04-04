@@ -70,9 +70,9 @@ def main():
     #           with the server using the same ID (1 and 2), and them releasing the resources allocated.
     #           We can then allocate new resources from this python without impacting the slices.
 
+    # We put the IP of the machine executing this script
     client1 = hydra.hydra_client("192.168.5.70", 5000, 1, True)
-
-
+    # We put the IP of the machine running the UE
     ue1 = xmlrpclib.ServerProxy("http://192.168.5.78:8080")
 
     if client1.check_connection(3) == "":
@@ -86,23 +86,29 @@ def main():
     slice1.allocate_tx(2.43e9 - 300e3, 400e3)
     slice1.allocate_rx(2.43e9 + 3e6 - 300e3, 400e3)
 
-
-    if (False):
-        client2 = hydra.hydra_client("192.168.5.81", 5000, 2)
+    if (True):
+        # We put the IP of the machine executing this script
+        client2 = hydra.hydra_client("192.168.5.70", 5000, 2, True)
+        # We put the IP of the machine running the UE
         ue2 = xmlrpclib.ServerProxy("http://192.168.5.81:8080")
 
         if client2.check_connection(3) == "":
             print("client2 could not connect to server")
             sys.exit(1)
         slice2 = Slice( client2, ue2)
-        slice2.allocate_tx(2.43e9 + 400e3, 200e3)
-        slice2.allocate_rx(2.43e9 + 3e6 + 300e3, 200e3)
+        slice2.allocate_tx(2.43e9 + 200e3, 200e3)
+        slice2.allocate_rx(2.43e9 + 3e6 + 200e3, 200e3)
 
 
     ## YOUR CODE HERE
-
-
-
+    ## YOUR CODE HERE
+    ## YOUR CODE HERE
+    ## YOUR CODE HERE
+    ## YOUR CODE HERE
+    ## YOUR CODE HERE
+    ## YOUR CODE HERE
+    ## YOUR CODE HERE
+    ## YOUR CODE HERE
     print("Press CTRL-C to quit")
     while True:
         time.sleep(1)

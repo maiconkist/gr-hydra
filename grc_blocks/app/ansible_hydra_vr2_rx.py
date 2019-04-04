@@ -3,22 +3,10 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr2 Rx
-# Generated: Wed Apr  3 16:35:53 2019
+# Generated: Thu Apr  4 18:41:32 2019
 ##################################################
 
-from distutils.version import StrictVersion
 
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print "Warning: failed to XInitThreads()"
-
-from PyQt5 import Qt, QtCore
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
@@ -26,67 +14,37 @@ from gnuradio import gr
 from gnuradio import uhd
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
-from gnuradio.qtgui import Range, RangeWidget
 from optparse import OptionParser
-import sys
+import SimpleXMLRPCServer
+import threading
 import time
-from gnuradio import qtgui
 
 
-class ansible_hydra_vr2_rx(gr.top_block, Qt.QWidget):
+class ansible_hydra_vr2_rx(gr.top_block):
 
-    def __init__(self, freqrx=2.43e9, freqtx=2.43e9+3e6, samp_rate=200e3, vr1offset=-300e3, vr2offset=200e3):
+    def __init__(self, ansibleIP='192.168.5.81', freqrx=2.43e9, freqtx=2.43e9+3e6, gain=0.85, mul=0.04, samp_rate=200e3, vr1offset=-300e3, vr2offset=200e3):
         gr.top_block.__init__(self, "Ansible Hydra Vr2 Rx")
-        Qt.QWidget.__init__(self)
-        self.setWindowTitle("Ansible Hydra Vr2 Rx")
-        qtgui.util.check_set_qss()
-        try:
-            self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except:
-            pass
-        self.top_scroll_layout = Qt.QVBoxLayout()
-        self.setLayout(self.top_scroll_layout)
-        self.top_scroll = Qt.QScrollArea()
-        self.top_scroll.setFrameStyle(Qt.QFrame.NoFrame)
-        self.top_scroll_layout.addWidget(self.top_scroll)
-        self.top_scroll.setWidgetResizable(True)
-        self.top_widget = Qt.QWidget()
-        self.top_scroll.setWidget(self.top_widget)
-        self.top_layout = Qt.QVBoxLayout(self.top_widget)
-        self.top_grid_layout = Qt.QGridLayout()
-        self.top_layout.addLayout(self.top_grid_layout)
-
-        self.settings = Qt.QSettings("GNU Radio", "ansible_hydra_vr2_rx")
-
-        if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-            self.restoreGeometry(self.settings.value("geometry").toByteArray())
-        else:
-            self.restoreGeometry(self.settings.value("geometry", type=QtCore.QByteArray))
 
         ##################################################
         # Parameters
         ##################################################
+        self.ansibleIP = ansibleIP
         self.freqrx = freqrx
         self.freqtx = freqtx
+        self.gain = gain
+        self.mul = mul
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
 
         ##################################################
-        # Variables
-        ##################################################
-        self.mul = mul = 0.03
-        self.gain = gain = 0.85
-
-        ##################################################
         # Blocks
         ##################################################
-        self._mul_range = Range(0, 1, 0.001, 0.03, 200)
-        self._mul_win = RangeWidget(self._mul_range, self.set_mul, 'mul', "counter_slider", float)
-        self.top_layout.addWidget(self._mul_win)
-        self._gain_range = Range(0, 1, 0.01, 0.85, 200)
-        self._gain_win = RangeWidget(self._gain_range, self.set_gain, 'gain', "counter_slider", float)
-        self.top_layout.addWidget(self._gain_win)
+        self.xmlrpc_server_0 = SimpleXMLRPCServer.SimpleXMLRPCServer((ansibleIP, 8080), allow_none=True)
+        self.xmlrpc_server_0.register_instance(self)
+        self.xmlrpc_server_0_thread = threading.Thread(target=self.xmlrpc_server_0.serve_forever)
+        self.xmlrpc_server_0_thread.daemon = True
+        self.xmlrpc_server_0_thread.start()
         self.uhd_usrp_source_0 = uhd.usrp_source(
         	",".join(("", "")),
         	uhd.stream_args(
@@ -147,10 +105,11 @@ class ansible_hydra_vr2_rx(gr.top_block, Qt.QWidget):
         self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_tag_debug_0_0, 0))
         self.connect((self.uhd_usrp_source_0, 0), (self.digital_ofdm_rx_0_0, 0))
 
-    def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "ansible_hydra_vr2_rx")
-        self.settings.setValue("geometry", self.saveGeometry())
-        event.accept()
+    def get_ansibleIP(self):
+        return self.ansibleIP
+
+    def set_ansibleIP(self, ansibleIP):
+        self.ansibleIP = ansibleIP
 
     def get_freqrx(self):
         return self.freqrx
@@ -165,6 +124,21 @@ class ansible_hydra_vr2_rx(gr.top_block, Qt.QWidget):
     def set_freqtx(self, freqtx):
         self.freqtx = freqtx
         self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
+
+    def get_gain(self):
+        return self.gain
+
+    def set_gain(self, gain):
+        self.gain = gain
+        self.uhd_usrp_sink_0.set_normalized_gain(self.gain, 0)
+
+
+    def get_mul(self):
+        return self.mul
+
+    def set_mul(self, mul):
+        self.mul = mul
+        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -188,24 +162,12 @@ class ansible_hydra_vr2_rx(gr.top_block, Qt.QWidget):
         self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
         self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
 
-    def get_mul(self):
-        return self.mul
-
-    def set_mul(self, mul):
-        self.mul = mul
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
-
-    def get_gain(self):
-        return self.gain
-
-    def set_gain(self, gain):
-        self.gain = gain
-        self.uhd_usrp_sink_0.set_normalized_gain(self.gain, 0)
-
-
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
+    parser.add_option(
+        "", "--ansibleIP", dest="ansibleIP", type="string", default='192.168.5.81',
+        help="Set ansibleIP [default=%default]")
     return parser
 
 
@@ -213,20 +175,9 @@ def main(top_block_cls=ansible_hydra_vr2_rx, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-        style = gr.prefs().get_string('qtgui', 'style', 'raster')
-        Qt.QApplication.setGraphicsSystem(style)
-    qapp = Qt.QApplication(sys.argv)
-
-    tb = top_block_cls()
+    tb = top_block_cls(ansibleIP=options.ansibleIP)
     tb.start()
-    tb.show()
-
-    def quitting():
-        tb.stop()
-        tb.wait()
-    qapp.aboutToQuit.connect(quitting)
-    qapp.exec_()
+    tb.wait()
 
 
 if __name__ == '__main__':
