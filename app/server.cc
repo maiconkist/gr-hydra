@@ -2,7 +2,7 @@
 #include "hydra/hydra_uhd_interface.h"
 
 /* Configure the TX radio */
-hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_loopback>();
+hydra::uhd_hydra_sptr usrp = std::make_shared<hydra::device_uhd>();
 
 void
 signal_handler(int signum)
@@ -20,20 +20,20 @@ int main()
    signal(SIGHUP, signal_handler);
 
    /* TRANSMITTER */
-   double d_tx_centre_freq = 1.1e9;
+   double d_tx_centre_freq = 2.43e9;
    double d_tx_samp_rate   = 2e6;
-   unsigned int u_tx_fft_size = 1024;
+   unsigned int u_tx_fft_size = 2048;
 
    /* RECEIVER */
-   double d_rx_centre_freq = 1.1e9;
+   double d_rx_centre_freq = 2.43e9 + 3e6;
    double d_rx_samp_rate   = 2e6;
-   unsigned int u_rx_fft_size = 1024;
+   unsigned int u_rx_fft_size = 2048;
 
    /* Control port */
    unsigned int u_port = 5000;
 
    /* Instantiate XVL */
-   hydra::HydraMain main = hydra::HydraMain("127.0.0.1:5000");
+   hydra::HydraMain main = hydra::HydraMain("192.168.5.54:5000");
 
    main.set_tx_config(
      usrp,
