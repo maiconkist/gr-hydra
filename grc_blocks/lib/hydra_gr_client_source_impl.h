@@ -4,7 +4,6 @@
 #include "hydra/hydra_gr_client_source.h"
 #include "hydra/hydra_client.h"
 
-
 #include <thread>
 #include <zmq.hpp>
 

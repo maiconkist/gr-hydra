@@ -6,7 +6,6 @@
 #include <string>
 #include <hydra/types.h>
 #include <hydra/hydra_main.h>
-#include <gnuradio/blocks/udp_source.h>
 
 using namespace hydra;
 

@@ -1,17 +1,17 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2016 Trinity Connect Centre.
- * 
+ *
  * HyDRA is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
- * 
+ *
  * HyDRA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
@@ -36,11 +36,23 @@ fft_complex::fft_complex(size_t fft_size, bool forward):
                    FFTW_MEASURE);
 }
 
-int
+void
 fft_complex::set_data(const gr_complex *data, size_t len)
 {
    // Copy samples to fft buffer
    std::copy(data, data + len, g_inbuf);
+}
+
+void
+fft_complex::reset_inbuf()
+{
+  std::fill(g_inbuf, g_inbuf +  g_fft_size, 0);
+}
+
+void
+fft_complex::reset_outbuf()
+{
+  std::fill(g_outbuf, g_outbuf +  g_fft_size, 0);
 }
 
 gr_complex*
