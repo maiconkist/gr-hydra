@@ -1,23 +1,15 @@
 #include "hydra/hydra_uhd_interface.h"
 
-#include "hydra/hydra_fft.h"
-
-#include <chrono>
-#include <fstream>
-#include <iostream>
-#include <numeric>
-#include <thread>
-#include <uhd/usrp/usrp.h>
-#include <opencv2/opencv.hpp>
 
 namespace hydra {
 
 device_uhd::device_uhd(std::string device_args)
 {
-   std::cout <<  "Creating USRP with args \"" <<  device_args << "\"" << std::endl;
-   usrp = uhd::usrp::multi_usrp::make(device_args);
-}
+  logger = hydra_log("backend|usrp");
 
+  logger.info("Creating USRP with args \"" +  device_args + "\"");
+  usrp = uhd::usrp::multi_usrp::make(device_args);
+}
 
 void
 device_uhd::release()
@@ -36,28 +28,26 @@ device_uhd::release()
   }
 }
 
-
 device_uhd::~device_uhd()
 {
 }
-
 
 void
 device_uhd::set_tx_config(double freq, double rate, double gain)
 {
   abstract_device::set_tx_config(freq, rate, gain);
 
-  std::cout << "Setting TX Rate: " << rate << std::endl;
+  logger.info("Setting TX Rate: " + std::to_string(rate));
   usrp->set_tx_rate(rate);
-  std::cout << "Actual TX Rate: " << usrp->get_tx_rate() << std::endl;
+  logger.info("Actual TX Rate: " + std::to_string(usrp->get_tx_rate()));
 
-  std::cout << "Setting TX Gain: " << gain << std::endl;
+  logger.info("Setting TX Gain: " + std::to_string(gain));
   usrp->set_normalized_tx_gain(gain);
-  std::cout << "Actual TX Gain: " << usrp->get_tx_gain() << std::endl;
+  logger.info("Actual TX Gain: " + std::to_string(usrp->get_tx_gain()));
 
-  std::cout << "Setting TX freq: " << freq / 1e6 << " MHz" << std::endl;
+  logger.info("Setting TX freq: " + std::to_string(freq/1e6) + " [MHz]");
   usrp->set_tx_freq(freq);
-  std::cout << "Actual TX freq: " << usrp->get_tx_freq()/1e6 << " MHz" << std::endl;
+  logger.info("Actual TX freq: " + std::to_string(usrp->get_tx_freq()/1e6) + " [MHz]");
 
   uhd::stream_args_t stream_args("fc32", "sc16");
   tx_stream = usrp->get_tx_stream(stream_args);
@@ -68,18 +58,17 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
 {
   abstract_device::set_rx_config(freq, rate, gain);
 
-  std::cout << "Setting RX Rate: " << rate << std::endl;
+  logger.info("Setting RX Rate: " + std::to_string(rate));
   usrp->set_rx_rate(rate);
-  std::cout << "Actual RX Rate: " << usrp->get_rx_rate() << std::endl;
+  logger.info("Actual RX Rate: " + std::to_string(usrp->get_rx_rate()));
 
-  // no gain for reception.
-  std::cout << "Setting RX Gain: " << gain << std::endl;
+  logger.info("Setting RX Gain: " + std::to_string(gain));
   usrp->set_normalized_rx_gain(0.0);
-  std::cout << "Actual RX Gain: " << usrp->get_rx_gain() << std::endl;
+  logger.info("Actual RX Gain: " + std::to_string(usrp->get_rx_gain()));
 
-  std::cout << "Setting RX freq: " << freq / 1e6 << " MHz" << std::endl;
+  logger.info("Setting RX freq: " + std::to_string(freq/1e6) + " [MHz]");
   usrp->set_rx_freq(freq);
-  std::cout << "Actual RX freq: " << usrp->get_rx_freq()/1e6 << " MHz" << std::endl;
+  logger.info("Actual RX freq: " + std::to_string(usrp->get_rx_freq()/1e6) + " [MHz]");
 
 
   uhd::stream_args_t stream_args("fc32"); //complex floats
@@ -94,7 +83,7 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
 }
 
 void
-device_uhd::send(const window &buf, size_t len)
+device_uhd::send(const iq_window &buf, size_t len)
 {
 #ifdef USE_USRP_STREAM_API
     uhd::tx_metadata_t md;
@@ -118,7 +107,7 @@ device_uhd::send(const window &buf, size_t len)
 }
 
 size_t
-device_uhd::receive(window &buf, size_t len)
+device_uhd::receive(iq_window &buf, size_t len)
 {
   uhd::rx_metadata_t md;
 
@@ -155,6 +144,8 @@ device_uhd::receive(window &buf, size_t len)
 #else
       rx_stream->recv(&buf.front(), buf.size(), md, 0.001024);
 #endif
+
+#ifdef UHD_LOG
       switch(md.error_code)
       {
         case uhd::rx_metadata_t::ERROR_CODE_NONE:
@@ -171,14 +162,16 @@ device_uhd::receive(window &buf, size_t len)
           return 0;
           break;
       }
+#endif
 }
 
 device_image_gen::device_image_gen(std::string device_args)
 {
+  logger = hydra_log("backend|image");
 }
 
 void
-device_image_gen::send(const window &buf, size_t len)
+device_image_gen::send(const iq_window &buf, size_t len)
 {
    static const size_t cols = len;
    static sfft_complex g_ifft_complex = sfft_complex(new fft_complex(len));
@@ -221,44 +214,45 @@ device_image_gen::send(const window &buf, size_t len)
          }
       }
 
-      std::cout << "Saving image: ./watterfall_" << std::to_string(img_counter) << ".png" << std::endl;
+      logger.info("Saving immage: ./watterfall_" + std::to_string(img_counter) + ".png");
       cv::imwrite(std::string("./waterfall_" + std::to_string(img_counter++) + ".png"), img);
       g_iq_samples.clear();
    }
 }
 
 size_t
-device_image_gen::receive(window &buf, size_t len)
+device_image_gen::receive(iq_window &buf, size_t len)
 {
   static const char *str_read = "/home/connect/ofdm.bin";
   static std::ifstream infile(str_read, std::ifstream::binary);
 
   if (not infile.eof())
   {
-    infile.read((char*)&buf.front(), len * sizeof(gr_complex));
+    infile.read((char*)&buf.front(), len * sizeof(iq_sample));
   }
   else
   {
-    std::cout << "Reseting file" << std::endl;
+    logger.info("Reseting file");
     infile.clear();
     infile.seekg(0);
-    infile.read((char*)&buf.front(), len * sizeof(gr_complex));
+    infile.read((char*)&buf.front(), len * sizeof(iq_sample));
   }
 }
 
 device_loopback::device_loopback(std::string device_args)
 {
+  logger = hydra_log("backend|loop");
 }
 
 void
-device_loopback::send(const window &buf, size_t len)
+device_loopback::send(const iq_window &buf, size_t len)
 {
    std::lock_guard<std::mutex> _l(g_mutex);
    g_windows_vec.push_back(buf);
 }
 
 size_t
-device_loopback::receive(window &buf, size_t len)
+device_loopback::receive(iq_window &buf, size_t len)
 {
    while (g_windows_vec.size() == 0) { return 0; };
 
@@ -269,15 +263,74 @@ device_loopback::receive(window &buf, size_t len)
    return buf.size();
 }
 
+// File source and sink device
+device_file::device_file(std::string file_name)
+{
+  // Get the file name
+  s_file_name = file_name;
+
+  logger = hydra_log("backend|file");
+}
+
+void
+device_file::set_tx_config(double freq, double rate, double gain)
+{
+  // Get the TX sampling rate
+  tx_rate = rate;
+
+  logger.info("Limiting write to " + std::to_string(rate) + "samples/second.");
+
+  // Congigure the output stream
+  output_file_stream.open(s_file_name, std::ios::out | std::ios::binary | std::ios::trunc);
+}
+
+void
+device_file::set_rx_config(double freq, double rate, double gain)
+{
+  // Get the RX sampling rate
+  rx_rate = rate;
+
+  logger.info("Limiting read to " + std::to_string(rate) + "samples/second.");
+
+  // Configure the input stream
+  input_file_stream.open(s_file_name, std::ios::in| std::ios::binary);
+}
+
+void
+device_file::send(const iq_window &buf, size_t len)
+{
+  // Sleep for the appropriate amount of time
+  std::this_thread::sleep_for(std::chrono::microseconds(static_cast<unsigned long>((len*1e6)/tx_rate)));
+
+  // for (auto it = buf.begin(); it != buf.end(); it++)
+  // {
+    // std::cout << (*it) << " ";
+  // }
+  // std::cout << std::endl;
+
+  // Write the buffer to file
+  output_file_stream.write(reinterpret_cast<const char *>(buf.data()), len * sizeof(iq_sample));
+}
+
+size_t
+device_file::receive(iq_window &buf, size_t len)
+{
+  // Sleep for the appropriate amount of time
+  std::this_thread::sleep_for(std::chrono::microseconds(static_cast<unsigned long>((len*1e6)/rx_rate)));
+
+  // Read the file onto a buffer
+  input_file_stream.read(reinterpret_cast<char *>(buf.data()), len * sizeof(iq_sample));
+}
 
 device_network::device_network(std::string host_addr, std::string remote_addr):
   g_host_addr(host_addr),
   g_remote_addr(remote_addr)
 {
+  logger = hydra_log("backend|network");
 }
 
 void
-device_network::send(const window &buf, size_t len)
+device_network::send(const iq_window &buf, size_t len)
 {
   if (!init_tx)
   {
@@ -286,13 +339,13 @@ device_network::send(const window &buf, size_t len)
     socket_tx = std::make_unique<zmq::socket_t>(context, ZMQ_PUSH);
 
     std::string addr = "tcp://" + g_host_addr + ":" + std::to_string(PORT);
-    std::cout << "device_network recv:" << addr << std::endl;
+    logger.debug("device_network recv:" + addr);
 
     socket_tx->connect("tcp://" + addr);
     init_tx = true;
   }
 
-  zmq::message_t message(buf.size() * sizeof(gr_complex));
+  zmq::message_t message(buf.size() * sizeof(iq_sample));
 
   iq_sample *tmp = static_cast<iq_sample *>(message.data());
   for (size_t i = 0; i < buf.size(); ++i)
@@ -302,7 +355,7 @@ device_network::send(const window &buf, size_t len)
 }
 
 size_t
-device_network::receive(window &buf, size_t len)
+device_network::receive(iq_window &buf, size_t len)
 {
   if (!init_rx)
   {
@@ -311,7 +364,7 @@ device_network::receive(window &buf, size_t len)
     socket_rx = std::make_unique<zmq::socket_t>(context, ZMQ_PULL);
 
     std::string addr = "tcp://" + g_remote_addr + ":" + std::to_string(PORT);
-    std::cout << "device_network recv:" << addr << std::endl;
+    logger.debug("device_network recv:" + addr);
 
     socket_rx->connect(addr);
     init_rx = true;
@@ -321,14 +374,14 @@ device_network::receive(window &buf, size_t len)
   socket_rx->recv(&message);
 
   if  (message.size() != len)
-    std::cout << "Error: message size does not equal to len" << std::endl;
+    logger.warning("Message size does not equal to len");
 
   if (message.size() > 0)
   {
     iq_sample *tmp = static_cast<iq_sample *>(message.data());
 
     if (message.size() % sizeof(iq_sample) != 0)
-      std::cout << "Error: message not complete" << std::endl;
+      logger.warning("Message not complete");
 
     buf.insert(buf.begin(),
         tmp,

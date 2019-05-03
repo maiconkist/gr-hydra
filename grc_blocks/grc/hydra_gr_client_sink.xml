@@ -5,7 +5,7 @@
   <category>[HyDRA]</category>
   <import>import threading</import>
   <import>import hydra</import>
-  <make>hydra.hydra_gr_client_sink($u_id, $host, $port)
+  <make>hydra.hydra_gr_client_sink($u_id, $host, $port, $group)
 self.$(id).start_client($center_frequency, $samp_rate, $payload)
 </make>
   <param>
@@ -22,16 +22,25 @@ self.$(id).start_client($center_frequency, $samp_rate, $payload)
     <name>Virtual Radio ID</name>
     <key>u_id</key>
     <type>int</type>
+    <value>1</value>
   </param>
   <param>
     <name>Client IP</name>
     <key>host</key>
     <type>string</type>
+    <value>127.0.0.1</value>
   </param>
   <param>
     <name>Port</name>
     <key>port</key>
     <type>int</type>
+    <value>5000</value>
+  </param>
+  <param>
+    <name>Group</name>
+    <key>group</key>
+    <type>string</type>
+    <value>default</value>
   </param>
   <param>
     <name>Payload</name>

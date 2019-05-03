@@ -1,130 +1,173 @@
 #include "hydra/hydra_socket.h"
 
-#include <numeric>
-#include <complex>
-#include <boost/format.hpp>
-#include <zmq.hpp>
-
 namespace hydra
 {
 
+// ZMQ Source
 zmq_source::zmq_source(const std::string& server_addr,
                        const std::string& remote_addr,
-                       const std::string& port):
+                       const std::string& port,
+                       const unsigned int& buf_size):
   s_host(remote_addr),
   s_port(port),
-  socket(context, ZMQ_PULL),
-  g_th_run(true)
+  g_th_run(true),
+  socket(context, ZMQ_PULL)
 {
-    // Create a thread to receive the data
-    g_rx_thread = std::make_unique<std::thread>(&zmq_source::connect, this);
-}
+  // Create the outbut buffer with the proper buffer size
+  p_output_buffer = std::make_shared<hydra_buffer<iq_sample>>(buf_size);
+  // Create a thread to receive the data
+  g_rx_thread = std::make_unique<std::thread>(&zmq_source::run, this);
 
-
-zmq_source::~zmq_source()
-{
-  g_th_run = false;
-  g_rx_thread->join();
-}
-
+  logger = hydra_log("zmq|source");
+};
 
 void
-zmq_source::connect()
+zmq_source::stop()
 {
-  std::string addr = "tcp://" + s_host + ":" + s_port;
-  std::cout << "zmq_source addr: " << addr << std::endl;
+  // Toggle thread stop condition
+  g_th_run = false;
+  // Join event loop thread
+  g_rx_thread->join();
+};
 
+void
+zmq_source::run()
+{
+  // Construct the URI
+  std::string addr = "tcp://" + s_host + ":" + s_port;
+  logger.info("Remote client address: " + addr);
+
+  // Specify a timeout and configure the socket
+  socket.setsockopt(ZMQ_RCVTIMEO, 100);
+  // Connect to remote client
   socket.connect(addr.c_str());
 
+  // Create temporary variables outsize the loop
+  div_t type_size_div;
+  // Received message flag
+  int rc;
+
+  // Event loop
   while (g_th_run)
   {
-    socket.recv(&message, ZMQ_NOBLOCK);
+    // Receive information from the client
+    rc = socket.recv(&message);
 
-    if (message.size() > 0)
+    // If we received a message and the thread should be alive
+    if (rc and g_th_run)
     {
-      std::lock_guard<std::mutex> _l(out_mtx);
-      iq_sample *tmp = static_cast<iq_sample *>(message.data());
+      // Divide the message size by the size of an IQ sample
+      type_size_div = std::div(static_cast<int>(message.size()), sizeof(iq_sample));
 
-      if (message.size() % sizeof(iq_sample) != 0)
-        std::cout << "Error: message not complete" << std::endl;
+      // If there's a remainder
+      if (type_size_div.rem)
+      {
+        logger.warning("Incomplete message.");
+      }
 
-      output_buffer.insert(output_buffer.end(),
-                           tmp,
-                           tmp + (message.size()/sizeof(iq_sample)));
+      // Write the amount of IQ samples to the buffer
+      p_output_buffer->write(
+          static_cast<iq_sample *>(message.data()),
+          type_size_div.quot);
     }
-
+    // Clear message data
     message.rebuild();
   }
 
-  std::cout << "exiting zmq_source" << std::endl;
-}
+  // Close the ZMQ primitives
+  socket.close();
+  // context.close();
+
+  // Output debug information
+  logger.info("Stopped socket.");
+};
 
 
-zmq_sink::zmq_sink(
-  iq_stream *input_buffer,
-  std::mutex* in_mtx,
-  const std::string& server_addr,
-  const std::string& remote_addr,
-  const std::string& port): g_input_buffer(input_buffer),
-                            p_in_mtx(in_mtx),
-                            s_host(server_addr),
-                            s_port(port),
-                            g_th_run(true),
-                            socket(context, ZMQ_PUSH)
+zmq_sink::zmq_sink(std::shared_ptr<hydra_buffer<iq_sample>> input_buffer,
+                   const std::string& server_addr,
+                   const std::string& remote_addr,
+                   const std::string& port):
+  p_input_buffer(input_buffer),
+  s_host(server_addr),
+  s_port(port),
+  g_th_run(true),
+  socket(context, ZMQ_PUSH)
 {
-  g_tx_thread = std::make_unique<std::thread>(&zmq_sink::transmit, this);
-}
+  // Create a thread to receive the data
+  g_rx_thread = std::make_unique<std::thread>(&zmq_sink::run, this);
 
-zmq_sink::~zmq_sink()
+  logger = hydra_log("zmq|sink");
+};
+
+void
+zmq_sink::stop()
 {
+  // Toggle thread stop condition
   g_th_run = false;
-  g_tx_thread->join();
-}
-
+  // Join event loop thread
+  g_rx_thread->join();
+};
 
 // Assign the handle receive callback when a datagram is received
 void
-zmq_sink::transmit()
+zmq_sink::run()
 {
+  // Construct the URI
   std::string addr = "tcp://" + s_host + ":" + s_port;
-  std::cout << "zmq_sink addr: " << addr << std::endl;
-  socket.bind(addr.c_str());
-  socket.setsockopt(ZMQ_SNDTIMEO, 2000);
+  logger.info("Local server address: " + addr);
 
+  // Set timeout for send operation
+  socket.setsockopt(ZMQ_SNDTIMEO, 100);
+  // Bind address
+  socket.bind(addr.c_str());
+
+  // Initialize temporary variables outside the loop
+  unsigned int u_buffer_size;
+  unsigned int u_message_size;
+
+  // Event loop
   while (g_th_run)
   {
+    // Get the buffer size
+    u_buffer_size = p_input_buffer->size();
     // If there is anything to transmit
-    if (g_input_buffer->size() > 0)
+    if (u_buffer_size)
     {
-      /* Local scope lock */
+      // Calculate the message size
+      u_message_size = u_buffer_size * sizeof(iq_sample);
+      // Allocate enough memory for this message
+      message.rebuild(u_message_size);
+
+      // Copy the samples onto the message object
+      std::memcpy(message.data(),
+          &p_input_buffer->read(u_buffer_size).front(),
+          u_message_size);
+
+      // If we are still running
+      if (g_th_run)
       {
-        // Copy everything to output_buffer. Clear input
-        //
-        std::lock_guard<std::mutex> _inmtx(*p_in_mtx);
-
-        if (!g_th_run) return;
-
-        message.rebuild(g_input_buffer->size() * sizeof(gr_complex));
-        iq_sample *tmp = static_cast<iq_sample *>(message.data());
-        for (size_t i = 0; i < g_input_buffer->size() && g_th_run; ++i)
-          tmp[i] = (*g_input_buffer)[i];
-
-        g_input_buffer->erase(g_input_buffer->begin(), g_input_buffer->begin() + g_input_buffer->size());
+        // Send message to client
+        socket.send(message);
       }
-
-     if (g_th_run) socket.send(message);
-    }
+    } // If buffer
+    // There's nothing to trasmit
     else
     {
+      // Sleep for a microssecond and prevent this thread to explode
       std::this_thread::sleep_for(std::chrono::microseconds(1));
     }
   } // while
 
-  std::cout << "Leaving zmq_sink::transmit thread" << std::endl;
+  // Close the ZMQ primitives
+  socket.close();
+  // context.close();
+
+  // Output debug information
+  logger.info("Stopped socket.");
 }
 
 tcp_sink::tcp_sink(
-  iq_stream *input_buffer,
+  sample_stream *input_buffer,
   std::mutex* in_mtx,
   const std::string& s_host,
   const std::string& s_port):
@@ -295,7 +338,7 @@ udp_source::handle_receive(
 
 
 udp_sink::udp_sink(
-  iq_stream *input_buffer,
+  sample_stream *input_buffer,
   std::mutex* in_mtx,
   const std::string& s_host,
   const std::string& s_port):
@@ -319,7 +362,7 @@ udp_sink::udp_sink(
 void
 udp_sink::transmit()
 {
-  gr_complex output_buffer[BUFFER_SIZE];
+  iq_sample output_buffer[BUFFER_SIZE];
 
   while (g_th_run)
   {
@@ -382,7 +425,7 @@ test_socket()
   // Initialise the UDP client
 	udp_source server(host, port);
 
-  iq_stream* buffer = server.buffer();
+  sample_stream* buffer = server.buffer();
 
   int i = 0;
   while (true)

@@ -1,17 +1,17 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2016 Trinity Connect Centre.
- * 
+ *
  * HyDRA is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
- * 
+ *
  * HyDRA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
@@ -26,8 +26,8 @@ fft_complex::fft_complex(size_t fft_size, bool forward):
    g_fft_size(fft_size),
    g_forward(forward)
 {
-   g_inbuf  = (gr_complex *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
-   g_outbuf = (gr_complex *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
+   g_inbuf  = (iq_sample *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
+   g_outbuf = (iq_sample *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
 
    g_plan = fftwf_plan_dft_1d(fft_size,
                    (fftwf_complex *)(g_inbuf),
@@ -37,19 +37,19 @@ fft_complex::fft_complex(size_t fft_size, bool forward):
 }
 
 int
-fft_complex::set_data(const gr_complex *data, size_t len)
+fft_complex::set_data(const iq_sample *data, size_t len)
 {
    // Copy samples to fft buffer
    std::copy(data, data + len, g_inbuf);
 }
 
-gr_complex*
+iq_sample*
 fft_complex::get_inbuf()
 {
    return g_inbuf;
 }
 
-gr_complex*
+iq_sample*
 fft_complex::get_outbuf()
 {
    return g_outbuf;

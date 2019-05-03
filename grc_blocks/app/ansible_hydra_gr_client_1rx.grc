@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <?grc format='1' created='3.7.10'?>
 <flow_graph>
-  <timestamp>Mon Jul 23 11:24:05 2018</timestamp>
+  <timestamp>Thu Apr 11 13:48:44 2019</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -10,7 +10,7 @@
     </param>
     <param>
       <key>window_size</key>
-      <value>1400,1400</value>
+      <value></value>
     </param>
     <param>
       <key>category</key>
@@ -30,7 +30,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(0, 4)</value>
+      <value>(8, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -38,7 +38,7 @@
     </param>
     <param>
       <key>generate_options</key>
-      <value>qt_gui</value>
+      <value>no_gui</value>
     </param>
     <param>
       <key>hier_block_src_path</key>
@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ansible_hydra_gr_client_1tx_1rx_mul</value>
+      <value>ansible_hydra_gr_client_1rx</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -66,7 +66,7 @@
     </param>
     <param>
       <key>run_options</key>
-      <value>run</value>
+      <value>prompt</value>
     </param>
     <param>
       <key>run</key>
@@ -93,11 +93,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1016, 4)</value>
+      <value>(1016, 8)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -109,7 +109,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>mul</value>
+      <value>mul_0</value>
     </param>
     <param>
       <key>label</key>
@@ -160,7 +160,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(792, 4)</value>
+      <value>(792, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -184,105 +184,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>127.0.0.1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_multiply_const_vxx</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>const</key>
-      <value>mul</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(800, 240)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_multiply_const_vxx_0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_pdu_to_tagged_stream</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(296, 252)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_pdu_to_tagged_stream_0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>tag</key>
-      <value>"len"</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
+      <value>192.168.5.241</value>
     </param>
   </block>
   <block>
@@ -360,7 +262,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(232, 444)</value>
+      <value>(232, 448)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -466,7 +368,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(616, 396)</value>
+      <value>(616, 400)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -526,97 +428,6 @@
     </param>
   </block>
   <block>
-    <key>digital_ofdm_tx</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>cp_len</key>
-      <value>16</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>fft_len</key>
-      <value>64</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(544, 192)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>header_mod</key>
-      <value>"BPSK"</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>digital_ofdm_tx_0</value>
-    </param>
-    <param>
-      <key>packet_len_key</key>
-      <value>"len"</value>
-    </param>
-    <param>
-      <key>log</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>occupied_carriers</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>payload_mod</key>
-      <value>"BPSK"</value>
-    </param>
-    <param>
-      <key>pilot_carriers</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>pilot_symbols</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>rolloff</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>scramble_bits</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>sync_word1</key>
-      <value>()</value>
-    </param>
-    <param>
-      <key>sync_word2</key>
-      <value>()</value>
-    </param>
-  </block>
-  <block>
     <key>parameter</key>
     <param>
       <key>alias</key>
@@ -632,7 +443,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(568, 4)</value>
+      <value>(568, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -656,7 +467,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.42e9</value>
+      <value>1.42e9 + 3e6</value>
     </param>
   </block>
   <block>
@@ -675,7 +486,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(456, 4)</value>
+      <value>(456, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -699,7 +510,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.42e9</value>
+      <value>1.42e9</value>
     </param>
   </block>
   <block>
@@ -710,7 +521,7 @@
     </param>
     <param>
       <key>center_frequency</key>
-      <value>freqrx + vr2offset</value>
+      <value>freqrx + vr1offset</value>
     </param>
     <param>
       <key>c_host</key>
@@ -730,7 +541,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(984, 396)</value>
+      <value>(984, 400)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -758,62 +569,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>u_id</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>hydra_gr_sink</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>center_frequency</key>
-      <value>freqtx + vr1offset</value>
-    </param>
-    <param>
-      <key>host</key>
-      <value>ansibleIP</value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(992, 196)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>hydra_gr_sink_0</value>
-    </param>
-    <param>
-      <key>payload</key>
-      <value>1024</value>
-    </param>
-    <param>
-      <key>port</key>
-      <value>5000</value>
-    </param>
-    <param>
-      <key>samp_rate</key>
-      <value>samp_rate</value>
+      <value>samp_rate * 2</value>
     </param>
     <param>
       <key>u_id</key>
@@ -832,11 +588,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(976, 48)</value>
+      <value>(888, 124)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1102,7 +858,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(320, 36)</value>
+      <value>(328, 8)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1145,7 +901,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(448, 84)</value>
+      <value>(448, 88)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1188,7 +944,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(568, 84)</value>
+      <value>(568, 88)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1212,30 +968,12 @@
     </param>
     <param>
       <key>value</key>
-      <value>300e3</value>
+      <value>700e3</value>
     </param>
   </block>
   <connection>
-    <source_block_id>blocks_multiply_const_vxx_0</source_block_id>
-    <sink_block_id>hydra_gr_sink_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_pdu_to_tagged_stream_0</source_block_id>
-    <sink_block_id>digital_ofdm_tx_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>blocks_tagged_stream_to_pdu_0</source_block_id>
     <sink_block_id>blocks_tuntap_pdu_1</sink_block_id>
-    <source_key>pdus</source_key>
-    <sink_key>pdus</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_tuntap_pdu_1</source_block_id>
-    <sink_block_id>blocks_pdu_to_tagged_stream_0</sink_block_id>
     <source_key>pdus</source_key>
     <sink_key>pdus</sink_key>
   </connection>
@@ -1248,12 +986,6 @@
   <connection>
     <source_block_id>digital_ofdm_rx_0</source_block_id>
     <sink_block_id>blocks_tagged_stream_to_pdu_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>digital_ofdm_tx_0</source_block_id>
-    <sink_block_id>blocks_multiply_const_vxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

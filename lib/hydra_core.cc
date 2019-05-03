@@ -1,6 +1,5 @@
 #include "hydra/hydra_core.h"
 
-#include <boost/algorithm/string.hpp>
 
 
 namespace hydra {
@@ -11,18 +10,21 @@ HydraCore::HydraCore()
    // Initialise the resource manager
    p_resource_manager = std::make_unique<xvl_resource_manager>();
    p_hypervisor = std::make_unique<Hypervisor>();
+
+   logger = hydra_log("core");
 }
 
 void
 HydraCore::set_rx_resources(uhd_hydra_sptr usrp,
                             double d_centre_freq,
                             double d_bandwidth,
+                            double d_norm_gain,
                             unsigned int u_fft_size)
 {
   // Initialise the RX resources
   p_resource_manager->set_rx_resources(d_centre_freq, d_bandwidth);
 
-  usrp->set_rx_config(d_centre_freq, d_bandwidth, 0);
+  usrp->set_rx_config(d_centre_freq, d_bandwidth, d_norm_gain);
   p_hypervisor->set_rx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
   // Toggle flag
@@ -33,12 +35,13 @@ void
 HydraCore::set_tx_resources(uhd_hydra_sptr usrp,
                             double d_centre_freq,
                             double d_bandwidth,
+                            double d_norm_gain,
                             unsigned int u_fft_size)
 {
    // Initialise the RX resources
    p_resource_manager->set_tx_resources(d_centre_freq, d_bandwidth);
 
-   usrp->set_tx_config(d_centre_freq, d_bandwidth, 0.6);
+   usrp->set_tx_config(d_centre_freq, d_bandwidth, d_norm_gain);
    p_hypervisor->set_tx_resources(usrp, d_centre_freq, d_bandwidth, u_fft_size);
 
    // Toggle flag
@@ -59,7 +62,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
   if (not b_receiver)
   {
     // Return error -- zero is bad
-    std::cout << "RX Resources not configured. Rejecting request." << std::endl;
+    logger.error("RX Resources not configured.");
     return 0;
   }
 
@@ -83,8 +86,6 @@ HydraCore::request_rx_resources(unsigned int u_id,
   // Try to reserve the resource chunks
   if(p_resource_manager->reserve_rx_resources(u_id, d_centre_freq, d_bandwidth))
   {
-    // Return error -- zero is bad
-    std::cout << "RX Resources already in use. Rejecting request." << std::endl;
     return 0;
   }
 
@@ -99,7 +100,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
   vr->set_rx_chain(u_udp_port, d_centre_freq, d_bandwidth, server_addr, remote_addr);
 
    // If able to create all of it, return the port number
-  std::cout << "RX Resources allocated successfully." << std::endl;
+  logger.info("RX Resources allocated successfully.");
   return u_udp_port++;
 }
 
@@ -108,16 +109,16 @@ HydraCore::request_tx_resources(unsigned int u_id,
                                 double d_centre_freq,
                                 double d_bandwidth,
                                 const std::string &server_addr,
-                                const std::string &remote_addr,
-                                bool bpad)
+                                const std::string &remote_addr)
 {
   std::lock_guard<std::mutex> _p(g_mutex);
 
   // If not configured to transmit
   if (not b_transmitter)
   {
-      // Return error -- zero is bad
-      return 0;
+    // Return error -- zero is bad
+    logger.error("<core> TX Resources not configured.");
+    return 0;
   }
 
   // Tey to find the given VR
@@ -144,20 +145,20 @@ HydraCore::request_tx_resources(unsigned int u_id,
     return 0;
   }
 
-
   static size_t u_udp_port = 33500;
   if (vr == nullptr)
   {
      vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
-     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, server_addr, remote_addr, bpad);
+     vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, server_addr, remote_addr);
      p_hypervisor->attach_virtual_radio(vr);
   }
   else
   {
-    vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, server_addr, remote_addr, bpad);
+    vr->set_tx_chain(u_udp_port, d_centre_freq, d_bandwidth, server_addr, remote_addr);
   }
 
   // If able to create all of it, return the port number
+  logger.info("TX Resources allocated successfully.");
   return u_udp_port++;
 }
 
@@ -232,12 +233,16 @@ HydraCore::query_resources()
 int
 HydraCore::free_resources(size_t radio_id)
 {
-  std::cout << "CORE: freeing resources for radio: " << radio_id << std::endl;
+  logger.info("Freeing resources for radio: " + std::to_string(radio_id));
   p_resource_manager->free_rx_resources(radio_id);
   p_resource_manager->free_tx_resources(radio_id);
+  auto vr = p_hypervisor->get_vradio(radio_id);
+  // Stop the VR chains if the VR exists
+  if (vr != nullptr){vr->stop();}
+
   p_hypervisor->detach_virtual_radio(radio_id);
 
-  std::cout << "CORE: DONE freeing resources for radio: " << radio_id << std::endl;
+  logger.info("Freed resources for radio: " + std::to_string(radio_id));
   return 1;
 }
 

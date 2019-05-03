@@ -2,6 +2,8 @@
 #define INCLUDED_HYDRA_XVL_WRAPPER
 
 #include <thread>
+#include <memory>
+#include <iostream>
 
 #include "hydra/hydra_hypervisor.h"
 

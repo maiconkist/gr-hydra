@@ -1,10 +1,5 @@
 #include "hydra/hydra_xvl_wrapper.h"
 
-#include <memory>
-#include <thread>
-#include <iostream>
-
-
 namespace hydra {
 
 HydraXVL* HydraXVL::pinstance;

@@ -1,7 +1,5 @@
 #include "hydra/hydra_resource.h"
 
-#include <boost/format.hpp>
-
 namespace hydra {
 
 // Methods of the resource manager class
@@ -10,6 +8,8 @@ xvl_resource_manager::xvl_resource_manager()
   // Set initial flags. The user must set the RX/TX resources.
   b_receiver = false;
   b_transmitter = false;
+
+  logger = hydra_log("resource");
 }
 
 void
@@ -27,7 +27,7 @@ xvl_resource_manager::set_rx_resources(double d_centre_freq,
   b_receiver = true;
 
   // Initial chunk, with all the available resources
-  rx_resources = rf_front_end(d_centre_freq, d_bandwidth);
+  rx_resources = rf_front_end(d_centre_freq, d_bandwidth, 0, &logger);
 }
 
 void
@@ -45,7 +45,7 @@ xvl_resource_manager::set_tx_resources(double d_centre_freq,
   b_transmitter = true;
 
   // Initial chunk, with all the available resources
-  tx_resources = rf_front_end(d_centre_freq, d_bandwidth);
+  tx_resources = rf_front_end(d_centre_freq, d_bandwidth, 0, &logger);
 }
 
 int
@@ -179,10 +179,13 @@ xvl_resource_manager::check_rx_free(double d_centre_freq,
 // Methods of the RF front-end class
 rf_front_end::rf_front_end(double d_cf,
                            double d_bw,
-                           unsigned int u_id)
+                           unsigned int u_id,
+                           hydra_log* logger)
 {
   // Create empty chunk with all the available resources
   resources.emplace_back(d_cf, d_bw, u_id);
+
+  p_logger = logger;
 }
 
 int
@@ -268,11 +271,25 @@ rf_front_end::create_chunks(double d_centre_freq,
     // Create a chunk for the given service
     (*it) = chunk(d_centre_freq, d_bandwidth, u_id);
 
+
     // Change the result flag -- zero is a great signal
     result = 0;
+    // Break the while loop and exit
     break;
 
   } // End for loop
+
+  // Depending on the results
+  if (result)
+  {
+    // Output some debug information
+    p_logger->warning("Could not reserve " + std::to_string(d_bandwidth) + "[Hz] at " + std::to_string(d_centre_freq) + "[Hz] for Virtual Radio #" + std::to_string(u_id));
+  }
+  else
+  {
+    // Output some debug information
+    p_logger->info("Reserved " + std::to_string(d_bandwidth) + "[Hz] at " + std::to_string(d_centre_freq) + "[Hz] for Virtual Radio #" + std::to_string(u_id));
+  }
 
   return result;
 }

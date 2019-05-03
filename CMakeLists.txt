@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.8.9)
 # Define project name
 project (HyDRA)
 
+# set(CMAKE_BUILD_TYPE Debug)
+
 # Use C++17
 set(CMAKE_CXX_FLAGS "-std=c++17")
 # set(CMAKE_CXX_STANDARD 17)
@@ -40,7 +42,14 @@ find_library(
 )
 
 # Find Boost
-find_package(Boost "1.58" COMPONENTS system filesystem REQUIRED)
+find_package(Boost "1.58" COMPONENTS
+  system
+  filesystem
+  program_options
+  log
+  log_setup REQUIRED)
+
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
 # Include the project's directories
 include_directories(include)

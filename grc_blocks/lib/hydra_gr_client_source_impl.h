@@ -19,9 +19,9 @@ class hydra_gr_client_source_impl : public hydra_gr_client_source
   /** CTOR
    */
   hydra_gr_client_source_impl(unsigned int u_id,
-                              const std::string &c_host,
                               const std::string &s_host,
-                              unsigned int u_port);
+                              unsigned int u_port,
+                              const std::string &s_group);
 
   /** DTOR
    */

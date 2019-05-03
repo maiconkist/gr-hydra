@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 ##################################################
 # GNU Radio Python Flow Graph
-# Title: Ansible Hydra Gr Client 1Tx 1Rx
-# Generated: Wed Mar 13 01:16:45 2019
+# Title: Ansible Hydra Gr Client 1Rx
+# Generated: Thu Apr 11 17:27:14 2019
 ##################################################
-
 
 from gnuradio import blocks
 from gnuradio import digital
@@ -15,14 +14,16 @@ from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from optparse import OptionParser
 import hydra
-import threading
 
 
-class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
+class ansible_hydra_gr_client_1rx(gr.top_block):
 
-    def __init__(self, ansibleIP='127.0.0.1', freqrx=2.42e9+300e3,
-                 freqtx=2.42e9-300e3, mul=0.04, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
-        gr.top_block.__init__(self, "Ansible Hydra Gr Client 1Tx 1Rx")
+    def __init__(self, ansibleIP='127.0.0.1',
+                 freqrx=2e9, freqtx=2e9, mul=0.01,
+                 tx_rate=200e3, rx_rate=200e3,
+                 vr1offset=-300e3, vr2offset=700e3):
+
+        gr.top_block.__init__(self, "Ansible Hydra Gr Client 1Rx")
 
         ##################################################
         # Parameters
@@ -31,29 +32,16 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
         self.freqrx = freqrx
         self.freqtx = freqtx
         self.mul = mul
-        self.samp_rate = samp_rate
+        self.rx_rate = rx_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
 
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(
-            7, ansibleIP, 5000, 'default')
-        self.hydra_gr_sink_0.start_client(freqtx, samp_rate , 1024)
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(
-            7, ansibleIP, 5000, 'default')
-        self.hydra_gr__source_0_0.start_client(freqrx, samp_rate , 10000)
+        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, ansibleIP, ansibleIP, 5000)
+        self.hydra_gr__source_0_0.start_client(freqrx, rx_rate, 10000)
 
-        self.digital_ofdm_tx_0 = digital.ofdm_tx(
-        	  fft_len=64, cp_len=16,
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
-        	  rolloff=0,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
         self.digital_ofdm_rx_0 = digital.ofdm_rx(
         	  fft_len=64, cp_len=16,
         	  frame_length_tag_key='frame_'+"len",
@@ -67,19 +55,13 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
         (self.blocks_tuntap_pdu_1).set_max_output_buffer(100000)
         self.blocks_tagged_stream_to_pdu_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
-        self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul, ))
 
         ##################################################
         # Connections
         ##################################################
         self.msg_connect((self.blocks_tagged_stream_to_pdu_0, 'pdus'), (self.blocks_tuntap_pdu_1, 'pdus'))
-        self.msg_connect((self.blocks_tuntap_pdu_1, 'pdus'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))
-        self.connect((self.blocks_pdu_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tagged_stream_to_pdu_0, 0))
-        self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
         self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
 
     def get_ansibleIP(self):
@@ -105,13 +87,12 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
 
     def set_mul(self, mul):
         self.mul = mul
-        self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
 
     def get_samp_rate(self):
-        return self.samp_rate
+        return self.rx_rate
 
     def set_samp_rate(self, samp_rate):
-        self.samp_rate = samp_rate
+        self.samp_rate = rx_rate
 
     def get_vr1offset(self):
         return self.vr1offset
@@ -129,17 +110,33 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--ansibleIP", dest="ansibleIP", type="string", default='127.0.0.1',
+        "", "--ansibleIP", dest="ansibleIP", type=str, default='127.0.0.1',
         help="Set ansibleIP [default=%default]")
+    parser.add_option(
+            "", "--tx_rate", dest="tx_rate", type=float, default=200e3,
+            help="TX Rate [default=%default]")
+    parser.add_option(
+            "", "--rx_rate", dest="rx_rate", type=float, default=200e3,
+            help="RX Rate [default=%default]")
+
+
+
     return parser
 
 
-def main(top_block_cls=ansible_hydra_gr_client_1tx_1rx, options=None):
+def main(top_block_cls=ansible_hydra_gr_client_1rx, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls(ansibleIP=options.ansibleIP)
+    tb = top_block_cls(ansibleIP=options.ansibleIP,
+                       tx_rate=options.tx_rate,
+                       rx_rate=options.rx_rate)
     tb.start()
+    try:
+        raw_input('Press Enter to quit: ')
+    except EOFError:
+        pass
+    tb.stop()
     tb.wait()
 
 
