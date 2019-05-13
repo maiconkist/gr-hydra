@@ -120,8 +120,16 @@
       <value>2048</value>
     </param>
     <param>
+      <key>rx_norm_gain</key>
+      <value>0.0</value>
+    </param>
+    <param>
       <key>rx_samp_rate</key>
       <value>2e6</value>
+    </param>
+    <param>
+      <key>group</key>
+      <value>default</value>
     </param>
     <param>
       <key>ip</key>
@@ -134,6 +142,10 @@
     <param>
       <key>tx_fft_size</key>
       <value>2048</value>
+    </param>
+    <param>
+      <key>tx_norm_gain</key>
+      <value>0.6</value>
     </param>
     <param>
       <key>tx_samp_rate</key>
@@ -223,7 +235,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.43e9+3e6</value>
+      <value>1.1e9+5e6</value>
     </param>
   </block>
   <block>
@@ -266,7 +278,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.43e9</value>
+      <value>1.1e9</value>
     </param>
   </block>
 </flow_graph>

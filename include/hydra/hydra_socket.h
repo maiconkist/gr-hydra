@@ -7,11 +7,15 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include <numeric>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/format.hpp>
 #include <zmq.hpp>
 
 #include "hydra/types.h"
+#include "hydra/hydra_buffer.hpp"
+#include "hydra/hydra_log.h"
 
 // Using name space UDP
 using boost::asio::ip::udp;
@@ -21,92 +25,106 @@ namespace hydra
 
 class zmq_source
 {
- public:
-  /* CTOR
-   */
-  zmq_source(const std::string &server_addr,
-             const std::string &remote_addr,
-             const std::string& port);
+  public:
+    /* CTOR */
+    zmq_source(const std::string &server_addr,
+               const std::string &remote_addr,
+               const std::string& port,
+               const unsigned int& buf_size);
 
-  /** DTOR
-   */
-  ~zmq_source();
+    /* DTOR  */
+    void stop();
 
-  static std::unique_ptr<zmq_source> make(const std::string &server_addr,
-                                          const std::string &remote_addr,
-                                          const std::string& port)
-  {
-    return std::make_unique<zmq_source>(server_addr, remote_addr, port);
-  }
+    static std::unique_ptr<zmq_source> make(const std::string &server_addr,
+                                            const std::string &remote_addr,
+                                            const std::string& port,
+                                            const unsigned int& buf_size)
+    {
+      return std::make_unique<zmq_source>(
+          server_addr, remote_addr, port, buf_size);
+    }
 
-  // Returns pointer to the output buffer
-  iq_stream* buffer(){ return &output_buffer; };
+    // Returns an array with the number of requested elements
+    /* template <unsigned int num_of_samples>
+    std::array<iq_sample, num_of_samples> consume()
+    {
+      //Consume from the internal buffer an returns the array
+      return output_buffer.read<num_of_samples>();
+    };*/
 
-  // Returns pointer to the mutex
-  std::mutex* mutex() {return &out_mtx;};
+    // Return pointer to the internal buffer
+    std::shared_ptr<hydra_buffer<iq_sample>> buffer()
+    {
+      return p_output_buffer;
+    };
 
- private:
-  std::string s_host;
-  std::string s_port;
-  bool g_th_run;
+  private:
+    // Hold host and port information
+    std::string s_host;
+    std::string s_port;
+    // Thread stop condition
+    bool g_th_run;
 
+    hydra_log logger;
 
-  // UDP thread to handle the receiving of datagrams
-  std::unique_ptr<std::thread> g_rx_thread;
-  zmq::context_t context;
-  zmq::message_t message;
-  zmq::socket_t socket;
+    // Thread to handle the receiving of datagrams
+    std::unique_ptr<std::thread> g_rx_thread;
+    // ZMQ-related primitives
+    zmq::context_t context;
+    zmq::message_t message;
+    zmq::socket_t socket;
 
-  // Create output buffer
-  iq_stream output_buffer;
+    // Create output buffer
+    std::shared_ptr<hydra_buffer<iq_sample>> p_output_buffer;
 
-  // Lock access to the deque
-  std::mutex out_mtx;
-
-  void connect();
+    // Event loop
+    void run();
 };
-
 
 class zmq_sink
 {
-public:
-  /* CTOR
-   */
-  zmq_sink(iq_stream *p_input_buffer,
-           std::mutex *in_mtx,
-           const std::string& server_addr,
-           const std::string& remote_addr,
-           const std::string& port);
+  public:
+    /* CTOR */
+    zmq_sink(std::shared_ptr<hydra_buffer<iq_sample>> input_buffer,
+             const std::string& server_addr,
+             const std::string& remote_addr,
+             const std::string& port);
 
-  /** DTOR
-   */
-  ~zmq_sink();
+    /* DTOR */
+    void stop();
 
-  static std::unique_ptr<zmq_sink> make(iq_stream *p_input_buffer,
-                                        std::mutex *in_mtx,
-                                        const std::string& server_addr,
-                                        const std::string& remote_addr,
-                                        const std::string& port)
-  {
-    return std::make_unique<zmq_sink>(p_input_buffer, in_mtx, server_addr, remote_addr, port);
-  }
+    static std::unique_ptr<zmq_sink> make(std::shared_ptr<hydra_buffer<iq_sample>> input_buffer,
+                                          const std::string& server_addr,
+                                          const std::string& remote_addr,
+                                          const std::string& port)
+    {
+      return std::make_unique<zmq_sink>(input_buffer, server_addr, remote_addr, port);
+    }
 
-  void transmit();
+  private:
+     // Hold host and port information
+    std::string s_host;
+    std::string s_port;
 
-private:
-  std::string s_host;
-  std::string s_port;
+    // Thread stop condition
+    bool g_th_run;
 
-  // UDP thread to handle the receiving of datagrams
-  std::unique_ptr<std::thread> g_tx_thread;
-  zmq::context_t context;
-  zmq::message_t message;
-  zmq::socket_t socket;
+    hydra_log logger;
 
-  bool g_th_run;
-  iq_stream * g_input_buffer;
-  std::mutex * p_in_mtx;
-};
+    // Thread to handle the receiving of datagrams
+    std::unique_ptr<std::thread> g_rx_thread;
+
+    // ZMQ-related primitives
+    zmq::context_t context;
+    zmq::message_t message;
+    zmq::socket_t socket;
+
+    // Create input buffer
+    std::shared_ptr<hydra_buffer<iq_sample>> p_input_buffer;
+
+    // Event loop
+    void run();
+  };
 
 
 class tcp_sink
@@ -115,7 +133,7 @@ public:
 
   /* CTOR
    */
-  tcp_sink(iq_stream* p_input_buffer,
+  tcp_sink(sample_stream* p_input_buffer,
            std::mutex* in_mtx,
            const std::string &s_host,
            const std::string &s_port);
@@ -135,7 +153,7 @@ public:
   // Assign the handle receive callback when a datagram is received
   void transmit();
 
-  static std::unique_ptr<tcp_sink> make(iq_stream* p_input_buffer,
+  static std::unique_ptr<tcp_sink> make(sample_stream* p_input_buffer,
                            std::mutex* in_mtx,
                            const std::string &s_host,
                            const std::string &s_port)
@@ -159,7 +177,7 @@ public:
   std::unique_ptr<std::thread> tx_udp_thread;
 
   // Pointer to output buffer
-  iq_stream* g_input_buffer;
+  sample_stream* g_input_buffer;
 
   // Pointer to the input buffer mutex
   std::mutex* p_in_mtx;
@@ -193,7 +211,7 @@ class udp_source
   void receive();
 
   // Returns pointer to the output buffer
-  iq_stream* buffer(){ return &output_buffer; };
+  sample_stream* buffer(){ return &output_buffer; };
 
   // Returns pointer to the mutex
   std::mutex* mutex() {return &out_mtx;};
@@ -220,7 +238,7 @@ class udp_source
   // Create remainder buffer, which just needs 16 bytes
   std::array<char, IQ_SIZE> remainder_buffer;
   // Create output buffer
-  iq_stream output_buffer;
+  sample_stream output_buffer;
 
   // Counter of bytes remaining from a previous reception
   unsigned int u_remainder;
@@ -242,7 +260,7 @@ public:
 
   /* CTOR
    */
-  udp_sink(iq_stream* p_input_buffer,
+  udp_sink(sample_stream* p_input_buffer,
            std::mutex* in_mtx,
            const std::string &s_host,
            const std::string &s_port);
@@ -262,7 +280,7 @@ public:
   // Assign the handle receive callback when a datagram is received
   void transmit();
 
-  static std::unique_ptr<udp_sink> make(iq_stream* p_input_buffer,
+  static std::unique_ptr<udp_sink> make(sample_stream* p_input_buffer,
                            std::mutex* in_mtx,
                            const std::string &s_host,
                            const std::string &s_port)
@@ -287,7 +305,7 @@ public:
   std::unique_ptr<std::thread> tx_udp_thread;
 
   // Pointer to output buffer
-  iq_stream* g_input_buffer;
+  sample_stream* g_input_buffer;
 
   // Pointer to the input buffer mutex
   std::mutex* p_in_mtx;

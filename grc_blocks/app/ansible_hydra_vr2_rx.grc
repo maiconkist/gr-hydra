@@ -403,7 +403,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(840, 244)</value>
+      <value>(840, 200)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -750,7 +750,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.43e9</value>
+      <value>1.1e9</value>
     </param>
   </block>
   <block>
@@ -793,7 +793,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2.43e9+3e6</value>
+      <value>1.1e9+5e6</value>
     </param>
   </block>
   <block>
@@ -3170,7 +3170,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>200e3</value>
+      <value>700e3</value>
     </param>
   </block>
   <block>

@@ -6,9 +6,9 @@ list(APPEND hydra_sources
     hydra_fft.cc
     hydra_virtual_radio.cc
     hydra_hypervisor.cc
-    hydra_buffer.cc
     hydra_socket.cc
     hydra_stats.cc
+    hydra_log.cc
     hydra_resource.cc
     hydra_server.cc
     hydra_client.cc
@@ -40,5 +40,5 @@ install(TARGETS hydra
 )
 
 
-add_executable(hydra_test_resource hydra_resource.cc)
-set_target_properties(hydra_test_resource PROPERTIES COMPILE_FLAGS "-DTEST_RESOURCE")
+# add_executable(hydra_test_resource hydra_resource.cc)
+# set_target_properties(hydra_test_resource PROPERTIES COMPILE_FLAGS "-DTEST_RESOURCE")

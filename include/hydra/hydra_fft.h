@@ -21,10 +21,6 @@
 #ifndef INCLUDED_HYDRA_FFT_H
 #define INCLUDED_HYDRA_FFT_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <fftw3.h>
 #include <hydra/types.h>
 #include <boost/shared_ptr.hpp>
@@ -33,39 +29,39 @@ namespace hydra {
 
 class fft_complex
 {
- public:
-  /** CTOR
-   * @param fft_size
-   * @param fortward
-   */
-  fft_complex(size_t fft_size, bool forward = true);
+  public:
+    /** CTOR
+     * @param fft_size
+     * @param fortward
+     */
+    fft_complex(size_t fft_size, bool forward = true);
 
-  /**
-   */
-  void set_data(const gr_complex *data, size_t len);
+    /**
+    */
+    int set_data(const iq_sample *data, size_t len);
 
-  void reset_inbuf();
-  void reset_outbuf();
+    void reset_inbuf();
+    void reset_outbuf();
 
-  /**
-   */
-  gr_complex* get_inbuf();
+    /**
+    */
+    iq_sample* get_inbuf();
 
+    /**
+     */
+    iq_sample* get_outbuf();
 
-  /**
-   */
-  gr_complex* get_outbuf();
+    /**
+    */
+    void execute();
 
-  /**
-   */
-  void execute();
+  private:
+    size_t g_fft_size;
+    bool g_forward;
+    iq_sample *g_inbuf;
+    iq_sample *g_outbuf;
+    fftwf_plan g_plan;
 
- private:
-  size_t g_fft_size;
-  bool g_forward;
-  gr_complex *g_inbuf;
-  gr_complex *g_outbuf;
-  fftwf_plan g_plan;
 };
 
 /* TYPEDEFS for this class */

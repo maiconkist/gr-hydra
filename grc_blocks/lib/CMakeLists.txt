@@ -22,6 +22,8 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+
 include_directories(${Boost_INCLUDE_DIR} ../../include)
 link_directories(${Boost_LIBRARY_DIRS})
 
@@ -30,9 +32,10 @@ list(APPEND hydra_sources
     ../../lib/hydra_fft.cc
     ../../lib/hydra_virtual_radio.cc
     ../../lib/hydra_hypervisor.cc
-    ../../lib/hydra_buffer.cc
+    ../../include/hydra/hydra_buffer.hpp
     ../../lib/hydra_socket.cc
     ../../lib/hydra_stats.cc
+    ../../lib/hydra_log.cc
     ../../lib/hydra_resource.cc
     ../../lib/hydra_server.cc
     ../../lib/hydra_client.cc

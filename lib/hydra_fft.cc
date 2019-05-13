@@ -26,8 +26,8 @@ fft_complex::fft_complex(size_t fft_size, bool forward):
    g_fft_size(fft_size),
    g_forward(forward)
 {
-   g_inbuf  = (gr_complex *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
-   g_outbuf = (gr_complex *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
+   g_inbuf  = (iq_sample *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
+   g_outbuf = (iq_sample *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
 
    g_plan = fftwf_plan_dft_1d(fft_size,
                    (fftwf_complex *)(g_inbuf),
@@ -36,8 +36,8 @@ fft_complex::fft_complex(size_t fft_size, bool forward):
                    FFTW_MEASURE);
 }
 
-void
-fft_complex::set_data(const gr_complex *data, size_t len)
+int
+fft_complex::set_data(const iq_sample *data, size_t len)
 {
    // Copy samples to fft buffer
    std::copy(data, data + len, g_inbuf);
@@ -55,13 +55,13 @@ fft_complex::reset_outbuf()
   std::fill(g_outbuf, g_outbuf +  g_fft_size, 0);
 }
 
-gr_complex*
+iq_sample*
 fft_complex::get_inbuf()
 {
    return g_inbuf;
 }
 
-gr_complex*
+iq_sample*
 fft_complex::get_outbuf()
 {
    return g_outbuf;

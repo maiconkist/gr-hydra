@@ -18,9 +18,9 @@ class hydra_gr_client_source_impl : public hydra_gr_client_source
   /** CTOR
    */
   hydra_gr_client_source_impl(unsigned int u_id,
-                              const std::string &c_host,
                               const std::string &s_host,
-                              unsigned int u_port);
+                              unsigned int u_port,
+                              const std::string &s_group);
 
   /** DTOR
    */
@@ -39,8 +39,6 @@ class hydra_gr_client_source_impl : public hydra_gr_client_source
  private:
   std::unique_ptr<hydra_client> client;
   std::unique_ptr<std::thread> rx_thread;
-
-  void test();
 };
 
   } /* namespace hydra */

@@ -1,30 +1,24 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2016 Trinity Connect Centre.
- * 
+ *
  * HyDRA is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
- * 
+ *
  * HyDRA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
  * Boston, MA 02110-1301, USA.
  */
 
-#include <hydra/hydra_virtual_radio.h>
-#include <hydra/hydra_hypervisor.h>
-
-#include <hydra/hydra_uhd_interface.h>
-
-#include <iostream>
-#include <numeric>
+#include "hydra/hydra_virtual_radio.h"
 
 namespace hydra {
 
@@ -36,6 +30,7 @@ VirtualRadio::VirtualRadio(size_t _idx, Hypervisor *hypervisor):
    g_rx_udp_port(0),
    g_tx_udp_port(0)
 {
+  logger = hydra_log("VR #" + std::to_string(g_idx));
 }
 
 
@@ -58,20 +53,20 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   g_ifft_complex  = sfft_complex(new fft_complex(g_rx_fft_size, false));
 
   // TODO this must be shared with the hypervisor, or come from it
-  std::mutex * hyp_mutex = new std::mutex;
-  rx_windows = new window_stream;
-  // Create new TX timed buffer
-  rx_buffer = std::make_shared<TxBuffer>(rx_windows,
-                                         hyp_mutex,
-                                         d_rx_bw,
-                                         g_rx_fft_size);
+  rx_windows = std::make_shared<hydra_buffer<iq_window>>(1000);
 
-  /* Create UDP transmitter */
-  rx_socket = zmq_sink::make(rx_buffer->stream(),
-                             rx_buffer->mutex(),
-                             server_addr,
-                             remote_addr,
-                             std::to_string(u_rx_udp));
+  // Create new resampler
+  rx_resampler = std::make_unique<resampler<iq_window, iq_sample>>(
+      rx_windows,
+      d_rx_bw,
+      g_rx_fft_size);
+
+  /* Create ZMQ transmitter */
+  rx_socket = zmq_sink::make(
+      rx_resampler->buffer(),
+      server_addr,
+      remote_addr,
+      std::to_string(u_rx_udp));
 
   /* Always in the end. */
   p_hypervisor->notify(*this, Hypervisor::SET_RX_MAP);
@@ -91,8 +86,7 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
                            double d_tx_cf,
                            double d_tx_bw,
                            const std::string &server_addr,
-                           const std::string &remote_addr,
-                           bool b_pad)
+                           const std::string &remote_addr)
 {
    // If already transmitting
    if (b_transmitter)
@@ -106,16 +100,18 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
 
    g_tx_fft_size = p_hypervisor->get_tx_fft() * (d_tx_bw / p_hypervisor->get_tx_bandwidth());
 
-   // Create UDP receiver
-   //tx_socket = udp_source::make("0.0.0.0", std::to_string(u_tx_udp));
-   tx_socket = zmq_source::make(server_addr, remote_addr, std::to_string(u_tx_udp));
+   // Create ZMQ receiver
+   tx_socket = zmq_source::make(
+       server_addr,
+       remote_addr,
+       std::to_string(u_tx_udp),
+       1000*g_tx_fft_size);
 
-   // Create new timed buffer
-   tx_buffer = std::make_shared<RxBuffer>(tx_socket->buffer(),
-                                          tx_socket->mutex(),
-                                          d_tx_bw,
-                                          g_tx_fft_size,
-                                          b_pad);
+   // Create new resampler
+   tx_resampler = std::make_unique<resampler<iq_sample, iq_window>>(
+       tx_socket->buffer(),
+       d_tx_bw,
+       g_tx_fft_size);
 
    // create fft object
    g_fft_complex  = sfft_complex(new fft_complex(g_tx_fft_size));
@@ -168,28 +164,26 @@ VirtualRadio::set_tx_mapping(const iq_map_vec &iq_map)
 }
 
 bool
-VirtualRadio::map_tx_samples(gr_complex *samples_buf)
+VirtualRadio::map_tx_samples(iq_sample *samples_buf)
 {
-  if (!b_transmitter) return false;
+  // If the transmitter chain was not defined
+  if (not b_transmitter){return false;}
 
-  std::lock_guard<std::mutex> _l(g_mutex);
+  // Try to get a window from the resampler
+  iq_window buf  = tx_resampler->buffer()->read_one();
 
-  const iq_window *buf = tx_buffer->consume();
-  if (buf == nullptr){ return false; }
-
-  const gr_complex *window = buf->data();
+  // Return false if the window is empty
+  if (buf.empty()){return false;}
 
   // Copy samples in TIME domain to FFT buffer, execute FFT
-  g_fft_complex->set_data(window, g_tx_fft_size);
+  g_fft_complex->set_data(&buf.front(), g_tx_fft_size);
   g_fft_complex->execute();
-  gr_complex *outbuf = g_fft_complex->get_outbuf();
+  iq_sample *outbuf = g_fft_complex->get_outbuf();
 
   // map samples in FREQ domain to samples_buff
   // perfors fft shift
-  size_t idx = 0;
-  for (iq_map_vec::iterator it = g_tx_map.begin();
-       it != g_tx_map.end();
-       ++it, ++idx)
+  int idx = 0;
+  for (auto it = g_tx_map.begin(); it != g_tx_map.end(); ++it, ++idx)
   {
     samples_buf[*it] = outbuf[idx];
   }
@@ -228,18 +222,20 @@ VirtualRadio::set_rx_mapping(const iq_map_vec &iq_map)
 }
 
 void
-VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
+VirtualRadio::demap_iq_samples(const iq_sample *samples_buf, size_t len)
 {
-  if (!b_receiver) return;
+  // If the receiver chain was not defined
+  if (not b_receiver){ return;}
 
   /* Copy the samples used by this radio */
   for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
     g_ifft_complex->get_inbuf()[idx] = samples_buf[g_rx_map[idx]];
 
+  // Perform the FFT operation
   g_ifft_complex->execute();
 
   /* Append new samples */
-  rx_buffer->produce(g_ifft_complex->get_outbuf(), g_rx_fft_size);
+  rx_resampler->buffer()->write(g_ifft_complex->get_outbuf(), g_rx_fft_size);
 }
 
 } /* namespace hydra */

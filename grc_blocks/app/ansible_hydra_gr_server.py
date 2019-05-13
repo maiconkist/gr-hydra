@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Server
-# Generated: Wed Apr  3 15:37:03 2019
+# Generated: Mon May 13 15:09:21 2019
 ##################################################
 
 
@@ -18,7 +18,7 @@ import threading
 
 class ansible_hydra_gr_server(gr.top_block):
 
-    def __init__(self, ansibleIPPort='192.168.5.54:5000', freqrx=2.43e9+3e6, freqtx=2.43e9):
+    def __init__(self, ansibleIPPort='192.168.5.54:5000', freqrx=1.1e9+5e6, freqtx=1.1e9):
         gr.top_block.__init__(self, "Ansible Hydra Gr Server")
 
         ##################################################
@@ -31,11 +31,11 @@ class ansible_hydra_gr_server(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.ahydra_gr_server_0 = hydra.hydra_gr_server(ansibleIPPort)
-        if freqtx > 0 and 2e6 > 0 and 2048 > 0:
-           self.ahydra_gr_server_0.set_tx_config(freqtx, 2e6, 2048, "USRP")
-        if freqrx > 0 and 2e6 > 0 and 2048 > 0:
-           self.ahydra_gr_server_0.set_rx_config(freqrx, 2e6, 2048, "USRP")
+        self.ahydra_gr_server_0 = hydra.hydra_gr_server(ansibleIPPort, 'default')
+        if freqtx > 0 and 2e6 > 0 and 2048 > 0 and 0.6 >= 0 and 0.6 >= 0:
+           self.ahydra_gr_server_0.set_tx_config(freqtx, 2e6, 0.6,2048, "USRP")
+        if freqrx > 0 and 2e6 > 0 and 2048 > 0 and 0.0 >= 0 and 0.0 >= 0:
+           self.ahydra_gr_server_0.set_rx_config(freqrx, 2e6, 0.0, 2048, "USRP")
         self.ahydra_gr_server_0_thread = threading.Thread(target=self.ahydra_gr_server_0.start_server)
         self.ahydra_gr_server_0_thread.daemon = True
         self.ahydra_gr_server_0_thread.start()
@@ -65,10 +65,10 @@ def argument_parser():
         "", "--ansibleIPPort", dest="ansibleIPPort", type="string", default='192.168.5.54:5000',
         help="Set ansibleIPPort [default=%default]")
     parser.add_option(
-        "", "--freqrx", dest="freqrx", type="eng_float", default=eng_notation.num_to_str(2.43e9+3e6),
+        "", "--freqrx", dest="freqrx", type="eng_float", default=eng_notation.num_to_str(1.1e9+5e6),
         help="Set freqrx [default=%default]")
     parser.add_option(
-        "", "--freqtx", dest="freqtx", type="eng_float", default=eng_notation.num_to_str(2.43e9),
+        "", "--freqtx", dest="freqtx", type="eng_float", default=eng_notation.num_to_str(1.1e9),
         help="Set freqtx [default=%default]")
     return parser
 

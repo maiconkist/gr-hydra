@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr2 Rx
-# Generated: Thu Apr  4 18:41:32 2019
+# Generated: Mon May 13 15:14:48 2019
 ##################################################
 
 
@@ -22,7 +22,7 @@ import time
 
 class ansible_hydra_vr2_rx(gr.top_block):
 
-    def __init__(self, ansibleIP='192.168.5.81', freqrx=2.43e9, freqtx=2.43e9+3e6, gain=0.85, mul=0.04, samp_rate=200e3, vr1offset=-300e3, vr2offset=200e3):
+    def __init__(self, ansibleIP='192.168.5.81', freqrx=1.1e9, freqtx=1.1e9+5e6, gain=0.85, mul=0.04, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Vr2 Rx")
 
         ##################################################

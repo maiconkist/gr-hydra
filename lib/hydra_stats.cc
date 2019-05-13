@@ -7,6 +7,8 @@ xvl_monitor::xvl_monitor(unsigned int u_port)
 {
   // Get the server port
   s_server_port = std::to_string(u_port);
+
+  logger = hydra_log("stats");
 }
 
 void xvl_monitor::start(void)
@@ -20,7 +22,7 @@ void xvl_monitor::start(void)
   zmq::message_t request;
 
   // Output info message
-  std::cout << "Waiting for statistics" << std::endl;
+  logger.info("Waiting for statistics");
 
   // Flag mark if it is a new virtual radio
   bool inside;
@@ -29,7 +31,8 @@ void xvl_monitor::start(void)
   // Message holder
   std::string s_message;
   // Print initial message
-  std::cout << "Stats:" << std::endl;
+  logger.info("Stats:");
+
   // Run indefinitely
   while(true)
   {
@@ -79,7 +82,7 @@ void xvl_monitor::run(void)
 }
 
 xvl_report::xvl_report(unsigned int u_type,
-                       iq_stream* buffer,
+                       sample_stream* buffer,
                        unsigned int u_port)
 {
   // Get the server port
@@ -98,7 +101,7 @@ xvl_report::xvl_report(unsigned int u_type,
                                                  buffer);
 }
 
-void xvl_report::push(iq_stream* buffer)
+void xvl_report::push(sample_stream* buffer)
 {
   // Thread stop condition
   thr_stop = false;

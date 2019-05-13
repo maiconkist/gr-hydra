@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr1 Rx
-# Generated: Thu Apr  4 13:09:54 2019
+# Generated: Mon May 13 15:20:27 2019
 ##################################################
 
 
@@ -22,12 +22,13 @@ import time
 
 class ansible_hydra_vr1_rx(gr.top_block):
 
-    def __init__(self, freqrx=2.43e9, freqtx=2.43e9+3e6, gain=0.85, mul=0.04, samp_rate=400e3, vr1offset=-300e3, vr2offset=700e3, ansibleIP='192.168.5.78'):
+    def __init__(self, ansibleIP='192.168.5.78', freqrx=1.1e9, freqtx=1.1e9+5e6, gain=0.85, mul=0.04, samp_rate=400e3, vr1offset=-300e3, vr2offset=700e3):
         gr.top_block.__init__(self, "Ansible Hydra Vr1 Rx")
 
         ##################################################
         # Parameters
         ##################################################
+        self.ansibleIP = ansibleIP
         self.freqrx = freqrx
         self.freqtx = freqtx
         self.gain = gain
@@ -35,7 +36,6 @@ class ansible_hydra_vr1_rx(gr.top_block):
         self.samp_rate = samp_rate
         self.vr1offset = vr1offset
         self.vr2offset = vr2offset
-        self.ansibleIP = ansibleIP
 
         ##################################################
         # Blocks
@@ -103,6 +103,12 @@ class ansible_hydra_vr1_rx(gr.top_block):
         self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
         self.connect((self.uhd_usrp_source_0, 0), (self.digital_ofdm_rx_0_0, 0))
 
+    def get_ansibleIP(self):
+        return self.ansibleIP
+
+    def set_ansibleIP(self, ansibleIP):
+        self.ansibleIP = ansibleIP
+
     def get_freqrx(self):
         return self.freqrx
 
@@ -153,12 +159,6 @@ class ansible_hydra_vr1_rx(gr.top_block):
 
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
-
-    def get_ansibleIP(self):
-        return self.ansibleIP
-
-    def set_ansibleIP(self, ansibleIP):
-        self.ansibleIP = ansibleIP
 
 
 def argument_parser():

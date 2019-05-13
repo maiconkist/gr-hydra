@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 1Tx 1Rx
-# Generated: Fri Feb  8 18:54:44 2019
+# Generated: Mon May 13 15:18:02 2019
 ##################################################
 
 
@@ -36,11 +36,11 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, '192.168.5.77', 5000)
-        self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
-        self.hydra_gr__source_0_0 = hydra.hydra_gr_client_source(1, '192.168.5.77', '192.168.5.77', 5000)
-        self.hydra_gr__source_0_0.start_client(freqrx + vr1offset, samp_rate * 2, 10000)
+        self.hydra_gr_source_0 = hydra.hydra_gr_client_source(1, 'ansibleIP', 5000, 'default')
+        self.hydra_gr_source_0.start_client(freqrx + vr1offset, samp_rate * 2, 5000)
 
+        self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, 'ansibleIP', 5000, 'default')
+        self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
         	  fft_len=64, cp_len=16,
         	  packet_length_tag_key="len",
@@ -62,6 +62,7 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
         self.blocks_tuntap_pdu_1 = blocks.tuntap_pdu('tap0', 1000, False)
         (self.blocks_tuntap_pdu_1).set_max_output_buffer(100000)
         self.blocks_tagged_stream_to_pdu_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
+        self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.06, ))
 
@@ -72,9 +73,10 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block):
         self.msg_connect((self.blocks_tuntap_pdu_1, 'pdus'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.hydra_gr_sink_0, 0))
         self.connect((self.blocks_pdu_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
+        self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.digital_ofdm_rx_0, 0), (self.blocks_tagged_stream_to_pdu_0, 0))
         self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
-        self.connect((self.hydra_gr__source_0_0, 0), (self.digital_ofdm_rx_0, 0))
+        self.connect((self.hydra_gr_source_0, 0), (self.digital_ofdm_rx_0, 0))
 
     def get_freqrx(self):
         return self.freqrx

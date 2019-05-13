@@ -4,12 +4,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3, or (at your option)
 # any later version.
-# 
+#
 # HyDRA is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this software; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
@@ -23,13 +23,21 @@ install(FILES
   hydra_fft.h
   hydra_virtual_radio.h
   hydra_hypervisor.h
-  hydra_buffer.h
+  hydra_buffer.hpp
   hydra_socket.h
   hydra_stats.h
+  hydra_log.h
   hydra_resource.h
+  hydra_resampler.hpp
   hydra_core.h
   hydra_server.h
   hydra_client.h
   hydra_main.h
   hydra_uhd_interface.h
   DESTINATION include/hydra)
+
+# Include all the helper headers
+install(DIRECTORY
+  util/
+  DESTINATION include/hydra/util
+)

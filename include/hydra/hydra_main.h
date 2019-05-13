@@ -5,6 +5,7 @@
 
 #include "hydra/hydra_server.h"
 #include "hydra/hydra_core.h"
+#include "hydra/hydra_log.h"
 #include "hydra/hydra_stats.h"
 #include "hydra/types.h"
 
@@ -15,23 +16,33 @@ class HydraMain
 public:
    /* CTOR
     */
-   HydraMain(std::string server_addr, unsigned int u_monitor_port = 4996);
+   HydraMain();
+
+   HydraMain(
+       std::string server_addr,
+       std::string group_name,
+       unsigned int u_monitor_port = 4996);
 
    void set_rx_config(uhd_hydra_sptr usrp,
-                      double d_cf,
-                      double d_bw,
-                      unsigned int u_fft_size);
+                      const double &d_cf,
+                      const double &d_bw,
+                      const double &d_ng,
+                      const unsigned int &u_fft_size);
 
    void set_tx_config(uhd_hydra_sptr usrp,
-                      double d_cf,
-                      double d_bw,
-                      unsigned int u_fft_size);
+                      const double &d_cf,
+                      const double &d_bw,
+                      const double &d_ng,
+                      const unsigned int &u_fft_size);
 
    // Run method
    void run();
 
+   void stop();
+
 private:
    std::string s_server_addr;
+   std::string s_group;
 
    // Pointer to the XVL Server
    std::shared_ptr<HydraServer> server;
@@ -40,7 +51,7 @@ private:
    // Pointer to the XVL Statistics monitor
    std::shared_ptr<xvl_monitor> monitor;
 
-
+  hydra_log logger;
 
 };
 

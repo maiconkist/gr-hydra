@@ -18,7 +18,7 @@ class hydra_gr_server_impl : public hydra_gr_server
 
   /** CTOR
    */
-   hydra_gr_server_impl(std::string u_port);
+   hydra_gr_server_impl(std::string server_addr, std::string s_group = "default");
 
   /** DTOR
    */
@@ -27,11 +27,13 @@ class hydra_gr_server_impl : public hydra_gr_server
 
   virtual void set_tx_config(double d_center_frequency,
                              double d_samp_rate,
+                             double d_norm_gain,
                              size_t d_tx_fft_size,
                              std::string mode);
 
   virtual void set_rx_config(double d_center_frequency,
                              double d_samp_rate,
+                             double d_norm_gain,
                              size_t d_tx_fft_size,
                              std::string mode);
 

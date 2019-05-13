@@ -4,7 +4,7 @@ link_directories(${HYDRA_SOURCE_DIR}/lib)
 
 # Add the Server executable
 add_executable(server server.cc)
-target_link_libraries(server hydra)
+target_link_libraries(server hydra ${Boost_LIBRARIES})
 
 # Add the Client executable
 add_executable(client client.cc)

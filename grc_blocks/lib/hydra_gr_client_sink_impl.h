@@ -18,7 +18,8 @@ class hydra_gr_client_sink_impl : public hydra_gr_client_sink
     */
    hydra_gr_client_sink_impl(unsigned int u_id,
                              const std::string &host,
-                             unsigned int u_port);
+                             unsigned int u_port,
+                             const std::string &s_group);
 
    virtual void start_client(double d_center_frequency,
                              double d_samp_rate,
