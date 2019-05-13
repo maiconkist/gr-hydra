@@ -7,6 +7,7 @@ hydra_client::hydra_client(std::string client_ip,
                            unsigned int u_client_id,
                            std::string s_group_name,
                            bool b_debug):
+  u_id(u_client_id),
   b_debug_flag(b_debug),
   s_client_host(client_ip),
   s_group(s_group_name)

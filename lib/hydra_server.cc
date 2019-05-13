@@ -200,6 +200,10 @@ HydraServer::run()
         double d_bw = root.get(key + ".bandwidth", 0.0);
         unsigned int u_id = root.get(key + ".id", 0.0);
 
+	logger.debug("d_cf: " + std::to_string(d_cf));
+	logger.debug("d_bw: " + std::to_string(d_bw));
+	logger.debug("u_id: " + std::to_string(u_id));
+
         // If there's no CF, BW or ID
         if (not bool(d_cf) or not bool(d_bw) or not u_id)
         {

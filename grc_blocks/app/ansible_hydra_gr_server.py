@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Server
-# Generated: Mon May 13 15:09:21 2019
+# Generated: Mon May 13 16:52:45 2019
 ##################################################
 
 
@@ -18,7 +18,7 @@ import threading
 
 class ansible_hydra_gr_server(gr.top_block):
 
-    def __init__(self, ansibleIPPort='192.168.5.54:5000', freqrx=1.1e9+5e6, freqtx=1.1e9):
+    def __init__(self, ansibleIPPort='192.168.5.251:5000', freqrx=1.1e9+5e6, freqtx=1.1e9):
         gr.top_block.__init__(self, "Ansible Hydra Gr Server")
 
         ##################################################
@@ -62,7 +62,7 @@ class ansible_hydra_gr_server(gr.top_block):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--ansibleIPPort", dest="ansibleIPPort", type="string", default='192.168.5.54:5000',
+        "", "--ansibleIPPort", dest="ansibleIPPort", type="string", default='192.168.5.251:5000',
         help="Set ansibleIPPort [default=%default]")
     parser.add_option(
         "", "--freqrx", dest="freqrx", type="eng_float", default=eng_notation.num_to_str(1.1e9+5e6),

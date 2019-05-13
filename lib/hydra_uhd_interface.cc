@@ -43,7 +43,7 @@ device_uhd::set_tx_config(double freq, double rate, double gain)
 
   logger.info("Setting TX Gain: " + std::to_string(gain));
   usrp->set_normalized_tx_gain(gain);
-  logger.info("Actual TX Gain: " + std::to_string(usrp->get_tx_gain()));
+  logger.info("Actual TX Gain: " + std::to_string(usrp->get_normalized_tx_gain()));
 
   logger.info("Setting TX freq: " + std::to_string(freq/1e6) + " [MHz]");
   usrp->set_tx_freq(freq);
@@ -64,7 +64,7 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
 
   logger.info("Setting RX Gain: " + std::to_string(gain));
   usrp->set_normalized_rx_gain(0.0);
-  logger.info("Actual RX Gain: " + std::to_string(usrp->get_rx_gain()));
+  logger.info("Actual RX Gain: " + std::to_string(usrp->get_normalized_rx_gain()));
 
   logger.info("Setting RX freq: " + std::to_string(freq/1e6) + " [MHz]");
   usrp->set_rx_freq(freq);
