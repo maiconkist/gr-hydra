@@ -50,7 +50,6 @@ HydraCore::request_rx_resources(unsigned int u_id,
 {
   std::lock_guard<std::mutex> _p(g_mutex);
 
-
   // If not configured to receive
   if (not b_receiver)
   {
@@ -69,8 +68,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
       p_resource_manager->free_rx_resources(u_id);
       p_resource_manager->reserve_rx_resources(u_id, d_centre_freq, d_bandwidth);
 
-      vr->set_rx_freq(d_centre_freq);
-      vr->set_rx_bandwidth(d_bandwidth);
+      vr->set_rx_chain(vr->get_rx_udp_port(), d_centre_freq, d_bandwidth, server_addr, remote_addr);
 
       return 1;
     }
@@ -127,9 +125,7 @@ HydraCore::request_tx_resources(unsigned int u_id,
       p_resource_manager->free_tx_resources(u_id);
       p_resource_manager->reserve_tx_resources(u_id, d_centre_freq, d_bandwidth);
 
-      vr->set_tx_freq(d_centre_freq);
-      vr->set_tx_bandwidth(d_bandwidth);
-
+      vr->set_tx_chain(vr->get_tx_udp_port(), d_centre_freq, d_bandwidth, server_addr, remote_addr, bpad);
       return 1;
     }
   }

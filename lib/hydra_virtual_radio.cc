@@ -1,17 +1,17 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2016 Trinity Connect Centre.
- * 
+ *
  * HyDRA is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
- * 
+ *
  * HyDRA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
@@ -46,13 +46,17 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                            const std::string &server_addr,
                            const std::string &remote_addr)
 {
+#if 0
   // If already receiving
   if (b_receiver) { return 1; }
+#endif
+  std::lock_guard<std::mutex> _l(rx_mutex);
 
   // Set the VR RX UDP port
   g_rx_udp_port = u_rx_udp;
   g_rx_cf = d_rx_freq;
   g_rx_bw = d_rx_bw;
+
 
   g_rx_fft_size = p_hypervisor->get_rx_fft() * (d_rx_bw / p_hypervisor->get_rx_bandwidth());
   g_ifft_complex  = sfft_complex(new fft_complex(g_rx_fft_size, false));
@@ -66,6 +70,9 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                                          d_rx_bw,
                                          g_rx_fft_size);
 
+
+  // assign nullptr to clear old rx_socket and wait for its dtor
+  rx_socket = nullptr;
   /* Create UDP transmitter */
   rx_socket = zmq_sink::make(rx_buffer->stream(),
                              rx_buffer->mutex(),
@@ -94,10 +101,11 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
                            const std::string &remote_addr,
                            bool b_pad)
 {
+#if 0
    // If already transmitting
-   if (b_transmitter)
-      // Return error
-      return 1;
+   if (b_transmitter) return 1;
+#endif
+  std::lock_guard<std::mutex> _l(tx_mutex);
 
    // Set the VR TX UDP port
    g_tx_udp_port = u_tx_udp;
@@ -172,7 +180,7 @@ VirtualRadio::map_tx_samples(gr_complex *samples_buf)
 {
   if (!b_transmitter) return false;
 
-  std::lock_guard<std::mutex> _l(g_mutex);
+  std::lock_guard<std::mutex> _l(tx_mutex);
 
   const iq_window *buf = tx_buffer->consume();
   if (buf == nullptr){ return false; }
@@ -231,6 +239,8 @@ void
 VirtualRadio::demap_iq_samples(const gr_complex *samples_buf, size_t len)
 {
   if (!b_receiver) return;
+
+  std::lock_guard<std::mutex> _l(rx_mutex);
 
   /* Copy the samples used by this radio */
   for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
