@@ -223,7 +223,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(0, 88)</value>
+      <value>(0, 116)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -247,7 +247,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>192.168.5.70</value>
+      <value>192.168.5.235</value>
     </param>
   </block>
   <block>
@@ -274,7 +274,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(832, 308)</value>
+      <value>(840, 312)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1250,7 +1250,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>samp_rate * 2</value>
+      <value>samp_rate </value>
     </param>
     <param>
       <key>u_id</key>
@@ -1313,7 +1313,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>samp_rate</value>
+      <value>samp_rate2</value>
     </param>
     <param>
       <key>u_id</key>
@@ -1368,7 +1368,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>samp_rate * 2</value>
+      <value>samp_rate</value>
     </param>
     <param>
       <key>u_id</key>
@@ -1423,7 +1423,7 @@
     </param>
     <param>
       <key>samp_rate</key>
-      <value>samp_rate</value>
+      <value>samp_rate2</value>
     </param>
     <param>
       <key>u_id</key>
@@ -1513,7 +1513,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>0.04</value>
+      <value>0.08</value>
     </param>
   </block>
   <block>
@@ -1532,7 +1532,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 4)</value>
+      <value>(272, 16)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1541,6 +1541,49 @@
     <param>
       <key>id</key>
       <value>samp_rate</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>400e3</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(272, 96)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>samp_rate2</value>
     </param>
     <param>
       <key>label</key>
@@ -1642,7 +1685,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>200e3</value>
+      <value>300e3</value>
     </param>
   </block>
   <connection>
