@@ -212,9 +212,9 @@ Resolved items are marked **Fixed**; unmarked entries remain open.
   Sources: `lib/hydra_virtual_radio.cc`, `lib/hydra_hypervisor.cc`,
   `lib/hydra_fft.cc`.
 
-- **The USRP backend ignores the requested RX gain.**
-  `device_uhd::set_rx_config` always passes `0.0` to
-  `set_normalized_rx_gain` rather than the supplied gain.
+- **Fixed: the USRP backend ignored the requested RX gain.**
+  `device_uhd::set_rx_config` forwards the supplied normalized gain to UHD
+  instead of forcing `0.0`, preserving the existing range validation.
   Source: `lib/hydra_uhd_interface.cc`.
 
 ### Possible optimizations

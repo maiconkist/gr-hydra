@@ -63,7 +63,7 @@ device_uhd::set_rx_config(double freq, double rate, double gain)
   logger.info("Actual RX Rate: " + std::to_string(usrp->get_rx_rate()));
 
   logger.info("Setting RX Gain: " + std::to_string(gain));
-  usrp->set_normalized_rx_gain(0.0);
+  usrp->set_normalized_rx_gain(gain);
   logger.info("Actual RX Gain: " + std::to_string(usrp->get_normalized_rx_gain()));
 
   logger.info("Setting RX freq: " + std::to_string(freq/1e6) + " [MHz]");
