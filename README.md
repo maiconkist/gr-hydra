@@ -139,11 +139,10 @@ Resolved items are marked **Fixed**; unmarked entries remain open.
   of occupied neighbors and coalescing of free chunks.
   Source: `lib/hydra_resource.cc`.
 
-- **Repeated resource release can crash the server.**
-  `Hypervisor::detach_virtual_radio` dereferences the result of `get_vradio`
-  without checking for a missing ID. GNU Radio block shutdown, block destruction,
-  and `hydra_client` destruction can each free the same radio. Cleanup needs to
-  be idempotent.
+- **Fixed: repeated resource release can crash the server.**
+  `Hypervisor::detach_virtual_radio` now returns `false` for a missing ID instead
+  of dereferencing a null radio. The `hydra_repeated_release` regression covers
+  unknown IDs and detaching the same radio more than once.
   Sources: `lib/hydra_hypervisor.cc`, `lib/hydra_core.cc`,
   `lib/hydra_client.cc`, `grc_blocks/lib/hydra_gr_client_*_impl.cc`.
 

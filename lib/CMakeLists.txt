@@ -48,3 +48,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   target_compile_definitions(hydra_test_resource PRIVATE _GLIBCXX_DEBUG)
 endif()
 add_test(NAME hydra_resource_release COMMAND hydra_test_resource)
+
+add_executable(hydra_test_hypervisor qa_hypervisor.cc)
+target_link_libraries(hydra_test_hypervisor hydra)
+add_test(NAME hydra_repeated_release COMMAND hydra_test_hypervisor)

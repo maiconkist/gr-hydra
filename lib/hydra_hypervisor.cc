@@ -85,6 +85,8 @@ Hypervisor::detach_virtual_radio(size_t radio_id)
 {
   // Get pointer to the virtual radios
   auto vr = get_vradio(radio_id);
+  if (vr == nullptr)
+    return false;
 
   // Lock access to the virtual radios vector
   std::lock_guard<std::mutex> _l(vradios_mtx);
