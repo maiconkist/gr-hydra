@@ -128,12 +128,15 @@ The following items come from a review of the current implementation. This is
 not an exhaustive bug inventory. Optimization ideas are candidates for profiling,
 not measured performance improvements.
 
-### Known bugs
+### Bug status
 
-- **Invalid iterators when releasing spectrum.** `rf_front_end::delete_chunks`
-  computes the previous iterator before checking whether the chunk is first,
-  and can dereference the end iterator when the chunk is last. Releasing
-  boundary allocations therefore invokes undefined behavior.
+Resolved items are marked **Fixed**; unmarked entries remain open.
+
+- **Fixed: invalid iterators when releasing spectrum.**
+  `rf_front_end::delete_chunks` now checks both list boundaries before
+  inspecting neighbors. The `hydra_resource_release` regression cases cover
+  full-band, boundary, interior, and adjacent allocations, including preservation
+  of occupied neighbors and coalescing of free chunks.
   Source: `lib/hydra_resource.cc`.
 
 - **Repeated resource release can crash the server.**

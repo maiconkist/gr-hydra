@@ -40,5 +40,11 @@ install(TARGETS hydra
 )
 
 
-# add_executable(hydra_test_resource hydra_resource.cc)
-# set_target_properties(hydra_test_resource PROPERTIES COMPILE_FLAGS "-DTEST_RESOURCE")
+add_executable(hydra_test_resource hydra_resource.cc hydra_log.cc)
+target_compile_definitions(hydra_test_resource PRIVATE TEST_RESOURCE)
+target_include_directories(hydra_test_resource PRIVATE ${Boost_INCLUDE_DIRS})
+target_link_libraries(hydra_test_resource ${Boost_LIBRARIES} pthread)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_compile_definitions(hydra_test_resource PRIVATE _GLIBCXX_DEBUG)
+endif()
+add_test(NAME hydra_resource_release COMMAND hydra_test_resource)

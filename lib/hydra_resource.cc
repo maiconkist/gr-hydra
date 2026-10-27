@@ -337,39 +337,27 @@ rf_front_end::delete_chunks(unsigned int u_id)
     // Jumps to next chunk if the current chunk isn't the right one
     if (it->u_id != u_id) { continue; }
 
-    // Iterators to the previous and next chunks
-    auto pv = std::prev(it, 1);
-    auto nx = std::next(it, 1);
-
-    // If the neighbouring chunks are not free, or if this is the only chunk
-    if ((resources.size() == 1) or
-        (pv->u_id != 0 and nx->u_id != 0) or
-        (it == resources.begin() and nx->u_id != 0) or
-        (it == --resources.end() and pv->u_id != 0))
-    {
-      // Create a new free the chunk
-      (*it) = (chunk) {it->d_centre_freq, it->d_bandwidth, 0};
-
-      // Jump to next iteration
-      continue;
-    }
-
     // Temp variables to hold the free chunks' info
     double d_c_centre_freq = it->d_centre_freq;
     double d_c_bandwidth = it->d_bandwidth;
 
     // If the lower chunk if free
-    if (pv->u_id == 0)
+    if (it != resources.begin())
     {
-      d_c_centre_freq = ((pv->d_centre_freq - pv->d_bandwidth/2.0) + (d_c_centre_freq + d_c_bandwidth/2)) / 2.0 ;
-      d_c_bandwidth += pv->d_bandwidth;
+      auto pv = std::prev(it);
+      if (pv->u_id == 0)
+      {
+        d_c_centre_freq = ((pv->d_centre_freq - pv->d_bandwidth/2.0) + (d_c_centre_freq + d_c_bandwidth/2)) / 2.0 ;
+        d_c_bandwidth += pv->d_bandwidth;
 
-      // Erase the neighbour chunk
-      resources.erase(pv);
+        // Erase the neighbour chunk
+        resources.erase(pv);
+      }
     }
 
     // If the upper chunk if free
-    if (nx->u_id == 0)
+    auto nx = std::next(it);
+    if (nx != resources.end() and nx->u_id == 0)
     {
       d_c_centre_freq = ((nx->d_centre_freq + nx->d_bandwidth/2) + (d_c_centre_freq - d_c_bandwidth/2))/2.0;
       d_c_bandwidth += nx->d_bandwidth;
@@ -386,117 +374,89 @@ rf_front_end::delete_chunks(unsigned int u_id)
 
 } // namespace hydra
 
-// Test module
-#if 1
-int main(int argv, char **argc)
+#ifdef TEST_RESOURCE
+#include <initializer_list>
+#include <stdexcept>
+
+namespace {
+
+void require(bool condition, const char *message)
 {
-  using namespace hydra;
+  if (not condition)
+    throw std::runtime_error(message);
+}
 
-  double cf = 1.1e6;
-  double bw = 2e6;
-  int workd;
+void expect_chunks(hydra::rf_front_end &front_end,
+                   std::initializer_list<hydra::chunk> expected)
+{
+  const auto actual = front_end.list_chunks();
+  require(actual.size() == expected.size(), "Unexpected number of spectrum chunks");
 
-  xvl_resource_manager rm;
-  rm.set_rx_resources(cf, bw);
+  auto entry = actual.begin();
+  for (const auto &chunk : expected)
+  {
+    require(entry->second.get<unsigned int>("id") == chunk.u_id,
+            "Unexpected spectrum owner");
+    require(entry->second.get<double>("centre_freq") == chunk.d_centre_freq,
+            "Unexpected spectrum centre frequency");
+    require(entry->second.get<double>("bandwidth") == chunk.d_bandwidth,
+            "Unexpected spectrum bandwidth");
+    ++entry;
+  }
+}
 
-  // Tree to get respondes from the methods
-  boost::property_tree::ptree output_tree;
-  // String stream to pipe the trees
-  std::stringstream es;
+void test_release()
+{
+  hydra::hydra_log logger;
 
-  std::cout << "\nInitial setup" << std::endl;
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
+  for (const auto &allocation : {hydra::chunk(100, 100, 1),
+                                hydra::chunk(75, 50, 1),
+                                hydra::chunk(125, 50, 1),
+                                hydra::chunk(100, 20, 1)})
+  {
+    hydra::rf_front_end front_end(100, 100, 0, &logger);
+    require(front_end.create_chunks(allocation.d_centre_freq,
+                                   allocation.d_bandwidth, allocation.u_id) == 0,
+            "Unable to prepare allocation");
+    front_end.delete_chunks(1);
+    expect_chunks(front_end, {{100, 100, 0}});
+  }
 
-  es.str("");
-  std::cout << boost::format("Allocated first chunk @%1%, %2%") % (cf-200e3) % 200e3 << std::endl;
-  workd = rm.reserve_rx_resources(90, cf - 200e3, 200e3);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
+  for (unsigned int first : {1u, 2u})
+  {
+    hydra::rf_front_end front_end(100, 100, 0, &logger);
+    require(front_end.create_chunks(75, 50, 1) == 0 &&
+            front_end.create_chunks(125, 50, 2) == 0,
+            "Unable to prepare adjacent allocations");
 
-  es.str("");
-  std::cout << boost::format("Allocated second chunk @%1%, %2%") % (cf+200e3) % 100e3 << std::endl;
-  workd = rm.reserve_rx_resources(91, cf + 200e3, 100e3);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
+    front_end.delete_chunks(first);
+    expect_chunks(front_end, {{75, 50, first == 1 ? 0u : 1u},
+                              {125, 50, first == 2 ? 0u : 2u}});
+    front_end.delete_chunks(3 - first);
+    expect_chunks(front_end, {{100, 100, 0}});
+  }
 
-  es.str("");
-  std::cout << "\nFreed first chunk" << std::endl;
-  workd = rm.free_rx_resources(90);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
+  hydra::rf_front_end front_end(100, 100, 0, &logger);
+  require(front_end.create_chunks(75, 50, 1) == 0 &&
+          front_end.create_chunks(125, 50, 1) == 0,
+          "Unable to prepare allocations sharing an ID");
+  front_end.delete_chunks(1);
+  expect_chunks(front_end, {{100, 100, 0}});
+}
 
-  es.str("");
-  std::cout << "\nFreed first chunk" << std::endl;
-  workd = rm.free_rx_resources(91);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
+} // namespace
 
-
-#if 0
-  rm.set_rx_resources(2e3, 20);
-  int workd;
-
-  // Tree to get respondes from the methods
-  boost::property_tree::ptree output_tree;
-  // String stream to pipe the trees
-  std::stringstream es;
-
-  std::cout << "\nInitial setup" << std::endl;
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
-
-  es.str("");
-  std::cout << "\nAllocated first chunk" << std::endl;
-  workd = rm.reserve_rx_resources(3, 2e3, 10);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
-
-  es.str("");
-  std::cout << "\nFreed first chunk" << std::endl;
-  workd = rm.free_resources(3);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
-
-
-  es.str("");
-  std::cout << "\nAllocated lower chunk" << std::endl;
-  workd = rm.reserve_rx_resources(2, 1992.5, 5);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
-
-  es.str("");
-  std::cout << "\nAllocated upper chunk" << std::endl;
-  workd = rm.reserve_rx_resources(1 , 2007.5, 5);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
-
-  es.str("");
-  std::cout << "\nTrying to free lower chunks" << std::endl;
-  workd = rm.free_resources(2);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
-
-
-  es.str("");
-  std::cout << "\nTrying to free upper chunks" << std::endl;
-  workd = rm.free_resources(1);
-  output_tree = rm.query_resources();
-  boost::property_tree::json_parser::write_json(es, output_tree);
-  std::cout << es.str() << std::endl;
-#endif
-
+int main()
+{
+  try
+  {
+    test_release();
+  }
+  catch (const std::exception &error)
+  {
+    std::cerr << error.what() << std::endl;
+    return 1;
+  }
   return 0;
 }
 #endif
