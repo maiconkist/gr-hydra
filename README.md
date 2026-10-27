@@ -175,11 +175,10 @@ Resolved items are marked **Fixed**; unmarked entries remain open.
   potentially processing stale samples after short reads.
   Sources: `lib/hydra_uhd_interface.cc`, `lib/hydra_hypervisor.cc`.
 
-- **Single-direction configurations have unsafe state and cleanup.** The
-  default `HydraCore` and `Hypervisor` constructors do not initialize their
-  RX/TX-enabled flags. Resource release also attempts both directions even when
-  only one is configured, and the resource manager exits for an unconfigured
-  direction.
+- **Fixed: unsafe single-direction state and cleanup.** Core and hypervisor
+  direction flags start disabled. Freeing an unconfigured direction is a
+  successful no-op rather than a process exit. Regressions cover RX-only and
+  TX-only resource managers, plus cleanup of an unconfigured core.
   Sources: `lib/hydra_core.cc`, `lib/hydra_hypervisor.cc`,
   `lib/hydra_resource.cc`.
 

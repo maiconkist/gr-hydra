@@ -26,10 +26,10 @@ class HydraCore
     std::unique_ptr<Hypervisor> p_hypervisor;
 
     // Save the receiver info
-    bool b_receiver;
+    bool b_receiver = false;
 
     // Save the transmitter info
-    bool b_transmitter;
+    bool b_transmitter = false;
 
     // Set of occupied UDP ports
     std::set<unsigned int> used_ports;

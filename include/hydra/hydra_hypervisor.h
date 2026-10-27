@@ -126,7 +126,7 @@ private:
   std::unique_ptr<std::thread> g_tx_thread;
   iq_map_vec g_tx_subcarriers_map; // mapping of subcarriers
   uhd_hydra_sptr g_tx_dev;
-  bool b_tx_chain;
+  bool b_tx_chain = false;
 
 
   // Stop the process loop and join TX thread
@@ -145,7 +145,7 @@ private:
   std::unique_ptr<std::thread> g_rx_thread;
   iq_map_vec g_rx_subcarriers_map; // mapping of subcarriers
   uhd_hydra_sptr g_rx_dev;
-  bool b_rx_chain;
+  bool b_rx_chain = false;
 
   hydra_log logger;
 

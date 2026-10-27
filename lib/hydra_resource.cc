@@ -121,12 +121,8 @@ int
 xvl_resource_manager::free_tx_resources(size_t u_id)
 {
   // TODO should be able to return an error message
-  // If the RX/TX resources were no defined
   if (not b_transmitter)
-    {
-      std::cerr << "Must define set of resources!" << std::endl;
-      exit(30);
-  }
+    return 0;
 
   // Lock the mutex
   mtx.lock();
@@ -141,10 +137,7 @@ int
 xvl_resource_manager::free_rx_resources(size_t u_id)
 {
   if (not b_receiver)
-  {
-    std::cerr << "Must define set of resources!" << std::endl;
-    exit(30);
-  }
+    return 0;
 
   mtx.lock();
   rx_resources.delete_chunks(u_id);
@@ -444,6 +437,35 @@ void test_release()
   expect_chunks(front_end, {{100, 100, 0}});
 }
 
+void test_single_direction_release()
+{
+  for (bool receiver : {false, true})
+  {
+    hydra::xvl_resource_manager manager;
+    if (receiver)
+    {
+      manager.set_rx_resources(100, 100);
+      require(manager.reserve_rx_resources(1, 100, 100) == 0,
+              "Unable to prepare RX-only allocation");
+      require(manager.free_tx_resources(1) == 0,
+              "Freeing an unconfigured TX direction should succeed");
+    }
+    else
+    {
+      manager.set_tx_resources(100, 100);
+      require(manager.reserve_tx_resources(1, 100, 100) == 0,
+              "Unable to prepare TX-only allocation");
+      require(manager.free_rx_resources(1) == 0,
+              "Freeing an unconfigured RX direction should succeed");
+    }
+
+    const auto resources = manager.query_resources();
+    const auto &chunks = resources.get_child(receiver ? "receiver" : "transmitter");
+    require(chunks.size() == 1 && chunks.front().second.get<unsigned int>("id") == 1,
+            "Freeing the unconfigured direction changed an active allocation");
+  }
+}
+
 } // namespace
 
 int main()
@@ -451,6 +473,7 @@ int main()
   try
   {
     test_release();
+    test_single_direction_release();
   }
   catch (const std::exception &error)
   {
