@@ -46,6 +46,24 @@ make
 sudo make install
 ```
 
+## TESTING (LINUX)
+
+QA is a standalone CMake project under `tests/`. It uses Boost.Test and CTest
+and links against the separately built core library. The core project does not
+include QA sources or test targets.
+
+```sh
+cmake -S . -B build
+cmake --build build --target hydra
+cmake -S tests -B tests/build \
+  -DHYDRA_LIBRARY="$PWD/build/lib/libhydra.so"
+cmake --build tests/build
+(cd tests/build && ctest --output-on-failure)
+```
+
+The QA project requires CMake 3.16 or later. Use matching compiler and ABI
+settings for the core and QA builds, including sanitizer or debug-iterator flags.
+
 ## RUNNING THE EXAMPLES
 
 ### NOMENCLATURE

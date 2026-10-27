@@ -414,36 +414,4 @@ udp_sink::transmit()
 }
 
 
-// Test module
-int
-test_socket()
-{
-  // Default variables
-  std::string host = "localhost";
-  std::string port = "5000";
-
-  // Initialise the UDP client
-	udp_source server(host, port);
-
-  sample_stream* buffer = server.buffer();
-
-  int i = 0;
-  while (true)
-    {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-
-      std::cout << i << "\t";
-      for(int j = 0; j < 10; j++)
-        {
-          std::cout << (*buffer)[j+i] << "\t";
-        }
-      std::cout << std::endl;
-
-      i+=10;
-
-    }
-
-  return 0;
-}
-
 } // namespace hydra
