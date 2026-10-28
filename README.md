@@ -235,13 +235,6 @@ not measured performance improvements.
   Sources: `lib/hydra_virtual_radio.cc`, `lib/hydra_hypervisor.cc`,
   `include/hydra/hydra_resampler.hpp`.
 
-- **Allocation responses have inconsistent success semantics.** TX response
-  parsing returns success (`0`) on malformed JSON, leaving endpoint fields
-  unset. Reconfiguring an existing radio returns `1`, which the server publishes
-  as its data port instead of returning the existing port.
-  Sources: `lib/hydra_client.cc`, `lib/hydra_core.cc`,
-  `lib/hydra_server.cc`.
-
 ### Possible optimizations
 
 - **Replace short polling loops with explicit wakeups.** Profile blocking

@@ -55,11 +55,12 @@ hydra_client::request_rx_resources(rx_configuration &rx_conf)
     return -1;
   }
 
-  bool success = root.get("xvl_rep.status", false);
+  const bool success = root.size() == 1 && root.get("xvl_rep.status", false);
+  const int port = root.get("xvl_rep.udp_port", 0);
 
-  if (success)
+  if (success && port > 0 && port <= 65535)
   {
-    rx_conf.server_port = root.get("xvl_rep.udp_port", 0);
+    rx_conf.server_port = port;
     rx_conf.server_ip = s_server_host;
     return 0;
   }
@@ -137,14 +138,15 @@ hydra_client::request_tx_resources(rx_configuration &tx_conf)
   }
   catch (const boost::property_tree::json_parser::json_parser_error &e)
   {
-    return 0;
+    return -1;
   }
 
-  bool success = root.get("xvl_rep.status", false);
+  const bool success = root.size() == 1 && root.get("xvl_rep.status", false);
+  const int port = root.get("xvl_rep.udp_port", 0);
 
-  if (success)
+  if (success && port > 0 && port <= 65535)
   {
-     tx_conf.server_port = root.get("xvl_rep.udp_port", 0);
+     tx_conf.server_port = port;
      tx_conf.server_ip = s_server_host;
      return 0;
   }
@@ -246,7 +248,7 @@ hydra_client::factory(const std::string &s_message)
     }
 
     // Return the reply data
-    return s_response.data();
+    return s_response;
   }
   else
   {

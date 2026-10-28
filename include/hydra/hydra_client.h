@@ -23,7 +23,7 @@ struct rx_configuration
 
    double center_freq;
    double bandwidth;
-   int    server_port;
+   int    server_port = 0;
    std::string server_ip;
 };
 

@@ -85,7 +85,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
       vr->set_rx_freq(d_centre_freq);
       vr->set_rx_bandwidth(d_bandwidth);
 
-      return 1;
+      return vr->get_rx_udp_port();
     }
   }
 
@@ -145,7 +145,7 @@ HydraCore::request_tx_resources(unsigned int u_id,
       vr->set_tx_freq(d_centre_freq);
       vr->set_tx_bandwidth(d_bandwidth);
 
-      return 1;
+      return vr->get_tx_udp_port();
     }
   }
 
