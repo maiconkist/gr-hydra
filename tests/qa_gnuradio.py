@@ -287,7 +287,7 @@ class CompanionDefinitionsTests(unittest.TestCase):
     def test_example_sources_regenerate(self):
         from gnuradio.grc.core.platform import Platform
 
-        platform = Platform(version=gr.version())
+        platform = Platform(version=gr.version(), prefs=gr.prefs())
         platform.build_library(
             [*platform.config.block_paths, str(ROOT / "grc_blocks" / "grc")]
         )
