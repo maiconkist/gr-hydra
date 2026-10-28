@@ -7,44 +7,63 @@
 
 ### REQUIRED LIBS
 
-* build-essential
-* cmake
-* libfftw3-dev
-* uhd-host
-* libuhd-dev
-* gnuradio-dev
-* libopencv-dev
-* libzmqpp-dev
-* swig
+The full build targets Ubuntu 24.04, GNU Radio 3.10, and Python 3. CMake 3.16
+or later is required for the GNU Radio module and QA.
 
-```
-sudo apt install build-essential cmake libfftw3-dev uhd-host libuhd-dev gnuradio-dev libopencv-dev libzmqpp-dev swig
+```sh
+sudo apt update
+sudo apt install --no-install-recommends \
+  build-essential ca-certificates cmake pkg-config \
+  libboost-filesystem-dev libboost-log-dev libboost-program-options-dev \
+  libboost-system-dev libfftw3-dev libuhd-dev uhd-host libopencv-dev cppzmq-dev \
+  gnuradio gnuradio-dev pybind11-dev python3-dev \
+  python3-lxml python3-yaml python3-zmq
 ```
 
 ## INSTALLATION
+
+### LINUX DOCKER BUILD
+
+```sh
+docker build --pull -t gr-hydra .
+docker run --rm gr-hydra
+```
+
+The Ubuntu 24.04 image installs the dependencies, builds the core libraries and
+applications, installs the GNU Radio C++/Python bindings and GRC definitions, and
+runs the standalone QA suites. Running the image repeats QA as a non-root user.
+Tests do not require USRP hardware.
+
+Build parallelism defaults to two jobs; override it with
+`--build-arg BUILD_JOBS=4` if needed. Sources and build outputs are under
+`/opt/hydra`, with the standalone applications in `/opt/hydra/build/app`.
+The `Linux Docker build` GitHub Actions workflow builds and runs this image on
+an Ubuntu 24.04 runner.
 
 #### STANDARD VERSION - NO GNURADIO SUPPORT
 
 Clone the repository and enter in the created folder (default: gr-hydra). Execute the following commands:
 
-```
-mkdir build; cd build;
-cmake ../
-make
-sudo make install
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build --parallel 2
+sudo cmake --install build
 sudo ldconfig
 ```
 
 #### WITH GNURADIO SUPPORT
 
-First install the STANDARD VERSION. Go to gr-hydra/grc_blocks and execute the following commands:
+First install the STANDARD VERSION. From the repository root:
 
+```sh
+cmake -S grc_blocks -B grc_blocks/build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build grc_blocks/build --parallel 2
+sudo cmake --install grc_blocks/build
+sudo ldconfig
 ```
-mkdir build; cd build;
-cmake ../
-make
-sudo make install
-```
+
+The module uses Python 3/pybind11 and YAML GRC definitions. Legacy generated
+Python 2 example scripts still need regeneration with the supported toolchain.
 
 ## TESTING (LINUX)
 
@@ -53,9 +72,10 @@ and links against the separately built core library. The core project does not
 include QA sources or test targets.
 
 ```sh
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build --target hydra
 cmake -S tests -B tests/build \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DHYDRA_LIBRARY="$PWD/build/lib/libhydra.so"
 cmake --build tests/build
 (cd tests/build && ctest --output-on-failure)
@@ -63,6 +83,15 @@ cmake --build tests/build
 
 The QA project requires CMake 3.16 or later. Use matching compiler and ABI
 settings for the core and QA builds, including sanitizer or debug-iterator flags.
+
+After installing the GNU Radio module, run its separate Python QA:
+
+```sh
+python3 tests/qa_gnuradio.py
+```
+
+These tests exercise the native control-client bindings over local TCP/ZeroMQ
+and load the GRC definitions with GNU Radio's schema and block loaders.
 
 ## RUNNING THE EXAMPLES
 
@@ -276,26 +305,23 @@ Resolved items are marked **Fixed**; unmarked entries remain open.
 
 ### Other improvements
 
-- **Add meaningful regression coverage and CI execution.** The three GNU Radio
-  QA files currently run empty flowgraphs without assertions. Cover allocation
-  boundaries, conflicting reservations, repeated release, malformed messages,
-  bandwidth changes, FFT round trips, and short backend reads. Exercise both
-  build paths and add a headless loopback integration scenario.
-  Sources: `grc_blocks/python/qa_*.py`, `.travis.yml`.
+- **Expand regression coverage.** Standalone QA and Linux Docker CI now cover
+  release boundaries, repeated release, unconfigured directions, Python
+  control-client round trips, and GRC definition loading. Add conflicting
+  reservations, malformed messages, bandwidth changes, FFT round trips, short
+  backend reads, and a headless IQ loopback integration scenario.
+  Sources: `tests/`, `.github/workflows/docker-build.yml`.
 
-- **Unify core build ownership and dependency declarations.** The standalone
-  build uses C++17, while the GNU Radio build uses C++14 and recompiles the core
-  sources into a separate library. Share a core build target, make required
-  dependencies and include paths explicit, and keep installation instructions
-  consistent with the CMake requirements.
+- **Complete core build metadata.** Both builds now use C++17, and the GNU Radio
+  module links the standalone core instead of recompiling it. Finish
+  target-based dependency declarations and package exports for the core.
   Sources: `CMakeLists.txt`, `lib/CMakeLists.txt`,
   `grc_blocks/CMakeLists.txt`, `grc_blocks/lib/CMakeLists.txt`.
 
-- **Define a supported GNU Radio and Python baseline.** The integration uses
-  GNU Radio 3.7-era APIs, SWIG, XML block definitions, and Python 2 examples.
-  Choose and document the supported toolchain before updating bindings and
-  generated flowgraphs.
-  Sources: `grc_blocks/CMakeLists.txt`, `grc_blocks/swig/`,
+- **Supported GNU Radio and Python build baseline: implemented.** The
+  integration targets GNU Radio 3.10, Python 3, pybind11, and YAML block
+  definitions. Legacy generated examples still need updating as described below.
+  Sources: `grc_blocks/CMakeLists.txt`, `grc_blocks/python/bindings.cc`,
   `grc_blocks/grc/`, `grc_blocks/app/`.
 
 - **Document the actual protocol and radio identity model.** Control uses

@@ -5,6 +5,7 @@
 #include "hydra_gr_client_source_impl.h"
 
 #include <gnuradio/io_signature.h>
+#include <gnuradio/sptr_magic.h>
 #include <gnuradio/zeromq/pull_source.h>
 
 namespace gr {
@@ -16,7 +17,8 @@ hydra_gr_client_source::make(unsigned           u_id,
                              unsigned int       port,
                              const std::string &s_group)
 {
-  return gnuradio::get_initial_sptr(new hydra_gr_client_source_impl(u_id, s_host, port, s_group));
+  return gnuradio::make_block_sptr<hydra_gr_client_source_impl>(
+      u_id, s_host, port, s_group);
 }
 
 /* CTOR

@@ -6,13 +6,15 @@
 #include <hydra/hydra_main.h>
 #include <gnuradio/hier_block2.h>
 
+#include <memory>
+
 namespace gr {
   namespace hydra {
 
 class HYDRA_API hydra_gr_server : virtual public gr::hier_block2
 {
   public:
-    typedef boost::shared_ptr<hydra_gr_server> sptr;
+    using sptr = std::shared_ptr<hydra_gr_server>;
 
     static sptr make(std::string server_addr, std::string group_name);
 

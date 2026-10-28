@@ -5,6 +5,7 @@
 #include "hydra_gr_server_impl.h"
 
 #include <gnuradio/io_signature.h>
+#include <gnuradio/sptr_magic.h>
 #include <hydra/types.h>
 #include <hydra/hydra_uhd_interface.h>
 
@@ -14,7 +15,7 @@ namespace gr {
 hydra_gr_server::sptr
 hydra_gr_server::make(std::string server_addr, std::string group_name)
 {
-  return gnuradio::get_initial_sptr(new hydra_gr_server_impl(server_addr, group_name));
+  return gnuradio::make_block_sptr<hydra_gr_server_impl>(server_addr, group_name);
 }
 
 hydra_gr_server_impl::hydra_gr_server_impl(std::string server_addr, std::string group_name)

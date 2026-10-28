@@ -16,19 +16,12 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-# The presence of this file turns this directory into a Python package
+"""HyDRA GNU Radio blocks and control client."""
 
-'''
-This is the GNU Radio XVL module. Place your Python package
-description here (python/__init__.py).
-'''
-
-# import swig generated symbols into the xvl namespace
-try:
-	# this might fail if the module is python-only
-	from hydra_swig import *
-except ImportError:
-	pass
-
-# import any pure python here
-#
+from .hydra_python import (
+    hydra_client,
+    hydra_gr_client_sink,
+    hydra_gr_client_source,
+    hydra_gr_server,
+    rx_configuration,
+)

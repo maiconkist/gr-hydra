@@ -17,32 +17,13 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 
-########################################################################
-# Include python install macros
-########################################################################
-include(GrPython)
-if(NOT PYTHONINTERP_FOUND)
-    return()
-endif()
+find_package(pybind11 CONFIG REQUIRED)
 
-########################################################################
-# Install python sources
-########################################################################
-GR_PYTHON_INSTALL(
-    FILES
-    __init__.py
-    DESTINATION ${GR_PYTHON_DIR}/hydra
-)
+pybind11_add_module(hydra_python bindings.cc)
+target_link_libraries(hydra_python PRIVATE gnuradio-hydra)
+set_target_properties(hydra_python PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/hydra")
+configure_file(__init__.py hydra/__init__.py COPYONLY)
 
-########################################################################
-# Handle the unit tests
-########################################################################
-include(GrTest)
-
-set(GR_TEST_TARGET_DEPS gnuradio-hydra)
-set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/swig)
-GR_ADD_TEST(qa_hydra_client_sink ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_client_sink.py)
-GR_ADD_TEST(qa_hydra_client_source ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_client_source.py)
-GR_ADD_TEST(qa_hydra_server ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_server.py)
-
-
+install(TARGETS hydra_python LIBRARY DESTINATION "${GR_PYTHON_DIR}/hydra")
+install(FILES __init__.py DESTINATION "${GR_PYTHON_DIR}/hydra")
