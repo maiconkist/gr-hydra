@@ -1,5 +1,38 @@
 # gr-hydra
 
+## PUBLICATIONS
+
+The following papers describe HyDRA and its extensions:
+
+- **[HyDRA: A Hypervisor for Software Defined Radios to Enable Radio Virtualization in Mobile Networks](https://doi.org/10.1109/INFCOMW.2017.8116510)**.
+  Maicon Kist, Juergen Rochol, Luiz A. DaSilva, and Cristiano Bonato Both.
+  *IEEE INFOCOM Workshops*, 2017, pp. 960-961.
+  [Download PDF](https://luizdasilva.wordpress.com/wp-content/uploads/2011/02/kist-demoinfocom17.pdf).
+
+- **[SDR Virtualization in Future Mobile Networks: Enabling Multi-Programmable Air-Interfaces](https://doi.org/10.1109/ICC.2018.8422643)**.
+  Maicon Kist, Juergen Rochol, Luiz A. DaSilva, and Cristiano Bonato Both.
+  *IEEE International Conference on Communications (ICC)*, 2018, pp. 1-6.
+  [Download PDF](https://luizdasilva.wordpress.com/wp-content/uploads/2018/06/1570411395.pdf).
+
+- **[Towards Enabling RAN as a Service - The Extensible Virtualisation Layer](https://doi.org/10.1109/ICC.2019.8761679)**.
+  Joao F. Santos, Maicon Kist, Jonathan van de Belt, Juergen Rochol, and
+  Luiz A. DaSilva.
+  *IEEE International Conference on Communications (ICC)*, 2019, pp. 1-6.
+  [Download PDF](https://vtechworks.lib.vt.edu/server/api/core/bitstreams/537e2017-b5f9-4f1a-a6c5-2750eb271713/content).
+
+- **[Virtual Radios, Real Services: Enabling RANaaS Through Radio Virtualisation](https://doi.org/10.1109/TNSM.2020.3009863)**.
+  Joao F. Santos, Maicon Kist, Juergen Rochol, and Luiz A. DaSilva.
+  *IEEE Transactions on Network and Service Management*, vol. 17, no. 4,
+  pp. 2610-2619, 2020.
+  [Download PDF](https://orca-project.eu/wp-content/uploads/sites/4/2020/07/santos_tnsm_2020.pdf).
+
+- **[AIRTIME: End-to-End Virtualization Layer for RAN-as-a-Service in Future Multi-Service Mobile Networks](https://doi.org/10.1109/TMC.2020.3046535)**.
+  Maicon Kist, Joao F. Santos, Diarmuid Collins, Juergen Rochol,
+  Luiz A. DaSilva, and Cristiano Bonato Both.
+  *IEEE Transactions on Mobile Computing*, vol. 21, no. 8,
+  pp. 2701-2717, 2022.
+  [Download PDF](https://vtechworks.lib.vt.edu/bitstream/handle/10919/107563/kist-tmc-2022.pdf).
+
 [![Linux Docker build](https://github.com/maiconkist/gr-hydra/actions/workflows/docker-build.yml/badge.svg?branch=bleeding&event=push)](https://github.com/maiconkist/gr-hydra/actions/workflows/docker-build.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
