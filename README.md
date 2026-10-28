@@ -255,13 +255,6 @@ not measured performance improvements.
   Sources: `lib/hydra_client.cc`, `lib/hydra_core.cc`,
   `lib/hydra_server.cc`.
 
-- **Sub-bin bandwidth requests can produce zero-length FFTs.** A positive
-  bandwidth smaller than one front-end FFT bin truncates to zero samples.
-  Validate the requested bandwidth and resulting FFT length before allocating
-  a radio or starting workers.
-  Sources: `lib/hydra_virtual_radio.cc`, `lib/hydra_hypervisor.cc`,
-  `lib/hydra_fft.cc`.
-
 ### Possible optimizations
 
 - **Replace short polling loops with explicit wakeups.** Profile blocking

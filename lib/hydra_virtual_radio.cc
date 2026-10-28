@@ -66,12 +66,15 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
   // If already receiving
   if (b_receiver) { return 1; }
 
+  const auto fft_size = p_hypervisor->rx_fft_size_for(d_rx_freq, d_rx_bw);
+  if (!fft_size) return -1;
+
   // Set the VR RX UDP port
   g_rx_udp_port = u_rx_udp;
   g_rx_cf = d_rx_freq;
   g_rx_bw = d_rx_bw;
 
-  g_rx_fft_size = p_hypervisor->get_rx_fft() * (d_rx_bw / p_hypervisor->get_rx_bandwidth());
+  g_rx_fft_size = fft_size;
   g_ifft_complex  = sfft_complex(new fft_complex(g_rx_fft_size, false));
 
   // TODO this must be shared with the hypervisor, or come from it
@@ -117,12 +120,15 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
       // Return error
       return 1;
 
+   const auto fft_size = p_hypervisor->tx_fft_size_for(d_tx_cf, d_tx_bw);
+   if (!fft_size) return -1;
+
    // Set the VR TX UDP port
    g_tx_udp_port = u_tx_udp;
    g_tx_bw = d_tx_bw;
    g_tx_cf = d_tx_cf;
 
-   g_tx_fft_size = p_hypervisor->get_tx_fft() * (d_tx_bw / p_hypervisor->get_tx_bandwidth());
+   g_tx_fft_size = fft_size;
 
    // Create ZMQ receiver
    tx_socket = zmq_source::make(
@@ -156,6 +162,7 @@ int
 VirtualRadio::set_tx_freq(double cf)
 {
   auto lock = lock_state();
+  if (!p_hypervisor->tx_fft_size_for(cf, g_tx_bw)) return -1;
   if (cf == g_tx_cf) return 0;
 
    double old_cf = g_tx_cf;
@@ -172,6 +179,7 @@ void
 VirtualRadio::set_tx_bandwidth(double bw)
 {
   auto lock = lock_state();
+  if (!p_hypervisor->tx_fft_size_for(g_tx_cf, bw)) return;
   if (bw == g_tx_bw) return;
 
 
@@ -223,6 +231,7 @@ int
 VirtualRadio::set_rx_freq(double cf)
 {
   auto lock = lock_state();
+  if (!p_hypervisor->rx_fft_size_for(cf, g_rx_bw)) return -1;
   double old_cf = g_rx_cf;
   g_rx_cf = cf;
 
@@ -237,6 +246,7 @@ void
 VirtualRadio::set_rx_bandwidth(double bw)
 {
   auto lock = lock_state();
+  if (!p_hypervisor->rx_fft_size_for(g_rx_cf, bw)) return;
   double old_bw = g_rx_bw;
   g_rx_bw = bw;
 

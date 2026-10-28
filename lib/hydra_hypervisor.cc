@@ -20,7 +20,72 @@
 
 #include "hydra/hydra_hypervisor.h"
 
+#include <cmath>
+#include <limits>
+#include <optional>
+#include <stdexcept>
+
 namespace hydra {
+
+namespace {
+
+struct BinRange
+{
+  size_t first;
+  size_t count;
+};
+
+std::optional<BinRange> bin_range(double cf, double bandwidth,
+                                 double frontend_cf, double frontend_bandwidth,
+                                 size_t fft_size)
+{
+  if (!fft_size || fft_size > size_t(std::numeric_limits<int>::max()) ||
+      !std::isfinite(cf) || !std::isfinite(bandwidth) || bandwidth <= 0 ||
+      !std::isfinite(frontend_cf) || !std::isfinite(frontend_bandwidth) ||
+      frontend_bandwidth <= 0 || bandwidth > frontend_bandwidth)
+    return std::nullopt;
+
+  const double low = frontend_cf - frontend_bandwidth / 2;
+  const double high = frontend_cf + frontend_bandwidth / 2;
+  const double bin_width = frontend_bandwidth / fft_size;
+  if (!std::isfinite(low) || !std::isfinite(high) || bin_width <= 0)
+    return std::nullopt;
+  const double first = (cf - bandwidth / 2 - low) / bin_width;
+  const double count = fft_size * (bandwidth / frontend_bandwidth);
+  if (!std::isfinite(first) || first < 0 || first >= fft_size ||
+      cf + bandwidth / 2 > high || count < 1 || count > fft_size)
+    return std::nullopt;
+
+  BinRange range{size_t(first), size_t(count)};
+  if (range.count > fft_size - range.first)
+    return std::nullopt;
+  return range;
+}
+
+}
+
+void
+Hypervisor::validate_frontend(double cf, double bandwidth, size_t fft_size)
+{
+  if (!bin_range(cf, bandwidth, cf, bandwidth, fft_size))
+    throw std::invalid_argument("Invalid front-end frequency, bandwidth, or FFT size");
+}
+
+size_t
+Hypervisor::rx_fft_size_for(double cf, double bandwidth) const
+{
+  auto lock = lock_state();
+  const auto range = bin_range(cf, bandwidth, g_rx_cf, g_rx_bw, rx_fft_len);
+  return range ? range->count : 0;
+}
+
+size_t
+Hypervisor::tx_fft_size_for(double cf, double bandwidth) const
+{
+  auto lock = lock_state();
+  const auto range = bin_range(cf, bandwidth, g_tx_cf, g_tx_bw, tx_fft_len);
+  return range ? range->count : 0;
+}
 
 Hypervisor::Hypervisor()
 {
@@ -39,6 +104,7 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
         g_rx_bw(bandwidth),
         g_rx_subcarriers_map(_fft_m_len, -1)
 {
+   validate_frontend(central_frequency, bandwidth, _fft_m_len);
    g_fft_complex  = sfft_complex(new fft_complex(rx_fft_len));
    g_ifft_complex = sfft_complex(new fft_complex(tx_fft_len, false));
 
@@ -77,7 +143,8 @@ size_t
 Hypervisor::create_vradio(double cf, double bandwidth)
 {
    auto lock = lock_state();
-   size_t fft_n = bandwidth / (g_tx_bw / tx_fft_len);
+   if (!tx_fft_size_for(cf, bandwidth))
+     throw std::invalid_argument("Invalid virtual radio bandwidth or frequency");
    vradio_ptr vradio(new VirtualRadio(g_vradios.size(), this));
 
 
@@ -196,6 +263,7 @@ Hypervisor::notify(VirtualRadio &vr, Hypervisor::Notify set_maps)
 void
 Hypervisor::set_tx_resources(uhd_hydra_sptr tx_dev, double cf, double bw, size_t fft)
 {
+   validate_frontend(cf, bw, fft);
    std::lock_guard<std::mutex> lifecycle_lock(stop_mutex);
    thr_tx_stop = true;
    if (g_tx_thread && g_tx_thread->joinable()) g_tx_thread->join();
@@ -257,14 +325,10 @@ Hypervisor::set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    double vr_cf = vr.get_tx_freq();
    double offset = (vr_cf - vr_bw/2.0) - (g_tx_cf - g_tx_bw/2.0) ;
 
-   // First VR subcarrier
-   int sc = offset / (g_tx_bw / tx_fft_len);
-   size_t fft_n = vr_bw /(g_tx_bw /tx_fft_len);
-
-   if (sc < 0 || sc > tx_fft_len)
-   {
-     return -1;
-   }
+   const auto range = bin_range(vr_cf, vr_bw, g_tx_cf, g_tx_bw, tx_fft_len);
+   if (!range || subcarriers_map.size() != tx_fft_len) return -1;
+   int sc = int(range->first);
+   size_t fft_n = range->count;
    double c_bw = fft_n*g_tx_bw/tx_fft_len;
    double c_cf = g_tx_cf - g_tx_bw/2 + (g_tx_bw/tx_fft_len) * (sc + (fft_n/2));
 
@@ -326,6 +390,7 @@ Hypervisor::get_tx_window(iq_window &optr, size_t len)
 void
 Hypervisor::set_rx_resources(uhd_hydra_sptr rx_dev, double cf, double bw, size_t fft_len)
 {
+  validate_frontend(cf, bw, fft_len);
   std::lock_guard<std::mutex> lifecycle_lock(stop_mutex);
   thr_rx_stop = true;
   if (g_rx_thread && g_rx_thread->joinable()) g_rx_thread->join();
@@ -387,15 +452,10 @@ Hypervisor::set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    double vr_cf = vr.get_rx_freq();
    double offset = (vr_cf - vr_bw/2.0) - (g_rx_cf - g_rx_bw/2.0) ;
 
-   // First VR subcarrier
-   int sc = offset / (g_rx_bw / rx_fft_len);
-   size_t fft_n = vr_bw /(g_rx_bw /rx_fft_len);
-
-
-   if (sc < 0 || sc > rx_fft_len)
-   {
-      return -1;
-   }
+   const auto range = bin_range(vr_cf, vr_bw, g_rx_cf, g_rx_bw, rx_fft_len);
+   if (!range || subcarriers_map.size() != rx_fft_len) return -1;
+   int sc = int(range->first);
+   size_t fft_n = range->count;
 
    // TODO what this means?
    double c_bw = fft_n*g_rx_bw/rx_fft_len;

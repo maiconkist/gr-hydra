@@ -9,6 +9,7 @@
 #include <atomic>
 #include <chrono>
 #include <future>
+#include <limits>
 #include <thread>
 
 namespace {
@@ -184,4 +185,55 @@ BOOST_AUTO_TEST_CASE(concurrent_retuning_streaming_membership_and_shutdown)
   stop_first.join();
   stop_second.join();
   BOOST_CHECK(valid.load());
+}
+
+BOOST_AUTO_TEST_CASE(invalid_and_sub_bin_requests_leave_resources_unchanged)
+{
+  QuietLogs quiet;
+  BOOST_CHECK_THROW(hydra::fft_complex(0), std::invalid_argument);
+  BOOST_CHECK_THROW(hydra::fft_complex(std::numeric_limits<size_t>::max()),
+                    std::invalid_argument);
+
+  auto device = std::make_shared<IdleDevice>();
+  hydra::HydraCore core;
+  BOOST_CHECK_THROW(core.set_rx_resources(device, 1000, 64, 0, 0),
+                    std::invalid_argument);
+  core.set_rx_resources(device, 1000, 64, 0, 64);
+  core.set_tx_resources(device, 1000, 64, 0, 64);
+  const auto before = core.query_resources();
+  for (const double bandwidth : {0.0, -1.0, 0.5,
+                                std::numeric_limits<double>::quiet_NaN(),
+                                std::numeric_limits<double>::infinity()})
+  {
+    BOOST_CHECK_EQUAL(core.request_rx_resources(
+        1, 1000, bandwidth, "127.0.0.1", "127.0.0.1"), 0);
+    BOOST_CHECK_EQUAL(core.request_tx_resources(
+        1, 1000, bandwidth, "127.0.0.1", "127.0.0.1"), 0);
+    BOOST_CHECK(core.query_resources() == before);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(one_bin_radio_rejects_smaller_reconfiguration)
+{
+  QuietLogs quiet;
+  boost::asio::io_service io;
+  boost::asio::ip::tcp::acceptor reservation(
+      io, {boost::asio::ip::address_v4::loopback(), 0});
+  const auto port = reservation.local_endpoint().port();
+  reservation.close();
+  hydra::Hypervisor hypervisor(64, 1000, 64);
+  auto radio = std::make_shared<hydra::VirtualRadio>(1, &hypervisor);
+  BOOST_CHECK_EQUAL(radio->set_rx_chain(port, 1000, 0.5, "127.0.0.1", "127.0.0.1"), -1);
+  BOOST_CHECK_EQUAL(radio->set_tx_chain(port, 1000, 0.5, "127.0.0.1", "127.0.0.1"), -1);
+  BOOST_CHECK(!radio->get_rx_enabled());
+  BOOST_CHECK(!radio->get_tx_enabled());
+  BOOST_REQUIRE_EQUAL(radio->set_rx_chain(port, 1000, 1, "127.0.0.1", "127.0.0.1"), 0);
+  BOOST_REQUIRE_EQUAL(radio->set_tx_chain(port, 1000, 1, "127.0.0.1", "127.0.0.1"), 0);
+  hypervisor.attach_virtual_radio(radio);
+  radio->set_rx_bandwidth(0.5);
+  radio->set_tx_bandwidth(0.5);
+  BOOST_CHECK_EQUAL(radio->get_rx_bandwidth(), 1);
+  BOOST_CHECK_EQUAL(radio->get_tx_bandwidth(), 1);
+  BOOST_CHECK_EQUAL(radio->get_rx_fft(), 1);
+  BOOST_CHECK_EQUAL(radio->get_tx_fft(), 1);
 }

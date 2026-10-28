@@ -23,6 +23,7 @@ HydraCore::set_rx_resources(uhd_hydra_sptr usrp,
                             unsigned int u_fft_size)
 {
   std::lock_guard<std::mutex> lock(g_mutex);
+  Hypervisor::validate_frontend(d_centre_freq, d_bandwidth, u_fft_size);
   // Initialise the RX resources
   p_resource_manager->set_rx_resources(d_centre_freq, d_bandwidth);
   usrp->set_rx_config(d_centre_freq, d_bandwidth, d_norm_gain);
@@ -40,6 +41,7 @@ HydraCore::set_tx_resources(uhd_hydra_sptr usrp,
                             unsigned int u_fft_size)
 {
    std::lock_guard<std::mutex> lock(g_mutex);
+   Hypervisor::validate_frontend(d_centre_freq, d_bandwidth, u_fft_size);
    // Initialise the RX resources
    p_resource_manager->set_tx_resources(d_centre_freq, d_bandwidth);
    usrp->set_tx_config(d_centre_freq, d_bandwidth, d_norm_gain);
@@ -66,6 +68,9 @@ HydraCore::request_rx_resources(unsigned int u_id,
     logger.error("RX Resources not configured.");
     return 0;
   }
+
+  if (!p_hypervisor->rx_fft_size_for(d_centre_freq, d_bandwidth))
+    return 0;
 
   auto vr = p_hypervisor->get_vradio(u_id);
 
@@ -122,6 +127,9 @@ HydraCore::request_tx_resources(unsigned int u_id,
     logger.error("<core> TX Resources not configured.");
     return 0;
   }
+
+  if (!p_hypervisor->tx_fft_size_for(d_centre_freq, d_bandwidth))
+    return 0;
 
   // Tey to find the given VR
   auto vr = p_hypervisor->get_vradio(u_id);

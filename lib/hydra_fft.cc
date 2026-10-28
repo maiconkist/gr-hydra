@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <mutex>
 #include <new>
+#include <limits>
 #include <stdexcept>
 
 namespace hydra {
@@ -35,6 +36,9 @@ fft_complex::fft_complex(size_t fft_size, bool forward):
    g_fft_size(fft_size),
    g_forward(forward)
 {
+   if (!fft_size || fft_size > size_t(std::numeric_limits<int>::max()) ||
+       fft_size > std::numeric_limits<size_t>::max() / sizeof(fftw_complex))
+      throw std::invalid_argument("FFT size must be a positive supported integer");
    g_inbuf.reset(static_cast<iq_sample*>(fftw_malloc(sizeof(fftw_complex) * fft_size)));
    g_outbuf.reset(static_cast<iq_sample*>(fftw_malloc(sizeof(fftw_complex) * fft_size)));
    if (!g_inbuf || !g_outbuf)

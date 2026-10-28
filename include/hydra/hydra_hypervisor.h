@@ -46,6 +46,10 @@ class Hypervisor
              double bandwidth);
   ~Hypervisor();
 
+  static void validate_frontend(double cf, double bandwidth, size_t fft_size);
+  size_t rx_fft_size_for(double cf, double bandwidth) const;
+  size_t tx_fft_size_for(double cf, double bandwidth) const;
+
   /**
    * @param cf VRadio central frequency
    * @param bandwidth VRadio bandwidth
