@@ -72,6 +72,7 @@ class VirtualRadio
     double const get_tx_bandwidth() { auto lock = lock_state(); return g_tx_bw; }
     int set_tx_freq(double cf);
     void set_tx_bandwidth(double bw);
+    int reconfigure_tx(double cf, double bw);
     void set_tx_mapping(const iq_map_vec &iq_map);
     size_t const set_tx_fft(size_t n) { auto lock = lock_state(); return g_tx_fft_size = n; }
     bool map_tx_samples(iq_sample *samples_buf); // called by the hypervisor
@@ -84,6 +85,7 @@ class VirtualRadio
     double const get_rx_bandwidth() { auto lock = lock_state(); return g_rx_bw; }
     int set_rx_freq(double cf);
     void set_rx_bandwidth(double bw);
+    int reconfigure_rx(double cf, double bw);
     void set_rx_mapping(const iq_map_vec &iq_map);
     size_t const set_rx_fft(size_t n) { auto lock = lock_state(); return g_rx_fft_size = n; }
     void demap_iq_samples(const iq_sample *samples_buf, size_t len); // called by the hypervisor

@@ -2,6 +2,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "hydra/hydra_resource.h"
+#include "qa_helpers.h"
 
 #include <initializer_list>
 
@@ -94,5 +95,50 @@ BOOST_AUTO_TEST_CASE(unconfigured_direction_release_preserves_active_allocation)
     const auto &chunks = resources.get_child(receiver ? "receiver" : "transmitter");
     BOOST_REQUIRE_EQUAL(chunks.size(), 1);
     BOOST_CHECK_EQUAL(chunks.front().second.get<unsigned int>("id"), 1);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(reconfiguration_commits_only_after_the_dsp_update_succeeds)
+{
+  hydra_test::QuietLogs quiet;
+  for (const bool receiver : {false, true})
+  {
+    hydra::xvl_resource_manager manager;
+    if (receiver) manager.set_rx_resources(100, 100);
+    else manager.set_tx_resources(100, 100);
+    auto reserve = [&](unsigned int id, double cf) {
+      return receiver ? manager.reserve_rx_resources(id, cf, 50)
+                      : manager.reserve_tx_resources(id, cf, 50);
+    };
+    auto replace = [&](double cf, const std::function<bool()>& apply) {
+      return receiver ? manager.reconfigure_rx_resources(1, cf, 50, apply)
+                      : manager.reconfigure_tx_resources(1, cf, 50, apply);
+    };
+    BOOST_REQUIRE_EQUAL(reserve(1, 75), 0);
+    BOOST_REQUIRE_EQUAL(reserve(2, 125), 0);
+    const auto occupied = manager.query_resources();
+    bool called = false;
+    BOOST_CHECK_EQUAL(replace(125, [&] { called = true; return true; }), 1);
+    BOOST_CHECK(!called);
+    BOOST_CHECK(manager.query_resources() == occupied);
+    BOOST_CHECK(!(receiver ? manager.check_rx_free(125, 50, 1)
+                          : manager.check_tx_free(125, 50, 1)));
+
+    if (receiver) manager.free_rx_resources(2);
+    else manager.free_tx_resources(2);
+    const auto before = manager.query_resources();
+    BOOST_CHECK_EQUAL(replace(125, [] { return false; }), 1);
+    BOOST_CHECK(manager.query_resources() == before);
+    BOOST_CHECK_THROW(replace(125, []() -> bool {
+      throw std::runtime_error("DSP preparation failed");
+    }), std::runtime_error);
+    BOOST_CHECK(manager.query_resources() == before);
+    BOOST_REQUIRE_EQUAL(replace(125, [] { return true; }), 0);
+    const auto after = manager.query_resources();
+    const auto& chunks = after.get_child(receiver ? "receiver" : "transmitter");
+    BOOST_REQUIRE_EQUAL(chunks.size(), 2);
+    BOOST_CHECK_EQUAL(chunks.front().second.get<unsigned int>("id"), 0);
+    BOOST_CHECK_EQUAL(chunks.back().second.get<unsigned int>("id"), 1);
+    BOOST_CHECK_EQUAL(chunks.back().second.get<double>("centre_freq"), 125);
   }
 }

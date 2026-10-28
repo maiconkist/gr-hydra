@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <limits>
+#include <numeric>
 #include <optional>
 #include <stdexcept>
 
@@ -60,6 +61,17 @@ std::optional<BinRange> bin_range(double cf, double bandwidth,
   if (range.count > fft_size - range.first)
     return std::nullopt;
   return range;
+}
+
+bool can_map(double cf, double bandwidth, double frontend_cf,
+             double frontend_bandwidth, size_t fft_size, int owner,
+             const iq_map_vec& bins)
+{
+  const auto range = bin_range(cf, bandwidth, frontend_cf, frontend_bandwidth, fft_size);
+  if (!range || bins.size() != fft_size) return false;
+  return std::all_of(bins.begin() + range->first,
+                     bins.begin() + range->first + range->count,
+                     [owner](int id) { return id == -1 || id == owner; });
 }
 
 }
@@ -225,39 +237,29 @@ int
 Hypervisor::notify(VirtualRadio &vr, Hypervisor::Notify set_maps)
 {
   auto lock = lock_state();
-  if (vr.get_tx_enabled() || (set_maps & Hypervisor::SET_TX_MAP))
+  const bool update_tx = set_maps == SET_NONE ? vr.get_tx_enabled() : set_maps & SET_TX_MAP;
+  const bool update_rx = set_maps == SET_NONE ? vr.get_rx_enabled() : set_maps & SET_RX_MAP;
+  if ((update_tx && !can_map(vr.get_tx_freq(), vr.get_tx_bandwidth(),
+                            g_tx_cf, g_tx_bw, tx_fft_len, vr.get_id(), g_tx_subcarriers_map)) ||
+      (update_rx && !can_map(vr.get_rx_freq(), vr.get_rx_bandwidth(),
+                            g_rx_cf, g_rx_bw, rx_fft_len, vr.get_id(), g_rx_subcarriers_map)))
+    return -1;
+
+  auto tx_map = g_tx_subcarriers_map;
+  auto rx_map = g_rx_subcarriers_map;
+  if (update_tx)
   {
-    iq_map_vec subcarriers_map = g_tx_subcarriers_map;
-    std::replace(subcarriers_map.begin(),
-                 subcarriers_map.end(),
-                 vr.get_id(),
-                 -1);
-
-    // enter 'if' in case of success
-    if (set_tx_mapping(vr, subcarriers_map ) > 0)
-    {
-      // LOG(INFO) << "success";
-      g_tx_subcarriers_map = subcarriers_map;
-    }
+    std::replace(tx_map.begin(), tx_map.end(), vr.get_id(), -1);
+    if (set_tx_mapping(vr, tx_map) < 0) return -1;
   }
-
-  if (vr.get_rx_enabled() || (set_maps & Hypervisor::SET_RX_MAP))
+  if (update_rx)
   {
-    iq_map_vec subcarriers_map = g_rx_subcarriers_map;
-    std::replace(subcarriers_map.begin(),
-                 subcarriers_map.end(),
-                 vr.get_id(),
-                 -1);
-
-    // enter 'if' in case of success
-    if (set_rx_mapping(vr, subcarriers_map ) > 0)
-    {
-      //LOG(INFO) << "success";
-      g_rx_subcarriers_map = subcarriers_map;
-    }
+    std::replace(rx_map.begin(), rx_map.end(), vr.get_id(), -1);
+    if (set_rx_mapping(vr, rx_map) < 0) return -1;
   }
-
-  return 1;
+  if (update_tx) g_tx_subcarriers_map.swap(tx_map);
+  if (update_rx) g_rx_subcarriers_map.swap(rx_map);
+  return 0;
 }
 
 void
@@ -336,24 +338,15 @@ Hypervisor::set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    logger.debug(str(boost::format("TX Actual  VR BW: %1%, CF: %2% ") % c_bw % c_cf));
    logger.info("Created vRF for #" + std::to_string(vr.get_id()) + ": CF @" +std::to_string(vr_cf) + ", BW @" + std::to_string(vr_bw) + ", Offset @" + std::to_string(offset) + ", First SC @ " + std::to_string(sc) + ". Last SC @" + std::to_string(sc + fft_n));
 
-   // Allocate subcarriers sequentially from sc
-   iq_map_vec the_map;
-   for (; sc < tx_fft_len; sc++)
-   {
-      //LOG_IF(subcarriers_map[sc] != -1, INFO) << "Subcarrier @" <<  sc << " already allocated";
-      if (subcarriers_map[sc] != -1)
-         return -1;
-
-      the_map.push_back(sc);
-      subcarriers_map[sc] = vr.get_id();
-
-      // break when we allocated enough subcarriers
-      if (the_map.size() == fft_n)
-         break;
-   }
-
+   if (!std::all_of(subcarriers_map.begin() + sc,
+                     subcarriers_map.begin() + sc + fft_n,
+                     [](int id) { return id == -1; }))
+     return -1;
+   iq_map_vec the_map(fft_n);
+   std::iota(the_map.begin(), the_map.end(), sc);
    vr.set_tx_fft(fft_n);
    vr.set_tx_mapping(the_map);
+   for (const auto bin : the_map) subcarriers_map[bin] = vr.get_id();
 
    return 1;
 }
@@ -485,24 +478,15 @@ Hypervisor::set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
    logger.debug(str(boost::format("RX Actual  VR BW: %1%, CF: %2% ") % c_bw % c_cf));
    logger.info("Created vRF for #" + std::to_string(vr.get_id()) + ": CF @" +std::to_string(vr_cf) + ", BW @" + std::to_string(vr_bw) + ", Offset @" + std::to_string(offset) + ", First SC @ " + std::to_string(sc) + ". Last SC @" + std::to_string(sc + fft_n));
 
-   // Allocate subcarriers sequentially from sc
-   iq_map_vec the_map;
-   for (; sc < rx_fft_len; sc++)
-   {
-      //LOG_IF(subcarriers_map[sc] != -1, INFO) << "Subcarrier @" <<  sc << " already allocated";
-      if (subcarriers_map[sc] != -1)
-         return -1;
-
-      the_map.push_back(sc);
-      subcarriers_map[sc] = vr.get_id();
-
-      // break when we allocated enough subcarriers
-      if (the_map.size() == fft_n)
-         break;
-   }
-
+   if (!std::all_of(subcarriers_map.begin() + sc,
+                     subcarriers_map.begin() + sc + fft_n,
+                     [](int id) { return id == -1; }))
+     return -1;
+   iq_map_vec the_map(fft_n);
+   std::iota(the_map.begin(), the_map.end(), sc);
    vr.set_rx_fft(fft_n);
    vr.set_rx_mapping(the_map);
+   for (const auto bin : the_map) subcarriers_map[bin] = vr.get_id();
 
    return 1;
 }

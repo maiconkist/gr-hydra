@@ -1,6 +1,7 @@
 #include "hydra/hydra_core.h"
 
 #include <atomic>
+#include <limits>
 
 
 namespace hydra {
@@ -59,7 +60,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
                                 const std::string &remote_addr)
 {
   std::lock_guard<std::mutex> _p(g_mutex);
-
+  if (!u_id || u_id > unsigned(std::numeric_limits<int>::max())) return 0;
 
   // If not configured to receive
   if (not b_receiver)
@@ -76,16 +77,17 @@ HydraCore::request_rx_resources(unsigned int u_id,
 
   if(vr != nullptr and vr->get_rx_enabled())
   {
-    // requesting tx resources for a VR already existing
-    if (p_resource_manager->check_rx_free(d_centre_freq, d_bandwidth, u_id))
+    try
     {
-      p_resource_manager->free_rx_resources(u_id);
-      p_resource_manager->reserve_rx_resources(u_id, d_centre_freq, d_bandwidth);
-
-      vr->set_rx_freq(d_centre_freq);
-      vr->set_rx_bandwidth(d_bandwidth);
-
-      return vr->get_rx_udp_port();
+      const auto result = p_resource_manager->reconfigure_rx_resources(
+          u_id, d_centre_freq, d_bandwidth,
+          [&] { return vr->reconfigure_rx(d_centre_freq, d_bandwidth) >= 0; });
+      return result == 0 ? vr->get_rx_udp_port() : 0;
+    }
+    catch (const std::exception& error)
+    {
+      logger.error("RX reconfiguration failed: " + std::string(error.what()));
+      return 0;
     }
   }
 
@@ -119,6 +121,7 @@ HydraCore::request_tx_resources(unsigned int u_id,
                                 const std::string &remote_addr)
 {
   std::lock_guard<std::mutex> _p(g_mutex);
+  if (!u_id || u_id > unsigned(std::numeric_limits<int>::max())) return 0;
 
   // If not configured to transmit
   if (not b_transmitter)
@@ -136,16 +139,17 @@ HydraCore::request_tx_resources(unsigned int u_id,
 
   if(vr != nullptr and vr->get_tx_enabled())
   {
-    // requesting tx resources for a VR already existing
-    if (p_resource_manager->check_tx_free(d_centre_freq, d_bandwidth, u_id))
+    try
     {
-      p_resource_manager->free_tx_resources(u_id);
-      p_resource_manager->reserve_tx_resources(u_id, d_centre_freq, d_bandwidth);
-
-      vr->set_tx_freq(d_centre_freq);
-      vr->set_tx_bandwidth(d_bandwidth);
-
-      return vr->get_tx_udp_port();
+      const auto result = p_resource_manager->reconfigure_tx_resources(
+          u_id, d_centre_freq, d_bandwidth,
+          [&] { return vr->reconfigure_tx(d_centre_freq, d_bandwidth) >= 0; });
+      return result == 0 ? vr->get_tx_udp_port() : 0;
+    }
+    catch (const std::exception& error)
+    {
+      logger.error("TX reconfiguration failed: " + std::string(error.what()));
+      return 0;
     }
   }
 

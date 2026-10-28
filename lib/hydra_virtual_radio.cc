@@ -162,33 +162,40 @@ int
 VirtualRadio::set_tx_freq(double cf)
 {
   auto lock = lock_state();
-  if (!p_hypervisor->tx_fft_size_for(cf, g_tx_bw)) return -1;
-  if (cf == g_tx_cf) return 0;
-
-   double old_cf = g_tx_cf;
-   g_tx_cf = cf;
-
-   int err = p_hypervisor->notify(*this, Hypervisor::SET_TX_MAP);
-   if (err < 0)
-      g_tx_cf = old_cf;
-
-   return err;
+  return reconfigure_tx(cf, g_tx_bw);
 }
 
 void
 VirtualRadio::set_tx_bandwidth(double bw)
 {
   auto lock = lock_state();
-  if (!p_hypervisor->tx_fft_size_for(g_tx_cf, bw)) return;
-  if (bw == g_tx_bw) return;
+  reconfigure_tx(g_tx_cf, bw);
+}
 
-
-   double old_bw = g_tx_bw;
-   g_tx_bw = bw;
-
-   int err = p_hypervisor->notify(*this, Hypervisor::SET_TX_MAP);
-   if (err < 0)
-      g_tx_bw = old_bw;
+int
+VirtualRadio::reconfigure_tx(double cf, double bw)
+{
+  auto lock = lock_state();
+  if (!g_tx_udp_port || !p_hypervisor->tx_fft_size_for(cf, bw)) return -1;
+  if (cf == g_tx_cf && bw == g_tx_bw) return 0;
+  const auto old_cf = g_tx_cf;
+  const auto old_bw = g_tx_bw;
+  g_tx_cf = cf;
+  g_tx_bw = bw;
+  try
+  {
+    const int result = p_hypervisor->notify(*this, Hypervisor::SET_TX_MAP);
+    if (result >= 0) return result;
+  }
+  catch (...)
+  {
+    g_tx_cf = old_cf;
+    g_tx_bw = old_bw;
+    throw;
+  }
+  g_tx_cf = old_cf;
+  g_tx_bw = old_bw;
+  return -1;
 }
 
 void
@@ -231,28 +238,40 @@ int
 VirtualRadio::set_rx_freq(double cf)
 {
   auto lock = lock_state();
-  if (!p_hypervisor->rx_fft_size_for(cf, g_rx_bw)) return -1;
-  double old_cf = g_rx_cf;
-  g_rx_cf = cf;
-
-  int err = p_hypervisor->notify(*this);
-  if (err < 0)
-    g_rx_cf = old_cf;
-
-  return err;
+  return reconfigure_rx(cf, g_rx_bw);
 }
 
 void
 VirtualRadio::set_rx_bandwidth(double bw)
 {
   auto lock = lock_state();
-  if (!p_hypervisor->rx_fft_size_for(g_rx_cf, bw)) return;
-  double old_bw = g_rx_bw;
-  g_rx_bw = bw;
+  reconfigure_rx(g_rx_cf, bw);
+}
 
-  int err = p_hypervisor->notify(*this);
-  if (err < 0)
+int
+VirtualRadio::reconfigure_rx(double cf, double bw)
+{
+  auto lock = lock_state();
+  if (!g_rx_udp_port || !p_hypervisor->rx_fft_size_for(cf, bw)) return -1;
+  if (cf == g_rx_cf && bw == g_rx_bw) return 0;
+  const auto old_cf = g_rx_cf;
+  const auto old_bw = g_rx_bw;
+  g_rx_cf = cf;
+  g_rx_bw = bw;
+  try
+  {
+    const int result = p_hypervisor->notify(*this, Hypervisor::SET_RX_MAP);
+    if (result >= 0) return result;
+  }
+  catch (...)
+  {
+    g_rx_cf = old_cf;
     g_rx_bw = old_bw;
+    throw;
+  }
+  g_rx_cf = old_cf;
+  g_rx_bw = old_bw;
+  return -1;
 }
 
 void

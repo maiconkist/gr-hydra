@@ -5,6 +5,7 @@
 #include <list>
 #include <math.h>
 #include <mutex>
+#include <functional>
 
 #include "hydra/hydra_log.h"
 #include <boost/property_tree/json_parser.hpp>
@@ -118,6 +119,11 @@ class xvl_resource_manager
     int reserve_tx_resources(unsigned int u_id,
                              double d_centre_freq,
                              double d_bandwidth);
+
+    int reconfigure_rx_resources(unsigned int id, double centre_freq, double bandwidth,
+                                 const std::function<bool()>& apply);
+    int reconfigure_tx_resources(unsigned int id, double centre_freq, double bandwidth,
+                                 const std::function<bool()>& apply);
 
     int check_rx_free(double d_centre_freq, double d_bandwidth, size_t u_id = 0);
     int check_tx_free(double d_centre_freq, double d_bandwidth, size_t u_id = 0);

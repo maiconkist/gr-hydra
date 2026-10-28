@@ -219,15 +219,6 @@ not measured performance improvements.
 
 ### Open bugs
 
-- **Retuning can report success after losing the original allocation.**
-  `rf_front_end::check_chunk` checks frequency bounds but not whether a chunk is
-  occupied. `HydraCore` then frees the old allocation and ignores a failed
-  replacement reservation; `Hypervisor::notify` also reports success when
-  mapping fails. Reservation and DSP-map updates need a consistent commit or
-  rollback.
-  Sources: `lib/hydra_resource.cc`, `lib/hydra_core.cc`,
-  `lib/hydra_hypervisor.cc`.
-
 - **Bandwidth changes leave incompatible DSP state.** Updating a radio's
   bandwidth changes its mapping and FFT length, but does not recreate its FFT
   plans, framing configuration, or buffer capacities. Increasing bandwidth can

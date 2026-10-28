@@ -233,3 +233,41 @@ BOOST_AUTO_TEST_CASE(rx_accumulates_short_reads_without_forwarding_stale_samples
   for (size_t i = 0; i < input.size(); ++i)
     BOOST_CHECK_SMALL(std::abs(received[i] - input[i]), 1e-5f);
 }
+
+BOOST_AUTO_TEST_CASE(rejected_retunes_keep_the_existing_rx_stream_alive)
+{
+  hydra_test::QuietLogs quiet;
+  hydra::Hypervisor hypervisor(64, 1000, 64);
+  const auto port = hydra_test::unused_tcp_port();
+  auto first = std::make_shared<hydra::VirtualRadio>(1, &hypervisor);
+  auto neighbor = std::make_shared<hydra::VirtualRadio>(2, &hypervisor);
+  BOOST_REQUIRE_EQUAL(first->set_rx_chain(port, 1000, 8, "127.0.0.1", "127.0.0.1"), 0);
+  BOOST_REQUIRE_EQUAL(neighbor->set_rx_chain(
+      hydra_test::unused_tcp_port(), 1016, 16, "127.0.0.1", "127.0.0.1"), 0);
+  hypervisor.attach_virtual_radio(first);
+  hypervisor.attach_virtual_radio(neighbor);
+  zmq::context_t context;
+  zmq::socket_t receiver(context, ZMQ_PULL);
+  receiver.set(zmq::sockopt::rcvtimeo, 3000);
+  receiver.set(zmq::sockopt::linger, 0);
+  auto monitor = handshake_monitor(receiver, context);
+  receiver.connect("tcp://127.0.0.1:" + std::to_string(port));
+  await_handshake(*monitor);
+  hydra::iq_window input(64, {0.25f, 0});
+  for (int attempt = 0; attempt < 3; ++attempt)
+  {
+    if (attempt == 1) BOOST_CHECK_LT(first->set_rx_freq(1016), 0);
+    if (attempt == 2) first->set_rx_bandwidth(48);
+    BOOST_CHECK_EQUAL(first->get_rx_freq(), 1000);
+    BOOST_CHECK_EQUAL(first->get_rx_bandwidth(), 8);
+    BOOST_CHECK_EQUAL(first->get_rx_udp_port(), port);
+    hypervisor.forward_rx_window(input, input.size());
+    zmq::message_t message;
+    BOOST_REQUIRE(receiver.recv(message, zmq::recv_flags::none).has_value());
+    hydra::iq_window output(8);
+    BOOST_REQUIRE_EQUAL(message.size(), output.size() * sizeof(hydra::iq_sample));
+    std::memcpy(output.data(), message.data(), message.size());
+    for (const auto sample : output)
+      BOOST_CHECK_SMALL(std::abs(sample - hydra::iq_sample(0.25f, 0)), 1e-5f);
+  }
+}

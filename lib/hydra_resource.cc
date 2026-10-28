@@ -1,6 +1,24 @@
 #include "hydra/hydra_resource.h"
 
+#include <cmath>
+
 namespace hydra {
+
+namespace {
+
+int reconfigure_resources(rf_front_end& resources, unsigned int id,
+                          double centre_freq, double bandwidth,
+                          const std::function<bool()>& apply)
+{
+  auto replacement = resources;
+  replacement.delete_chunks(id);
+  if (replacement.create_chunks(centre_freq, bandwidth, id) || !apply())
+    return 1;
+  resources = std::move(replacement);
+  return 0;
+}
+
+}
 
 // Methods of the resource manager class
 xvl_resource_manager::xvl_resource_manager()
@@ -16,6 +34,7 @@ void
 xvl_resource_manager::set_rx_resources(double d_centre_freq,
                                        double d_bandwidth)
 {
+  std::lock_guard<std::mutex> lock(mtx);
   // If already set the RX resources
   if (b_receiver)
     {
@@ -34,6 +53,7 @@ void
 xvl_resource_manager::set_tx_resources(double d_centre_freq,
                                        double d_bandwidth)
 {
+  std::lock_guard<std::mutex> lock(mtx);
   // If already set the TX resources
   if (b_transmitter)
   {
@@ -53,6 +73,7 @@ xvl_resource_manager::reserve_rx_resources(unsigned int u_id,
                                            double d_centre_freq,
                                            double d_bandwidth)
 {
+  std::lock_guard<std::mutex> lock(mtx);
   // If the RX resources were not defined
   if (not b_receiver)
   {
@@ -60,12 +81,7 @@ xvl_resource_manager::reserve_rx_resources(unsigned int u_id,
     return 1;
   }
 
-  // Lock the mutex
-  mtx.lock();
-  int result = rx_resources.create_chunks(d_centre_freq, d_bandwidth, u_id);
-  mtx.unlock();
-
-  return result;
+  return rx_resources.create_chunks(d_centre_freq, d_bandwidth, u_id);
 }
 
 int
@@ -73,6 +89,7 @@ xvl_resource_manager::reserve_tx_resources(unsigned int u_id,
                                            double d_centre_freq,
                                            double d_bandwidth)
 {
+  std::lock_guard<std::mutex> lock(mtx);
   // If the TX resources were not defined
   if (not b_transmitter)
   {
@@ -80,17 +97,33 @@ xvl_resource_manager::reserve_tx_resources(unsigned int u_id,
     return 1;
   }
 
-  // Lock the mutex
-  mtx.lock();
-  int result = tx_resources.create_chunks(d_centre_freq, d_bandwidth, u_id);
-  mtx.unlock();
+  return tx_resources.create_chunks(d_centre_freq, d_bandwidth, u_id);
+}
 
-  return result;
+int
+xvl_resource_manager::reconfigure_rx_resources(
+    unsigned int id, double centre_freq, double bandwidth,
+    const std::function<bool()>& apply)
+{
+  std::lock_guard<std::mutex> lock(mtx);
+  if (!b_receiver || !id) return 1;
+  return reconfigure_resources(rx_resources, id, centre_freq, bandwidth, apply);
+}
+
+int
+xvl_resource_manager::reconfigure_tx_resources(
+    unsigned int id, double centre_freq, double bandwidth,
+    const std::function<bool()>& apply)
+{
+  std::lock_guard<std::mutex> lock(mtx);
+  if (!b_transmitter || !id) return 1;
+  return reconfigure_resources(tx_resources, id, centre_freq, bandwidth, apply);
 }
 
 boost::property_tree::ptree
 xvl_resource_manager::query_resources()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   // If the RX/TX resources were no defined
   if ((not b_receiver) and (not b_transmitter))
   {
@@ -101,9 +134,6 @@ xvl_resource_manager::query_resources()
   // External an internal trees
   boost::property_tree::ptree tree;
 
-  // Lock the mutex
-  mtx.lock();
-
   // Add the chunks to the tree
   if (b_receiver)
     tree.add_child("receiver", rx_resources.list_chunks());
@@ -111,23 +141,18 @@ xvl_resource_manager::query_resources()
   if (b_transmitter)
     tree.add_child("transmitter", tx_resources.list_chunks());
 
-  // Unlock the mutex
-  mtx.unlock();
-
   return tree;
 }
 
 int
 xvl_resource_manager::free_tx_resources(size_t u_id)
 {
+  std::lock_guard<std::mutex> lock(mtx);
   // TODO should be able to return an error message
   if (not b_transmitter)
     return 0;
 
-  // Lock the mutex
-  mtx.lock();
   tx_resources.delete_chunks(u_id);
-  mtx.unlock();
 
   // Return false if succeeded
   return 0;
@@ -136,12 +161,11 @@ xvl_resource_manager::free_tx_resources(size_t u_id)
 int
 xvl_resource_manager::free_rx_resources(size_t u_id)
 {
+  std::lock_guard<std::mutex> lock(mtx);
   if (not b_receiver)
     return 0;
 
-  mtx.lock();
   rx_resources.delete_chunks(u_id);
-  mtx.unlock();
 
   // Return false if succeeded
   return 0;
@@ -152,6 +176,8 @@ xvl_resource_manager::check_tx_free(double d_centre_freq,
                                     double d_bandwidth,
                                     size_t u_id)
 {
+  std::lock_guard<std::mutex> lock(mtx);
+  if (!b_transmitter) return false;
   rf_front_end tmp = tx_resources;
   tmp.delete_chunks(u_id);
   return  tmp.check_chunk(d_centre_freq, d_bandwidth);
@@ -163,6 +189,8 @@ xvl_resource_manager::check_rx_free(double d_centre_freq,
                                     double d_bandwidth,
                                     size_t u_id)
 {
+  std::lock_guard<std::mutex> lock(mtx);
+  if (!b_receiver) return false;
   rf_front_end tmp = rx_resources;
   tmp.delete_chunks(u_id);
   return  tmp.check_chunk(d_centre_freq, d_bandwidth);
@@ -186,6 +214,7 @@ rf_front_end::create_chunks(double d_centre_freq,
                             double d_bandwidth,
                             unsigned int u_id)
 {
+  if (!check_chunk(d_centre_freq, d_bandwidth)) return 1;
   // Hold the result - One if bad
   int result = 1;
 
@@ -292,12 +321,15 @@ bool
 rf_front_end::check_chunk(double d_centre_freq,
                           double d_bandwidth)
 {
+  if (!std::isfinite(d_centre_freq) || !std::isfinite(d_bandwidth) || d_bandwidth <= 0)
+    return false;
   auto lo_freq = [](double cf, double bw) { return cf - bw/2.0;};
   auto hi_freq = [](double cf, double bw) { return cf + bw/2.0;};
 
   for (auto it = resources.begin(); it != resources.end(); ++it)
   {
-    if (lo_freq(d_centre_freq, d_bandwidth) >= lo_freq(it->d_centre_freq, it->d_bandwidth) &&
+    if (it->u_id == 0 &&
+        lo_freq(d_centre_freq, d_bandwidth) >= lo_freq(it->d_centre_freq, it->d_bandwidth) &&
         hi_freq(d_centre_freq, d_bandwidth) <= hi_freq(it->d_centre_freq, it->d_bandwidth))
 
       return true;

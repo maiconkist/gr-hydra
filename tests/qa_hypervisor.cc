@@ -212,3 +212,64 @@ BOOST_AUTO_TEST_CASE(one_bin_radio_rejects_smaller_reconfiguration)
   BOOST_CHECK_EQUAL(radio->get_rx_fft(), 1);
   BOOST_CHECK_EQUAL(radio->get_tx_fft(), 1);
 }
+
+BOOST_AUTO_TEST_CASE(core_retunes_preserve_allocations_and_apply_frequency_and_width_together)
+{
+  QuietLogs quiet;
+  for (const bool receiver : {false, true})
+  {
+    hydra::HydraCore core;
+    auto device = std::make_shared<IdleDevice>();
+    if (receiver) core.set_rx_resources(device, 1000, 64, 0, 64);
+    else core.set_tx_resources(device, 1000, 64, 0, 64);
+    auto request = [&](unsigned int id, double cf, double bw) {
+      return receiver ? core.request_rx_resources(id, cf, bw, "127.0.0.1", "127.0.0.1")
+                      : core.request_tx_resources(id, cf, bw, "127.0.0.1", "127.0.0.1");
+    };
+    const auto port = request(1, 984, 32);
+    BOOST_REQUIRE(port > 1);
+    BOOST_REQUIRE(request(2, 1008, 16) > 1);
+    const auto before = core.query_resources();
+    BOOST_CHECK_EQUAL(request(1, 1008, 16), 0);
+    BOOST_CHECK_EQUAL(request(1, 1000, 128), 0);
+    BOOST_CHECK(core.query_resources() == before);
+    BOOST_REQUIRE_EQUAL(request(1, 1024, 16), port);
+    const auto after = core.query_resources();
+    const auto& chunks = after.get_child(receiver ? "receiver" : "transmitter");
+    BOOST_CHECK_EQUAL(chunks.back().second.get<unsigned int>("id"), 1);
+    BOOST_CHECK_EQUAL(chunks.back().second.get<double>("centre_freq"), 1024);
+    BOOST_CHECK_EQUAL(chunks.back().second.get<double>("bandwidth"), 16);
+    BOOST_CHECK_EQUAL(chunks.back().second.get<int>(
+        receiver ? "rx_udp_port" : "tx_udp_port"), port);
+    BOOST_REQUIRE(request(3, 984, 32) > 1);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(mapping_conflicts_leave_frequency_and_candidate_maps_unchanged)
+{
+  QuietLogs quiet;
+  hydra::Hypervisor hypervisor(64, 1000, 64);
+  auto first = std::make_shared<hydra::VirtualRadio>(1, &hypervisor);
+  auto second = std::make_shared<hydra::VirtualRadio>(2, &hypervisor);
+  for (const auto& radio : {first, second})
+  {
+    const auto port = hydra_test::unused_tcp_port();
+    const double cf = radio == first ? 984 : 1016;
+    BOOST_REQUIRE_EQUAL(radio->set_rx_chain(port, cf, 16, "127.0.0.1", "127.0.0.1"), 0);
+    BOOST_REQUIRE_EQUAL(radio->set_tx_chain(port, cf, 16, "127.0.0.1", "127.0.0.1"), 0);
+    hypervisor.attach_virtual_radio(radio);
+  }
+  BOOST_CHECK_LT(first->set_rx_freq(1016), 0);
+  BOOST_CHECK_LT(first->set_tx_freq(1016), 0);
+  BOOST_CHECK_EQUAL(first->get_rx_freq(), 984);
+  BOOST_CHECK_EQUAL(first->get_tx_freq(), 984);
+  BOOST_CHECK_EQUAL(second->get_rx_freq(), 1016);
+  BOOST_CHECK_EQUAL(second->get_tx_freq(), 1016);
+  hydra::iq_map_vec map(64, -1);
+  map[10] = 2;
+  const auto before = map;
+  BOOST_CHECK_LT(hypervisor.set_rx_mapping(*first, map), 0);
+  BOOST_CHECK(map == before);
+  BOOST_CHECK_LT(hypervisor.set_tx_mapping(*first, map), 0);
+  BOOST_CHECK(map == before);
+}
