@@ -27,6 +27,7 @@
 #include "hydra/hydra_uhd_interface.h"
 
 #include <algorithm>
+#include <atomic>
 #include <functional>
 #include <iostream>
 #include <mutex>
@@ -43,6 +44,7 @@ class Hypervisor
   Hypervisor(size_t _fft_m_len,
              double central_frequency,
              double bandwidth);
+  ~Hypervisor();
 
   /**
    * @param cf VRadio central frequency
@@ -70,25 +72,7 @@ class Hypervisor
   int notify(VirtualRadio &vr, Notify set_maps = Notify::SET_NONE);
 
   // Method for stoppping the hypervisor's threads
-  void stop()
-  {
-    // If the TX chain was configured
-    if (b_tx_chain)
-    {
-      // Stop the TX thread
-      stop_tx();
-    }
-
-    // If the RX chain was configured
-    if (b_rx_chain)
-    {
-      // Stop the RX thread
-      stop_rx();
-    }
-
-
-    logger.info("Stopped the Hypervisor service");
-  }
+  void stop();
 
   // TX related methods
   double const get_tx_central_frequency() { return g_tx_cf; }
@@ -118,30 +102,23 @@ class Hypervisor
 
 private:
   // All TX structures
-  size_t tx_fft_len; // FFT M length
-  double g_tx_cf; // Hypervisor central frequency
-  double g_tx_bw; // Hypervisor bandwidth
+  size_t tx_fft_len = 0; // FFT M length
+  double g_tx_cf = 0; // Hypervisor central frequency
+  double g_tx_bw = 0; // Hypervisor bandwidth
   sfft_complex g_ifft_complex;
-  bool thr_tx_stop;
+  std::atomic<bool> thr_tx_stop{false};
   std::unique_ptr<std::thread> g_tx_thread;
   iq_map_vec g_tx_subcarriers_map; // mapping of subcarriers
   uhd_hydra_sptr g_tx_dev;
   bool b_tx_chain = false;
 
 
-  // Stop the process loop and join TX thread
-  void stop_tx()
-  {
-    thr_tx_stop = true;
-    g_tx_thread->join();
-  };
-
   // All RX structures
-  size_t rx_fft_len; // FFT M length
-  double g_rx_cf; // Hypervisor central frequency
-  double g_rx_bw; // Hypervisor bandwidth
+  size_t rx_fft_len = 0; // FFT M length
+  double g_rx_cf = 0; // Hypervisor central frequency
+  double g_rx_bw = 0; // Hypervisor bandwidth
   sfft_complex g_fft_complex;
-  bool thr_rx_stop;
+  std::atomic<bool> thr_rx_stop{false};
   std::unique_ptr<std::thread> g_rx_thread;
   iq_map_vec g_rx_subcarriers_map; // mapping of subcarriers
   uhd_hydra_sptr g_rx_dev;
@@ -149,15 +126,9 @@ private:
 
   hydra_log logger;
 
-  // Stop the process loop and join RX thread
-  void stop_rx()
-  {
-    thr_rx_stop = true;
-    g_rx_thread->join();
-  };
-
    vradio_vec g_vradios;
    std::mutex vradios_mtx;
+   std::mutex stop_mutex;
 };
 
 }; /* namespace hydra */

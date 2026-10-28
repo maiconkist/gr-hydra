@@ -3,6 +3,8 @@
 
 #include <thread>
 #include <chrono>
+#include <atomic>
+#include <mutex>
 
 #include "hydra/hydra_buffer.hpp"
 #include "hydra/hydra_log.h"
@@ -25,7 +27,8 @@ class resampler
     // Event loop thread
     std::unique_ptr<std::thread> run_thread;
     // Thread stop condition
-    bool stop_thread;
+    std::atomic<bool> stop_thread{false};
+    std::mutex stop_mutex;
 
     // Event loop method
     void run();
@@ -46,13 +49,17 @@ class resampler
         double sampling_rate,
         size_t fft_size);
 
+    ~resampler() { stop(); }
+
    // Stop the thread
    void stop()
    {
+      std::lock_guard<std::mutex> lock(stop_mutex);
       // Stop the thread
       stop_thread = true;
       // Stop the buffer thread
-      run_thread->join();
+      if (run_thread && run_thread->joinable())
+         run_thread->join();
    };
 
   // Return pointer to the internal buffer
@@ -86,10 +93,9 @@ resampler<input_data_type, output_data_type>::resampler(
   // Create a different type of output buffer depending on the template
   create_buffer();
 
+  logger = hydra_log("resampler");
   // Create a thread to receive the data
   run_thread = std::make_unique<std::thread>(&resampler::run, this);
-
-  logger = hydra_log("resampler");
 
   logger.info("Created resampler");
 };

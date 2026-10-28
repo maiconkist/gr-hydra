@@ -35,6 +35,10 @@ class fft_complex
      * @param fortward
      */
     fft_complex(size_t fft_size, bool forward = true);
+    ~fft_complex();
+
+    fft_complex(const fft_complex&) = delete;
+    fft_complex& operator=(const fft_complex&) = delete;
 
     /**
     */
@@ -58,9 +62,9 @@ class fft_complex
   private:
     size_t g_fft_size;
     bool g_forward;
-    iq_sample *g_inbuf;
-    iq_sample *g_outbuf;
-    fftwf_plan g_plan;
+    std::unique_ptr<iq_sample[], decltype(&fftw_free)> g_inbuf{nullptr, &fftw_free};
+    std::unique_ptr<iq_sample[], decltype(&fftw_free)> g_outbuf{nullptr, &fftw_free};
+    fftwf_plan g_plan = nullptr;
 
 };
 

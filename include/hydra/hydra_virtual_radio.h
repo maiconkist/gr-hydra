@@ -32,6 +32,7 @@
 #include <hydra/hydra_stats.h>
 
 #include <vector>
+#include <atomic>
 #include <mutex>
 // #include <boost/format.hpp>
 
@@ -43,28 +44,9 @@ class VirtualRadio
     /** CTOR
      */
     VirtualRadio(size_t _idx, Hypervisor *hypervisor);
+    ~VirtualRadio();
 
-    void stop()
-    {
-      // If Transmitting
-      if (b_transmitter)
-      {
-        // Stop resampler and socket loops
-        tx_resampler->stop();
-        tx_socket->stop();
-
-        logger.info("Stopped TX chain.");
-      }
-      // If receiving
-      if (b_receiver)
-      {
-        // Stop resampler and socket loops
-        rx_resampler->stop();
-        rx_socket->stop();
-
-        logger.info("Stopped RX chain.");
-      }
-    };
+    void stop();
 
     int set_rx_chain(unsigned int u_rx_udp,
                     double d_rx_centre_freq,
@@ -114,7 +96,7 @@ class VirtualRadio
     iq_map_vec g_rx_map;
     size_t g_rx_fft_size; // Subcarriers used by this VRadio
     size_t g_rx_udp_port;
-    bool b_receiver;
+    std::atomic<bool> b_receiver;
     double g_rx_cf;      // Central frequency
     double g_rx_bw;      // Bandwidth
     samples_vec g_rx_samples;
@@ -127,7 +109,7 @@ class VirtualRadio
     iq_map_vec g_tx_map;
     size_t g_tx_fft_size; // Subcarriers used by this VRadio
     size_t g_tx_udp_port;
-    bool b_transmitter;
+    std::atomic<bool> b_transmitter;
     ReportPtr tx_report;
     double g_tx_cf;      // Central frequency
     double g_tx_bw;      // Bandwidth

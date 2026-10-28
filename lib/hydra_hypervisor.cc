@@ -24,6 +24,7 @@ namespace hydra {
 
 Hypervisor::Hypervisor()
 {
+  logger = hydra_log("hypervisor");
 }
 
 Hypervisor::Hypervisor(size_t _fft_m_len,
@@ -32,7 +33,11 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
         tx_fft_len(_fft_m_len),
         g_tx_cf(central_frequency),
         g_tx_bw(bandwidth),
-        g_tx_subcarriers_map(_fft_m_len, -1)
+        g_tx_subcarriers_map(_fft_m_len, -1),
+        rx_fft_len(_fft_m_len),
+        g_rx_cf(central_frequency),
+        g_rx_bw(bandwidth),
+        g_rx_subcarriers_map(_fft_m_len, -1)
 {
    g_fft_complex  = sfft_complex(new fft_complex(rx_fft_len));
    g_ifft_complex = sfft_complex(new fft_complex(tx_fft_len, false));
@@ -42,6 +47,27 @@ Hypervisor::Hypervisor(size_t _fft_m_len,
 
   logger = hydra_log("hypervisor");
 };
+
+Hypervisor::~Hypervisor()
+{
+  stop();
+}
+
+void
+Hypervisor::stop()
+{
+  std::lock_guard<std::mutex> stop_lock(stop_mutex);
+  thr_tx_stop = true;
+  thr_rx_stop = true;
+  if (g_tx_thread && g_tx_thread->joinable()) g_tx_thread->join();
+  if (g_rx_thread && g_rx_thread->joinable()) g_rx_thread->join();
+
+  std::lock_guard<std::mutex> radios_lock(vradios_mtx);
+  for (const auto& radio : g_vradios)
+   radio->stop();
+  b_tx_chain = false;
+  b_rx_chain = false;
+}
 
 size_t
 Hypervisor::create_vradio(double cf, double bandwidth)

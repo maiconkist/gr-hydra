@@ -217,23 +217,7 @@ The following items come from a review of the current implementation. This is
 not an exhaustive bug inventory. Optimization ideas are candidates for profiling,
 not measured performance improvements.
 
-### Bug status
-
-Resolved items are marked **Fixed**; unmarked entries remain open.
-
-- **Fixed: invalid iterators when releasing spectrum.**
-  `rf_front_end::delete_chunks` now checks both list boundaries before
-  inspecting neighbors. The `hydra_resource_release` regression cases cover
-  full-band, boundary, interior, and adjacent allocations, including preservation
-  of occupied neighbors and coalescing of free chunks.
-  Source: `lib/hydra_resource.cc`.
-
-- **Fixed: repeated resource release can crash the server.**
-  `Hypervisor::detach_virtual_radio` now returns `false` for a missing ID instead
-  of dereferencing a null radio. The `hydra_repeated_release` regression covers
-  unknown IDs and detaching the same radio more than once.
-  Sources: `lib/hydra_hypervisor.cc`, `lib/hydra_core.cc`,
-  `lib/hydra_client.cc`, `grc_blocks/lib/hydra_gr_client_*_impl.cc`.
+### Open bugs
 
 - **Retuning can report success after losing the original allocation.**
   `rf_front_end::check_chunk` checks frequency bounds but not whether a chunk is
@@ -264,13 +248,6 @@ Resolved items are marked **Fixed**; unmarked entries remain open.
   potentially processing stale samples after short reads.
   Sources: `lib/hydra_uhd_interface.cc`, `lib/hydra_hypervisor.cc`.
 
-- **Fixed: unsafe single-direction state and cleanup.** Core and hypervisor
-  direction flags start disabled. Freeing an unconfigured direction is a
-  successful no-op rather than a process exit. Regressions cover RX-only and
-  TX-only resource managers, plus cleanup of an unconfigured core.
-  Sources: `lib/hydra_core.cc`, `lib/hydra_hypervisor.cc`,
-  `lib/hydra_resource.cc`.
-
 - **Worker state is not consistently synchronized.** Stop flags are ordinary
   booleans shared across threads, and radio-vector and mapping accesses do not
   consistently use the same synchronization. Allocation, retuning, streaming,
@@ -278,14 +255,6 @@ Resolved items are marked **Fixed**; unmarked entries remain open.
   Sources: `include/hydra/hydra_hypervisor.h`,
   `include/hydra/hydra_resampler.hpp`, `lib/hydra_hypervisor.cc`,
   `lib/hydra_virtual_radio.cc`, `lib/hydra_socket.cc`.
-
-- **FFT and worker lifetimes lack complete cleanup.** `fft_complex` allocates
-  FFTW buffers and a plan but has no destructor to release them. Hypervisor
-  shutdown joins the front-end threads without stopping every virtual radio's
-  socket and framing threads. Resource ownership should guarantee orderly
-  stop, join, and release.
-  Sources: `include/hydra/hydra_fft.h`, `lib/hydra_fft.cc`,
-  `include/hydra/hydra_hypervisor.h`, `include/hydra/hydra_virtual_radio.h`.
 
 - **Allocation responses have inconsistent success semantics.** TX response
   parsing returns success (`0`) on malformed JSON, leaving endpoint fields
@@ -300,11 +269,6 @@ Resolved items are marked **Fixed**; unmarked entries remain open.
   a radio or starting workers.
   Sources: `lib/hydra_virtual_radio.cc`, `lib/hydra_hypervisor.cc`,
   `lib/hydra_fft.cc`.
-
-- **Fixed: the USRP backend ignored the requested RX gain.**
-  `device_uhd::set_rx_config` forwards the supplied normalized gain to UHD
-  instead of forcing `0.0`, preserving the existing range validation.
-  Source: `lib/hydra_uhd_interface.cc`.
 
 ### Possible optimizations
 

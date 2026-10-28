@@ -20,51 +20,72 @@
 
 #include "hydra/hydra_fft.h"
 
+#include <algorithm>
+#include <mutex>
+#include <new>
+#include <stdexcept>
+
 namespace hydra {
+
+namespace {
+std::mutex planner_mutex;
+}
 
 fft_complex::fft_complex(size_t fft_size, bool forward):
    g_fft_size(fft_size),
    g_forward(forward)
 {
-   g_inbuf  = (iq_sample *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
-   g_outbuf = (iq_sample *) fftw_malloc(sizeof(fftw_complex) * fft_size) ;
+   g_inbuf.reset(static_cast<iq_sample*>(fftw_malloc(sizeof(fftw_complex) * fft_size)));
+   g_outbuf.reset(static_cast<iq_sample*>(fftw_malloc(sizeof(fftw_complex) * fft_size)));
+   if (!g_inbuf || !g_outbuf)
+      throw std::bad_alloc();
 
+   std::lock_guard<std::mutex> lock(planner_mutex);
    g_plan = fftwf_plan_dft_1d(fft_size,
-                   (fftwf_complex *)(g_inbuf),
-                   (fftwf_complex *)(g_outbuf),
+                   reinterpret_cast<fftwf_complex*>(g_inbuf.get()),
+                   reinterpret_cast<fftwf_complex*>(g_outbuf.get()),
                    forward? FFTW_FORWARD:FFTW_BACKWARD,
                    FFTW_MEASURE);
+   if (!g_plan)
+      throw std::runtime_error("Unable to create FFT plan");
+}
+
+fft_complex::~fft_complex()
+{
+   std::lock_guard<std::mutex> lock(planner_mutex);
+   fftwf_destroy_plan(g_plan);
 }
 
 int
 fft_complex::set_data(const iq_sample *data, size_t len)
 {
    // Copy samples to fft buffer
-   std::copy(data, data + len, g_inbuf);
+   std::copy(data, data + len, g_inbuf.get());
+   return 0;
 }
 
 void
 fft_complex::reset_inbuf()
 {
-  std::fill(g_inbuf, g_inbuf +  g_fft_size, 0);
+  std::fill_n(g_inbuf.get(), g_fft_size, 0);
 }
 
 void
 fft_complex::reset_outbuf()
 {
-  std::fill(g_outbuf, g_outbuf +  g_fft_size, 0);
+  std::fill_n(g_outbuf.get(), g_fft_size, 0);
 }
 
 iq_sample*
 fft_complex::get_inbuf()
 {
-   return g_inbuf;
+   return g_inbuf.get();
 }
 
 iq_sample*
 fft_complex::get_outbuf()
 {
-   return g_outbuf;
+   return g_outbuf.get();
 }
 
 void
@@ -72,18 +93,18 @@ fft_complex::execute()
 {
    if (g_forward == false)
    {
-      std::rotate(g_inbuf,
-            g_inbuf + g_fft_size/2,
-            g_inbuf + g_fft_size);
+      std::rotate(g_inbuf.get(),
+            g_inbuf.get() + g_fft_size/2,
+            g_inbuf.get() + g_fft_size);
    }
 
    fftwf_execute(g_plan);
 
    if (g_forward == true)
    {
-      std::rotate(g_outbuf,
-            g_outbuf + g_fft_size/2,
-            g_outbuf + g_fft_size);
+      std::rotate(g_outbuf.get(),
+            g_outbuf.get() + g_fft_size/2,
+            g_outbuf.get() + g_fft_size);
 
       for (size_t i = 0; i < g_fft_size; ++i)
          g_outbuf[i] /= float(g_fft_size);

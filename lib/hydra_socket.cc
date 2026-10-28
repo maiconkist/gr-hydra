@@ -15,19 +15,26 @@ zmq_source::zmq_source(const std::string& server_addr,
 {
   // Create the outbut buffer with the proper buffer size
   p_output_buffer = std::make_shared<hydra_buffer<iq_sample>>(buf_size);
+  logger = hydra_log("zmq|source");
+  socket.setsockopt(ZMQ_LINGER, 0);
   // Create a thread to receive the data
   g_rx_thread = std::make_unique<std::thread>(&zmq_source::run, this);
-
-  logger = hydra_log("zmq|source");
 };
+
+zmq_source::~zmq_source()
+{
+  stop();
+}
 
 void
 zmq_source::stop()
 {
+  std::lock_guard<std::mutex> lock(stop_mutex);
   // Toggle thread stop condition
   g_th_run = false;
   // Join event loop thread
-  g_rx_thread->join();
+  if (g_rx_thread && g_rx_thread->joinable())
+    g_rx_thread->join();
 };
 
 void
@@ -93,19 +100,26 @@ zmq_sink::zmq_sink(std::shared_ptr<hydra_buffer<iq_sample>> input_buffer,
   g_th_run(true),
   socket(context, ZMQ_PUSH)
 {
+  logger = hydra_log("zmq|sink");
+  socket.setsockopt(ZMQ_LINGER, 0);
   // Create a thread to receive the data
   g_rx_thread = std::make_unique<std::thread>(&zmq_sink::run, this);
-
-  logger = hydra_log("zmq|sink");
 };
+
+zmq_sink::~zmq_sink()
+{
+  stop();
+}
 
 void
 zmq_sink::stop()
 {
+  std::lock_guard<std::mutex> lock(stop_mutex);
   // Toggle thread stop condition
   g_th_run = false;
   // Join event loop thread
-  g_rx_thread->join();
+  if (g_rx_thread && g_rx_thread->joinable())
+    g_rx_thread->join();
 };
 
 // Assign the handle receive callback when a datagram is received

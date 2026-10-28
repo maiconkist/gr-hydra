@@ -6,6 +6,7 @@
 #include <deque>
 #include <chrono>
 #include <thread>
+#include <atomic>
 #include <mutex>
 #include <numeric>
 #include <boost/asio.hpp>
@@ -33,6 +34,7 @@ class zmq_source
                const unsigned int& buf_size);
 
     /* DTOR  */
+    ~zmq_source();
     void stop();
 
     static std::unique_ptr<zmq_source> make(const std::string &server_addr,
@@ -63,7 +65,8 @@ class zmq_source
     std::string s_host;
     std::string s_port;
     // Thread stop condition
-    bool g_th_run;
+    std::atomic<bool> g_th_run;
+    std::mutex stop_mutex;
 
     hydra_log logger;
 
@@ -91,6 +94,7 @@ class zmq_sink
              const std::string& port);
 
     /* DTOR */
+    ~zmq_sink();
     void stop();
 
     static std::unique_ptr<zmq_sink> make(std::shared_ptr<hydra_buffer<iq_sample>> input_buffer,
@@ -107,7 +111,8 @@ class zmq_sink
     std::string s_port;
 
     // Thread stop condition
-    bool g_th_run;
+    std::atomic<bool> g_th_run;
+    std::mutex stop_mutex;
 
     hydra_log logger;
 

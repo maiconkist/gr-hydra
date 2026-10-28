@@ -33,6 +33,22 @@ VirtualRadio::VirtualRadio(size_t _idx, Hypervisor *hypervisor):
   logger = hydra_log("VR #" + std::to_string(g_idx));
 }
 
+VirtualRadio::~VirtualRadio()
+{
+  stop();
+}
+
+void
+VirtualRadio::stop()
+{
+  std::lock_guard<std::mutex> lock(g_mutex);
+  b_transmitter = false;
+  b_receiver = false;
+  if (tx_socket) tx_socket->stop();
+  if (tx_resampler) tx_resampler->stop();
+  if (rx_resampler) rx_resampler->stop();
+  if (rx_socket) rx_socket->stop();
+}
 
 int
 VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
