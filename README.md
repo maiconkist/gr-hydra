@@ -62,8 +62,12 @@ sudo cmake --install grc_blocks/build
 sudo ldconfig
 ```
 
-The module uses Python 3/pybind11 and YAML GRC definitions. Legacy generated
-Python 2 example scripts still need regeneration with the supported toolchain.
+The module uses Python 3/pybind11 and YAML GRC definitions. The slice manager,
+the five `ansible_*.py` applications, and the legacy build/documentation helpers
+also use Python 3. The applications and their paired `.grc` sources have been
+migrated to GNU Radio 3.10, preserving the existing command-line options and
+radio settings. Running the radio applications still requires their configured
+USRP devices, TAP interfaces, and network peers.
 
 ## TESTING (LINUX)
 
@@ -84,14 +88,19 @@ cmake --build tests/build
 The QA project requires CMake 3.16 or later. Use matching compiler and ABI
 settings for the core and QA builds, including sanitizer or debug-iterator flags.
 
-After installing the GNU Radio module, run its separate Python QA:
+After installing the GNU Radio module, run the separate Python QA:
 
 ```sh
-python3 tests/qa_gnuradio.py
+python3 -m unittest discover -s tests -p 'qa_*.py' -v
 ```
 
-These tests exercise the native control-client bindings over local TCP/ZeroMQ
-and load the GRC definitions with GNU Radio's schema and block loaders.
+These tests check all repository Python files for Python 3 syntax, exercise the
+native control-client bindings over local TCP/ZeroMQ and XML-RPC, and cover the
+legacy template/documentation helpers. They also regenerate the five example
+flowgraphs, check their command-line entrypoints, and construct them with real
+GNU Radio DSP blocks. Hardware, HyDRA-server, and TAP endpoints are replaced by
+test doubles; Qt runs headlessly. No physical radio or privileged TAP setup is
+required.
 
 ## RUNNING THE EXAMPLES
 

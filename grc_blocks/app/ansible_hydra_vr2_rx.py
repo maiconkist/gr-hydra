@@ -1,29 +1,38 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-##################################################
+
+#
+# SPDX-License-Identifier: GPL-3.0
+#
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Vr2 Rx
-# Generated: Mon May 13 15:14:48 2019
-##################################################
-
+# GNU Radio version: 3.10.9.2
 
 from gnuradio import blocks
+from gnuradio import blocks, gr
 from gnuradio import digital
-from gnuradio import eng_notation
 from gnuradio import gr
-from gnuradio import uhd
-from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
-from optparse import OptionParser
-import SimpleXMLRPCServer
-import threading
+from gnuradio.fft import window
+import sys
+import signal
+from argparse import ArgumentParser
+from gnuradio.eng_arg import eng_float, intx
+from gnuradio import eng_notation
+from gnuradio import gr, pdu
+from gnuradio import network
+from gnuradio import uhd
 import time
+from xmlrpc.server import SimpleXMLRPCServer
+import threading
+
+
 
 
 class ansible_hydra_vr2_rx(gr.top_block):
 
     def __init__(self, ansibleIP='192.168.5.81', freqrx=1.1e9, freqtx=1.1e9+5e6, gain=0.85, mul=0.04, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
-        gr.top_block.__init__(self, "Ansible Hydra Vr2 Rx")
+        gr.top_block.__init__(self, "Ansible Hydra Vr2 Rx", catch_exceptions=True)
 
         ##################################################
         # Parameters
@@ -40,57 +49,66 @@ class ansible_hydra_vr2_rx(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.xmlrpc_server_0 = SimpleXMLRPCServer.SimpleXMLRPCServer((ansibleIP, 8080), allow_none=True)
+
+        self.xmlrpc_server_0 = SimpleXMLRPCServer((ansibleIP, 8080), allow_none=True)
         self.xmlrpc_server_0.register_instance(self)
         self.xmlrpc_server_0_thread = threading.Thread(target=self.xmlrpc_server_0.serve_forever)
         self.xmlrpc_server_0_thread.daemon = True
         self.xmlrpc_server_0_thread.start()
         self.uhd_usrp_source_0 = uhd.usrp_source(
-        	",".join(("", "")),
-        	uhd.stream_args(
-        		cpu_format="fc32",
-        		channels=range(1),
-        	),
+            ",".join(("", "")),
+            uhd.stream_args(
+                cpu_format="fc32",
+                args='',
+                channels=list(range(0,1)),
+            ),
         )
         self.uhd_usrp_source_0.set_samp_rate(samp_rate)
+        # No synchronization enforced.
+
         self.uhd_usrp_source_0.set_center_freq(freqrx + vr2offset, 0)
-        self.uhd_usrp_source_0.set_gain(0, 0)
         self.uhd_usrp_source_0.set_antenna('RX2', 0)
+        self.uhd_usrp_source_0.set_gain(0, 0)
         self.uhd_usrp_sink_0 = uhd.usrp_sink(
-        	",".join(("", "")),
-        	uhd.stream_args(
-        		cpu_format="fc32",
-        		channels=range(1),
-        	),
+            ",".join(("", "")),
+            uhd.stream_args(
+                cpu_format="fc32",
+                args='',
+                channels=list(range(0,1)),
+            ),
+            '',
         )
         self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
+        # No synchronization enforced.
+
         self.uhd_usrp_sink_0.set_center_freq(freqtx + vr2offset, 0)
-        self.uhd_usrp_sink_0.set_normalized_gain(gain, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
+        self.uhd_usrp_sink_0.set_normalized_gain(gain, 0)
         self.digital_ofdm_tx_0_0 = digital.ofdm_tx(
-        	  fft_len=64, cp_len=16,
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
-        	  rolloff=0,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
+            fft_len=64,
+            cp_len=16,
+            packet_length_tag_key="len",
+            bps_header=1,
+            bps_payload=1,
+            rolloff=0,
+            debug_log=False,
+            scramble_bits=False)
         self.digital_ofdm_rx_0_0 = digital.ofdm_rx(
-        	  fft_len=64, cp_len=16,
-        	  frame_length_tag_key='frame_'+"len",
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
-        self.blocks_tuntap_pdu_1_0 = blocks.tuntap_pdu('tap0', 1000, False)
-        self.blocks_tagged_stream_to_pdu_0_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
-        self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, 'VR2 TX', ""); self.blocks_tag_debug_0_0.set_display(True)
-        self.blocks_pdu_to_tagged_stream_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_vcc((mul, ))
-        self.blocks_message_debug_0 = blocks.message_debug()
+            fft_len=64, cp_len=16,
+            frame_length_tag_key='frame_'+"len",
+            packet_length_tag_key="len",
+            bps_header=1,
+            bps_payload=1,
+            debug_log=False,
+            scramble_bits=False)
+        self.blocks_tuntap_pdu_1_0 = network.tuntap_pdu('tap0', 1000, False)
+        self.blocks_tagged_stream_to_pdu_0_0 = pdu.tagged_stream_to_pdu(gr.types.byte_t, "len")
+        self.blocks_tag_debug_0_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, 'VR2 TX', "")
+        self.blocks_tag_debug_0_0.set_display(True)
+        self.blocks_pdu_to_tagged_stream_0_0 = pdu.pdu_to_tagged_stream(gr.types.byte_t, "len")
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_cc(mul)
+        self.blocks_message_debug_0 = blocks.message_debug(True, gr.log_levels.info)
+
 
         ##################################################
         # Connections
@@ -104,6 +122,7 @@ class ansible_hydra_vr2_rx(gr.top_block):
         self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
         self.connect((self.digital_ofdm_tx_0_0, 0), (self.blocks_tag_debug_0_0, 0))
         self.connect((self.uhd_usrp_source_0, 0), (self.digital_ofdm_rx_0_0, 0))
+
 
     def get_ansibleIP(self):
         return self.ansibleIP
@@ -132,21 +151,20 @@ class ansible_hydra_vr2_rx(gr.top_block):
         self.gain = gain
         self.uhd_usrp_sink_0.set_normalized_gain(self.gain, 0)
 
-
     def get_mul(self):
         return self.mul
 
     def set_mul(self, mul):
         self.mul = mul
-        self.blocks_multiply_const_vxx_0_0.set_k((self.mul, ))
+        self.blocks_multiply_const_vxx_0_0.set_k(self.mul)
 
     def get_samp_rate(self):
         return self.samp_rate
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
         self.uhd_usrp_sink_0.set_samp_rate(self.samp_rate)
+        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
 
     def get_vr1offset(self):
         return self.vr1offset
@@ -159,24 +177,35 @@ class ansible_hydra_vr2_rx(gr.top_block):
 
     def set_vr2offset(self, vr2offset):
         self.vr2offset = vr2offset
-        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
         self.uhd_usrp_sink_0.set_center_freq(self.freqtx + self.vr2offset, 0)
+        self.uhd_usrp_source_0.set_center_freq(self.freqrx + self.vr2offset, 0)
+
 
 
 def argument_parser():
-    parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
-    parser.add_option(
-        "", "--ansibleIP", dest="ansibleIP", type="string", default='192.168.5.81',
-        help="Set ansibleIP [default=%default]")
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--ansibleIP", dest="ansibleIP", type=str, default='192.168.5.81',
+        help="Set ansibleIP [default=%(default)r]")
     return parser
 
 
 def main(top_block_cls=ansible_hydra_vr2_rx, options=None):
     if options is None:
-        options, _ = argument_parser().parse_args()
-
+        options = argument_parser().parse_args()
     tb = top_block_cls(ansibleIP=options.ansibleIP)
+
+    def sig_handler(sig=None, frame=None):
+        tb.stop()
+        tb.wait()
+
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, sig_handler)
+    signal.signal(signal.SIGTERM, sig_handler)
+
     tb.start()
+
     tb.wait()
 
 

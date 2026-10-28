@@ -23,14 +23,7 @@ Utilities for extracting text from generated classes.
 """
 
 def is_string(txt):
-    if isinstance(txt, str):
-        return True
-    try:
-        if isinstance(txt, unicode):
-            return True
-    except NameError:
-        pass
-    return False
+    return isinstance(txt, str)
 
 def description(obj):
     if obj is None:
@@ -49,7 +42,7 @@ def description_bit(obj):
     elif is_string(obj):
         return obj
     else:
-        raise StandardError('Expecting a string or something with content, content_ or value attribute')
+        raise Exception('Expecting a string or something with content, content_ or value attribute')
     # If this bit is a paragraph then add one some line breaks.
     if hasattr(obj, 'name') and obj.name == 'para':
         result += "\n\n"

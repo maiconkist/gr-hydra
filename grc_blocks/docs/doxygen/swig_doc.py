@@ -20,7 +20,7 @@
 #
 """
 Creates the swig_doc.i SWIG interface file.
-Execute using: python swig_doc.py xml_path outputfilename
+Execute using: python3 swig_doc.py xml_path outputfilename
 
 The file instructs SWIG to transfer the doxygen comments into the
 python docstrings.
@@ -65,7 +65,7 @@ def utoascii(text):
     """
     if text is None:
         return ''
-    out = text.encode('ascii', 'replace')
+    out = text.encode('ascii', 'replace').decode('ascii')
     out = out.replace('"', '\\"')
     return out
 
@@ -228,15 +228,14 @@ def make_swig_interface_file(di, swigdocfilename, custom_output=None):
 
     output = "\n\n".join(output)
 
-    swig_doc = file(swigdocfilename, 'w')
-    swig_doc.write(output)
-    swig_doc.close()
+    with open(swigdocfilename, 'w', encoding='utf-8') as swig_doc:
+        swig_doc.write(output)
 
 if __name__ == "__main__":
     # Parse command line options and set up doxyxml.
-    err_msg = "Execute using: python swig_doc.py xml_path outputfilename"
+    err_msg = "Execute using: python3 swig_doc.py xml_path outputfilename"
     if len(sys.argv) != 3:
-        raise StandardError(err_msg)
+        raise Exception(err_msg)
     xml_path = sys.argv[1]
     swigdocfilename = sys.argv[2]
     di = DoxyIndex(xml_path)

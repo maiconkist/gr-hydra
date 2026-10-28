@@ -1,15 +1,15 @@
-#!/usr//bin/env python2
+#!/usr/bin/env python3
 
-import sys, time
+import sys
+import time
+from xmlrpc.client import ServerProxy
 
 import hydra
-import xmlrpclib
-import json
 
 
 
 # This class receives a hydra_client, which interacts with the Hydra-Server,
-#       and a xmlrpclib.ServerProxy, which interacts with the UE side.
+#       and an XML-RPC ServerProxy, which interacts with the UE side.
 # Use the methods to configure both the client and ue at the same time.
 
 class Slice:
@@ -24,11 +24,14 @@ class Slice:
     def allocate_tx(self, freq, bandwidth):
 
         # Configure TX freq for slice
-        spectrum_conf = hydra.rx_configuration(freq, bandwidth, False)
+        spectrum_conf = hydra.rx_configuration(freq, bandwidth)
         ret = self.client.request_tx_resources( spectrum_conf )
 
         if (ret < 0):
-            print "Error allocating HYDRA TX resources: freq: %f, bandwidth %f" % (freq, bandwidth) 
+            print(
+                f"Error allocating HYDRA TX resources: freq: {freq:f}, "
+                f"bandwidth {bandwidth:f}"
+            )
             return -1
 
         #  Configure the RX freq for UE (to receive from the slice)
@@ -38,18 +41,24 @@ class Slice:
         self.ue.set_samp_rate(bandwidth)
 
         if (self.ue.get_freqrx() != freq or self.ue.get_samp_rate() != bandwidth):
-            print "Error allocating UE RX resources: freq: %f, bandwidth %f" % (freq, bandwidth) 
+            print(
+                f"Error allocating UE RX resources: freq: {freq:f}, "
+                f"bandwidth {bandwidth:f}"
+            )
             return -1
 
         return 0
 
     def allocate_rx(self, freq, bandwidth):
         # Configure RX freq for slice
-        spectrum_conf = hydra.rx_configuration(freq, bandwidth, False)
+        spectrum_conf = hydra.rx_configuration(freq, bandwidth)
         ret = self.client.request_rx_resources( spectrum_conf )
 
         if (ret < 0):
-            print "Error allocating TX resources: freq: %f, bandwidth %f" % (freq, bandwidth) 
+            print(
+                f"Error allocating TX resources: freq: {freq:f}, "
+                f"bandwidth {bandwidth:f}"
+            )
 
         #  Configure the RX freq for UE (to receive from the slice)
         self.ue.set_freqtx(freq)
@@ -58,7 +67,10 @@ class Slice:
         self.ue.set_samp_rate(bandwidth)
 
         if (self.ue.get_freqtx() != freq or self.ue.get_samp_rate() != bandwidth):
-            print "Error allocating UE TX resources: freq: %f, bandwidth %f" % (freq, bandwidth) 
+            print(
+                f"Error allocating UE TX resources: freq: {freq:f}, "
+                f"bandwidth {bandwidth:f}"
+            )
             return -1
 
         return 0
@@ -71,9 +83,9 @@ def main():
     #           We can then allocate new resources from this python without impacting the slices.
 
     # We put the IP of the machine executing this script
-    client1 = hydra.hydra_client("192.168.5.70", 5000, 1, True)
+    client1 = hydra.hydra_client("192.168.5.70", 5000, 1, b_debug=True)
     # We put the IP of the machine running the UE
-    ue1 = xmlrpclib.ServerProxy("http://192.168.5.78:8080")
+    ue1 = ServerProxy("http://192.168.5.78:8080")
 
     if client1.check_connection(3) == "":
         print("client1 could not connect to server")
@@ -88,9 +100,9 @@ def main():
 
     if (True):
         # We put the IP of the machine executing this script
-        client2 = hydra.hydra_client("192.168.5.70", 5000, 2, True)
+        client2 = hydra.hydra_client("192.168.5.70", 5000, 2, b_debug=True)
         # We put the IP of the machine running the UE
-        ue2 = xmlrpclib.ServerProxy("http://192.168.5.81:8080")
+        ue2 = ServerProxy("http://192.168.5.81:8080")
 
         if client2.check_connection(3) == "":
             print("client2 could not connect to server")

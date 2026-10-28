@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
@@ -8,9 +8,9 @@ from xml.dom import minidom
 
 import os
 import sys
-import compound
+from . import compound
 
-import indexsuper as supermod
+from . import indexsuper as supermod
 
 class DoxygenTypeSub(supermod.DoxygenType):
     def __init__(self, version=None, compound=None):
@@ -74,4 +74,3 @@ def parse(inFilename):
     rootObj.build(rootNode)
 
     return rootObj
-

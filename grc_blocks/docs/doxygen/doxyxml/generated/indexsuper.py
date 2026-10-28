@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Generated Thu Jun 11 18:43:54 2009 by generateDS.py.
@@ -6,7 +6,6 @@
 
 import sys
 import getopt
-from string import lower as str_lower
 from xml.dom import minidom
 from xml.dom import Node
 
@@ -19,7 +18,7 @@ from xml.dom import Node
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError, exp:
+except ImportError as exp:
 
     class GeneratedsSuper:
         def format_string(self, input_data, input_name=''):
@@ -53,8 +52,6 @@ except ImportError, exp:
 # Globals
 #
 
-ExternalEncoding = 'ascii'
-
 #
 # Support/utility functions.
 #
@@ -64,7 +61,7 @@ def showIndent(outfile, level):
         outfile.write('    ')
 
 def quote_xml(inStr):
-    s1 = (isinstance(inStr, basestring) and inStr or
+    s1 = (isinstance(inStr, str) and inStr or
           '%s' % inStr)
     s1 = s1.replace('&', '&amp;')
     s1 = s1.replace('<', '&lt;')
@@ -72,7 +69,7 @@ def quote_xml(inStr):
     return s1
 
 def quote_attrib(inStr):
-    s1 = (isinstance(inStr, basestring) and inStr or
+    s1 = (isinstance(inStr, str) and inStr or
           '%s' % inStr)
     s1 = s1.replace('&', '&amp;')
     s1 = s1.replace('<', '&lt;')
@@ -216,7 +213,7 @@ class DoxygenType(GeneratedsSuper):
         else:
             outfile.write(' />\n')
     def exportAttributes(self, outfile, level, namespace_='', name_='DoxygenType'):
-        outfile.write(' version=%s' % (self.format_string(quote_attrib(self.version).encode(ExternalEncoding), input_name='version'), ))
+        outfile.write(' version=%s' % (self.format_string(quote_attrib(self.version), input_name='version'), ))
     def exportChildren(self, outfile, level, namespace_='', name_='DoxygenType'):
         for compound_ in self.compound:
             compound_.export(outfile, level, namespace_, name_='compound')
@@ -307,11 +304,11 @@ class CompoundType(GeneratedsSuper):
             outfile.write(' />\n')
     def exportAttributes(self, outfile, level, namespace_='', name_='CompoundType'):
         outfile.write(' kind=%s' % (quote_attrib(self.kind), ))
-        outfile.write(' refid=%s' % (self.format_string(quote_attrib(self.refid).encode(ExternalEncoding), input_name='refid'), ))
+        outfile.write(' refid=%s' % (self.format_string(quote_attrib(self.refid), input_name='refid'), ))
     def exportChildren(self, outfile, level, namespace_='', name_='CompoundType'):
         if self.name is not None:
             showIndent(outfile, level)
-            outfile.write('<%sname>%s</%sname>\n' % (namespace_, self.format_string(quote_xml(self.name).encode(ExternalEncoding), input_name='name'), namespace_))
+            outfile.write('<%sname>%s</%sname>\n' % (namespace_, self.format_string(quote_xml(self.name), input_name='name'), namespace_))
         for member_ in self.member:
             member_.export(outfile, level, namespace_, name_='member')
     def hasContent_(self):
@@ -336,7 +333,7 @@ class CompoundType(GeneratedsSuper):
             outfile.write('refid = %s,\n' % (self.refid,))
     def exportLiteralChildren(self, outfile, level, name_):
         showIndent(outfile, level)
-        outfile.write('name=%s,\n' % quote_python(self.name).encode(ExternalEncoding))
+        outfile.write('name=%s,\n' % quote_python(self.name))
         showIndent(outfile, level)
         outfile.write('member=[\n')
         level += 1
@@ -407,11 +404,11 @@ class MemberType(GeneratedsSuper):
             outfile.write(' />\n')
     def exportAttributes(self, outfile, level, namespace_='', name_='MemberType'):
         outfile.write(' kind=%s' % (quote_attrib(self.kind), ))
-        outfile.write(' refid=%s' % (self.format_string(quote_attrib(self.refid).encode(ExternalEncoding), input_name='refid'), ))
+        outfile.write(' refid=%s' % (self.format_string(quote_attrib(self.refid), input_name='refid'), ))
     def exportChildren(self, outfile, level, namespace_='', name_='MemberType'):
         if self.name is not None:
             showIndent(outfile, level)
-            outfile.write('<%sname>%s</%sname>\n' % (namespace_, self.format_string(quote_xml(self.name).encode(ExternalEncoding), input_name='name'), namespace_))
+            outfile.write('<%sname>%s</%sname>\n' % (namespace_, self.format_string(quote_xml(self.name), input_name='name'), namespace_))
     def hasContent_(self):
         if (
             self.name is not None
@@ -433,7 +430,7 @@ class MemberType(GeneratedsSuper):
             outfile.write('refid = %s,\n' % (self.refid,))
     def exportLiteralChildren(self, outfile, level, name_):
         showIndent(outfile, level)
-        outfile.write('name=%s,\n' % quote_python(self.name).encode(ExternalEncoding))
+        outfile.write('name=%s,\n' % quote_python(self.name))
     def build(self, node_):
         attrs = node_.attributes
         self.buildAttributes(attrs)
@@ -456,13 +453,13 @@ class MemberType(GeneratedsSuper):
 
 
 USAGE_TEXT = """
-Usage: python <Parser>.py [ -s ] <in_xml_file>
+Usage: python3 <Parser>.py [ -s ] <in_xml_file>
 Options:
     -s        Use the SAX parser, not the minidom parser.
 """
 
 def usage():
-    print USAGE_TEXT
+    print(USAGE_TEXT)
     sys.exit(1)
 
 
@@ -520,4 +517,3 @@ if __name__ == '__main__':
     main()
     #import pdb
     #pdb.run('main()')
-

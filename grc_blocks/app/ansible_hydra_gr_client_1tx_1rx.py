@@ -1,49 +1,45 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-##################################################
+
+#
+# SPDX-License-Identifier: GPL-3.0
+#
 # GNU Radio Python Flow Graph
 # Title: Ansible Hydra Gr Client 1Tx 1Rx
-# Generated: Mon May 13 16:53:01 2019
-##################################################
+# GNU Radio version: 3.10.9.2
 
-from distutils.version import StrictVersion
-
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print "Warning: failed to XInitThreads()"
-
-from PyQt5 import Qt, QtCore
+from PyQt5 import Qt
+from gnuradio import qtgui
+from PyQt5 import QtCore
 from gnuradio import blocks
 from gnuradio import digital
-from gnuradio import eng_notation
 from gnuradio import gr
-from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
-from gnuradio.qtgui import Range, RangeWidget
-from optparse import OptionParser
-import hydra
+from gnuradio.fft import window
 import sys
+import signal
+from PyQt5 import Qt
+from argparse import ArgumentParser
+from gnuradio.eng_arg import eng_float, intx
+from gnuradio import eng_notation
+from gnuradio import gr, pdu
+from gnuradio import network
+import hydra
 import threading
-from gnuradio import qtgui
+
 
 
 class ansible_hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
 
     def __init__(self, ansibleIP='192.168.5.251', freqrx=1.1e9 + 5e6, freqtx=1.1e9, samp_rate=200e3, vr1offset=-300e3, vr2offset=700e3):
-        gr.top_block.__init__(self, "Ansible Hydra Gr Client 1Tx 1Rx")
+        gr.top_block.__init__(self, "Ansible Hydra Gr Client 1Tx 1Rx", catch_exceptions=True)
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Ansible Hydra Gr Client 1Tx 1Rx")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except:
-            pass
+        except BaseException as exc:
+            print(f"Qt GUI: Could not set Icon: {str(exc)}", file=sys.stderr)
         self.top_scroll_layout = Qt.QVBoxLayout()
         self.setLayout(self.top_scroll_layout)
         self.top_scroll = Qt.QScrollArea()
@@ -58,10 +54,12 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
 
         self.settings = Qt.QSettings("GNU Radio", "ansible_hydra_gr_client_1tx_1rx")
 
-        if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-            self.restoreGeometry(self.settings.value("geometry").toByteArray())
-        else:
-            self.restoreGeometry(self.settings.value("geometry", type=QtCore.QByteArray))
+        try:
+            geometry = self.settings.value("geometry")
+            if geometry:
+                self.restoreGeometry(geometry)
+        except BaseException as exc:
+            print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
 
         ##################################################
         # Parameters
@@ -81,39 +79,41 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self._mul_range = Range(0, 1, 0.01, 0.04, 200)
-        self._mul_win = RangeWidget(self._mul_range, self.set_mul, 'mul', "counter_slider", float)
+
+        self._mul_range = qtgui.Range(0, 1, 0.01, 0.04, 200)
+        self._mul_win = qtgui.RangeWidget(self._mul_range, self.set_mul, "mul", "counter_slider", float, QtCore.Qt.Horizontal)
         self.top_layout.addWidget(self._mul_win)
         self.hydra_gr_source_0 = hydra.hydra_gr_client_source(1, ansibleIP, 5000, 'default')
-        self.hydra_gr_source_0.start_client(freqrx + vr1offset, samp_rate * 2, 5000)
-
+        self.hydra_gr_source_0.start_client((freqrx + vr1offset), (samp_rate * 2), 5000)
         self.hydra_gr_sink_0 = hydra.hydra_gr_client_sink(1, ansibleIP, 5000, 'default')
-        self.hydra_gr_sink_0.start_client(freqtx + vr1offset, samp_rate * 2, 1024)
+        self.hydra_gr_sink_0.start_client((freqtx + vr1offset), (samp_rate * 2), 1024)
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
-        	  fft_len=64, cp_len=16,
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
-        	  rolloff=0,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
+            fft_len=64,
+            cp_len=16,
+            packet_length_tag_key="len",
+            bps_header=1,
+            bps_payload=1,
+            rolloff=0,
+            debug_log=False,
+            scramble_bits=False)
         self.digital_ofdm_rx_0 = digital.ofdm_rx(
-        	  fft_len=64, cp_len=16,
-        	  frame_length_tag_key='frame_'+"len",
-        	  packet_length_tag_key="len",
-        	  bps_header=1,
-        	  bps_payload=1,
-        	  debug_log=False,
-        	  scramble_bits=False
-        	 )
-        self.blocks_tuntap_pdu_1 = blocks.tuntap_pdu('tap0', 1000, False)
-        (self.blocks_tuntap_pdu_1).set_max_output_buffer(100000)
-        self.blocks_tagged_stream_to_pdu_0 = blocks.tagged_stream_to_pdu(blocks.byte_t, "len")
-        self.blocks_tag_debug_1 = blocks.tag_debug(gr.sizeof_gr_complex*1, 'VR1 TX', ""); self.blocks_tag_debug_1.set_display(True)
-        self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', ""); self.blocks_tag_debug_0.set_display(True)
-        self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, "len")
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((mul, ))
+            fft_len=64, cp_len=16,
+            frame_length_tag_key='frame_'+"len",
+            packet_length_tag_key="len",
+            bps_header=1,
+            bps_payload=1,
+            debug_log=False,
+            scramble_bits=False)
+        self.blocks_tuntap_pdu_1 = network.tuntap_pdu('tap0', 1000, False)
+        self.blocks_tuntap_pdu_1.set_max_output_buffer(100000)
+        self.blocks_tagged_stream_to_pdu_0 = pdu.tagged_stream_to_pdu(gr.types.byte_t, "len")
+        self.blocks_tag_debug_1 = blocks.tag_debug(gr.sizeof_gr_complex*1, 'VR1 TX', "")
+        self.blocks_tag_debug_1.set_display(True)
+        self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_char*1, 'VR1 RX', "")
+        self.blocks_tag_debug_0.set_display(True)
+        self.blocks_pdu_to_tagged_stream_0 = pdu.pdu_to_tagged_stream(gr.types.byte_t, "len")
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(mul)
+
 
         ##################################################
         # Connections
@@ -128,9 +128,13 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
         self.connect((self.digital_ofdm_tx_0, 0), (self.blocks_tag_debug_1, 0))
         self.connect((self.hydra_gr_source_0, 0), (self.digital_ofdm_rx_0, 0))
 
+
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "ansible_hydra_gr_client_1tx_1rx")
         self.settings.setValue("geometry", self.saveGeometry())
+        self.stop()
+        self.wait()
+
         event.accept()
 
     def get_ansibleIP(self):
@@ -174,36 +178,44 @@ class ansible_hydra_gr_client_1tx_1rx(gr.top_block, Qt.QWidget):
 
     def set_mul(self, mul):
         self.mul = mul
-        self.blocks_multiply_const_vxx_0.set_k((self.mul, ))
+        self.blocks_multiply_const_vxx_0.set_k(self.mul)
+
 
 
 def argument_parser():
-    parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
-    parser.add_option(
-        "", "--ansibleIP", dest="ansibleIP", type="string", default='192.168.5.251',
-        help="Set ansibleIP [default=%default]")
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--ansibleIP", dest="ansibleIP", type=str, default='192.168.5.251',
+        help="Set ansibleIP [default=%(default)r]")
     return parser
 
 
 def main(top_block_cls=ansible_hydra_gr_client_1tx_1rx, options=None):
     if options is None:
-        options, _ = argument_parser().parse_args()
+        options = argument_parser().parse_args()
 
-    if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-        style = gr.prefs().get_string('qtgui', 'style', 'raster')
-        Qt.QApplication.setGraphicsSystem(style)
     qapp = Qt.QApplication(sys.argv)
 
     tb = top_block_cls(ansibleIP=options.ansibleIP)
+
     tb.start()
+
     tb.show()
 
-    def quitting():
+    def sig_handler(sig=None, frame=None):
         tb.stop()
         tb.wait()
-    qapp.aboutToQuit.connect(quitting)
-    qapp.exec_()
 
+        Qt.QApplication.quit()
+
+    signal.signal(signal.SIGINT, sig_handler)
+    signal.signal(signal.SIGTERM, sig_handler)
+
+    timer = Qt.QTimer()
+    timer.start(500)
+    timer.timeout.connect(lambda: None)
+
+    qapp.exec_()
 
 if __name__ == '__main__':
     main()

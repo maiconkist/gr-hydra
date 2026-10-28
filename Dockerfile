@@ -44,11 +44,11 @@ RUN cmake -S tests -B tests/build \
         -DHYDRA_LIBRARY=/opt/hydra/build/lib/libhydra.so \
     && cmake --build tests/build --parallel "${BUILD_JOBS}" \
     && ctest --test-dir tests/build --output-on-failure --timeout 60 \
-    && python3 tests/qa_gnuradio.py
+    && python3 -m unittest discover -s tests -p 'qa_*.py' -v
 
 RUN useradd --create-home hydra \
     && chown -R hydra:hydra /opt/hydra/tests/build
 
 USER hydra
 WORKDIR /home/hydra
-CMD ["/bin/sh", "-c", "ctest --test-dir /opt/hydra/tests/build --output-on-failure --timeout 60 && exec python3 /opt/hydra/tests/qa_gnuradio.py"]
+CMD ["/bin/sh", "-c", "ctest --test-dir /opt/hydra/tests/build --output-on-failure --timeout 60 && exec python3 -m unittest discover -s /opt/hydra/tests -p 'qa_*.py' -v"]
