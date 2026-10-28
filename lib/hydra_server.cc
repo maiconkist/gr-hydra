@@ -86,8 +86,7 @@ HydraServer::run()
   // Timeout to get out of the while loop since recv is blocking
   int timeout = 1000;
   socket.setsockopt(ZMQ_RCVTIMEO, &timeout, sizeof(timeout));
-  // int linger = 0; // Proper shutdown ZeroMQ
-  // socket.setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
+  socket.setsockopt(ZMQ_LINGER, 0);
 
   // Change the server status
   server_info.s_status = "Enabled";
@@ -110,6 +109,7 @@ HydraServer::run()
   // Event loop stop condition
   while (not thr_stop)
   {
+    rc = 0;
     //  Wait for next request from client
     try
     {
@@ -165,7 +165,8 @@ HydraServer::run()
       }
 
       // Extract key from the JSON tree
-      std::string key = root.front().first;
+      const std::string key = output_tree.empty() && root.size() == 1
+          ? root.front().first : std::string{};
       // logger.debug("key: " + key);
 
       // Sync message, reply with status
@@ -294,7 +295,7 @@ HydraServer::run()
         }
       }
       // Otherwise, unknown message
-      else
+      else if (output_tree.empty())
       {
         logger.warning("Unknown Message. Rejecting");
         // Add the content

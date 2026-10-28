@@ -235,12 +235,6 @@ not measured performance improvements.
   Sources: `lib/hydra_virtual_radio.cc`, `lib/hydra_hypervisor.cc`,
   `include/hydra/hydra_resampler.hpp`.
 
-- **Malformed or empty control JSON is not handled safely.** The server
-  continues to `root.front()` after a JSON parse failure, and an empty object
-  also has no first entry. Invalid requests should receive an error without
-  entering command dispatch.
-  Source: `lib/hydra_server.cc`.
-
 - **Backend receive results are incomplete.** The default UHD receive path,
   image backend, and file backend can reach the end of a non-void function
   without returning a sample count. `Hypervisor::rx_run` also treats the result

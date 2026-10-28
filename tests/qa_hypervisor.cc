@@ -1,9 +1,9 @@
 #define BOOST_TEST_MODULE hydra_hypervisor_tests
 #include <boost/test/included/unit_test.hpp>
-#include <boost/log/core.hpp>
 
 #include "hydra/hydra_core.h"
 #include "hydra/hydra_hypervisor.h"
+#include "qa_helpers.h"
 
 #include <memory>
 #include <atomic>
@@ -12,33 +12,8 @@
 #include <limits>
 #include <thread>
 
-namespace {
-
-struct QuietLogs
-{
-  bool previously_enabled = boost::log::core::get()->set_logging_enabled(false);
-  ~QuietLogs()
-  {
-    boost::log::core::get()->set_logging_enabled(previously_enabled);
-  }
-};
-
-class IdleDevice : public hydra::abstract_device
-{
-public:
-  void send(const hydra::iq_window&, size_t) override
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  }
-
-  size_t receive(hydra::iq_window&, size_t) override
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    return 0;
-  }
-};
-
-}
+using hydra_test::IdleDevice;
+using hydra_test::QuietLogs;
 
 BOOST_AUTO_TEST_CASE(unknown_and_repeated_detach_are_safe)
 {
