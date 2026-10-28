@@ -1,6 +1,6 @@
 # gr-hydra
 
-[![Build Status](https://travis-ci.org/maiconkist/gr-hydra.svg?branch=bleeding)](https://travis-ci.org/maiconkist/gr-hydra)
+[![Linux Docker build](https://github.com/maiconkist/gr-hydra/actions/workflows/docker-build.yml/badge.svg?branch=bleeding&event=push)](https://github.com/maiconkist/gr-hydra/actions/workflows/docker-build.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## GETTING STARTED
