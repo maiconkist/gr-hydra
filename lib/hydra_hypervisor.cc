@@ -413,13 +413,33 @@ Hypervisor::set_rx_resources(uhd_hydra_sptr rx_dev, double cf, double bw, size_t
 void
 Hypervisor::rx_run()
 {
-  size_t g_rx_sleep_time = llrint(get_rx_fft() * 1e9 / get_rx_bandwidth());
-  iq_window optr(get_rx_fft());
+  const auto fft_size = get_rx_fft();
+  iq_window incoming(fft_size);
+  iq_window window(fft_size);
+  size_t filled = 0;
 
   while (not thr_rx_stop)
   {
-    if (g_rx_dev->receive(optr, get_rx_fft()))
-      forward_rx_window(optr, get_rx_fft());
+    const auto requested = fft_size - filled;
+    const auto count = g_rx_dev->receive(incoming, requested);
+    if (count > requested || count > incoming.size())
+    {
+      logger.error("Backend returned more samples than requested");
+      filled = 0;
+      continue;
+    }
+    if (!count)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      continue;
+    }
+    std::copy_n(incoming.begin(), count, window.begin() + filled);
+    filled += count;
+    if (filled == fft_size)
+    {
+      forward_rx_window(window, fft_size);
+      filled = 0;
+    }
   }
 
   // Print debug message
@@ -491,6 +511,7 @@ void
 Hypervisor::forward_rx_window(iq_window &buf, size_t len)
 {
   auto lock = lock_state();
+  if (len != rx_fft_len || len > buf.size()) return;
   if (g_vradios.size() == 0) return;
 
     g_fft_complex->set_data(&buf.front(), len);

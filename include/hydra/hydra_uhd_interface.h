@@ -25,9 +25,11 @@ class abstract_device
 {
  public:
  abstract_device(){}
+  virtual ~abstract_device() = default;
 
   virtual void send(const iq_window &buf, size_t len) { std::cerr << __PRETTY_FUNCTION__ << " not implemented" << std::endl;};
-  virtual size_t receive(iq_window &buf, size_t len) { std::cerr << __PRETTY_FUNCTION__ << " not implemented" << std::endl;};
+  // Return the number of samples written, bounded by len and buf.size().
+  virtual size_t receive(iq_window &buf, size_t len) { std::cerr << __PRETTY_FUNCTION__ << " not implemented" << std::endl; return 0; };
 
   virtual void set_tx_config(double freq, double rate, double gain)
   {
@@ -99,6 +101,7 @@ public:
 private:
    samples_vec g_iq_samples;
    std::string file_read;
+   std::ifstream input_file_stream;
 };
 
 
@@ -147,8 +150,8 @@ private:
   std::ofstream output_file_stream;
 
   // Hold the sampling rates
-  double tx_rate;
-  double rx_rate;
+  double tx_rate = 0;
+  double rx_rate = 0;
 
 };
 
@@ -160,10 +163,14 @@ public:
    size_t receive(iq_window &buf, size_t len);
 
 private:
-   bool init_tx, init_rx;
+   bool init_tx = false;
+   bool init_rx = false;
 
    std::string g_host_addr, g_remote_addr;
+   zmq::context_t context;
    std::unique_ptr<zmq::socket_t> socket_tx, socket_rx;
+   iq_window pending_samples;
+   size_t pending_offset = 0;
 };
 
 

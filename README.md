@@ -235,13 +235,6 @@ not measured performance improvements.
   Sources: `lib/hydra_virtual_radio.cc`, `lib/hydra_hypervisor.cc`,
   `include/hydra/hydra_resampler.hpp`.
 
-- **Backend receive results are incomplete.** The default UHD receive path,
-  image backend, and file backend can reach the end of a non-void function
-  without returning a sample count. `Hypervisor::rx_run` also treats the result
-  as a boolean and forwards a full FFT window regardless of the actual count,
-  potentially processing stale samples after short reads.
-  Sources: `lib/hydra_uhd_interface.cc`, `lib/hydra_hypervisor.cc`.
-
 - **Allocation responses have inconsistent success semantics.** TX response
   parsing returns success (`0`) on malformed JSON, leaving endpoint fields
   unset. Reconfiguring an existing radio returns `1`, which the server publishes

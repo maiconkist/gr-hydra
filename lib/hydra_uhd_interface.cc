@@ -1,5 +1,7 @@
 #include "hydra/hydra_uhd_interface.h"
 
+#include <algorithm>
+#include <cstring>
 
 namespace hydra {
 
@@ -109,6 +111,8 @@ device_uhd::send(const iq_window &buf, size_t len)
 size_t
 device_uhd::receive(iq_window &buf, size_t len)
 {
+  len = std::min(len, buf.size());
+  if (!len || !rx_stream) return 0;
   uhd::rx_metadata_t md;
 
 #ifdef USE_USRP_STREAM_API
@@ -120,52 +124,26 @@ device_uhd::receive(iq_window &buf, size_t len)
   usrp->issue_stream_cmd(stream_cmd);
 
 
-  size_t num_samps = usrp->get_device()->recv(&buf.front(),
-                                              buf.size(),
+  size_t num_samps = usrp->get_device()->recv(buf.data(),
+                                              len,
                                               md,
                                               uhd::io_type_t::COMPLEX_FLOAT32,
                                               uhd::device::RECV_MODE_FULL_BUFF);
 
-  //handle the error codes
-  switch(md.error_code)
-  {
-    case uhd::rx_metadata_t::ERROR_CODE_NONE:
-      return num_samps;
-      break;
-
-    case uhd::rx_metadata_t::ERROR_CODE_TIMEOUT:
-      std::cout << "U" << std::endl;
-      break;
-
-    default:
-      std::cout << "D" << std::endl;
-      break;
-  }
 #else
-      rx_stream->recv(&buf.front(), buf.size(), md, 0.001024);
+  const size_t num_samps = rx_stream->recv(buf.data(), len, md, 0.001024);
 #endif
 
 #ifdef UHD_LOG
-      switch(md.error_code)
-      {
-        case uhd::rx_metadata_t::ERROR_CODE_NONE:
-          return 1;
-          break;
-
-        case uhd::rx_metadata_t::ERROR_CODE_TIMEOUT:
-          std::cout << "U" << std::endl;
-          return 0;
-          break;
-
-        default:
-          std::cout << "D" << std::endl;
-          return 0;
-          break;
-      }
+  if (md.error_code != uhd::rx_metadata_t::ERROR_CODE_NONE)
+    logger.warning(md.strerror());
 #endif
+  return num_samps;
 }
 
-device_image_gen::device_image_gen(std::string device_args)
+device_image_gen::device_image_gen(std::string device_args):
+  file_read(device_args.empty() ? "/home/connect/ofdm.bin" : device_args),
+  input_file_stream(file_read, std::ifstream::binary)
 {
   logger = hydra_log("backend|image");
 }
@@ -223,20 +201,16 @@ device_image_gen::send(const iq_window &buf, size_t len)
 size_t
 device_image_gen::receive(iq_window &buf, size_t len)
 {
-  static const char *str_read = "/home/connect/ofdm.bin";
-  static std::ifstream infile(str_read, std::ifstream::binary);
-
-  if (not infile.eof())
-  {
-    infile.read((char*)&buf.front(), len * sizeof(iq_sample));
-  }
-  else
+  len = std::min(len, buf.size());
+  if (!len || !input_file_stream.is_open()) return 0;
+  if (input_file_stream.eof())
   {
     logger.info("Reseting file");
-    infile.clear();
-    infile.seekg(0);
-    infile.read((char*)&buf.front(), len * sizeof(iq_sample));
+    input_file_stream.clear();
+    input_file_stream.seekg(0);
   }
+  input_file_stream.read(reinterpret_cast<char*>(buf.data()), len * sizeof(iq_sample));
+  return size_t(input_file_stream.gcount()) / sizeof(iq_sample);
 }
 
 device_loopback::device_loopback(std::string device_args)
@@ -248,18 +222,24 @@ void
 device_loopback::send(const iq_window &buf, size_t len)
 {
    std::lock_guard<std::mutex> _l(g_mutex);
-   g_windows_vec.push_back(buf);
+   len = std::min(len, buf.size());
+   if (len) g_windows_vec.emplace_back(buf.begin(), buf.begin() + len);
 }
 
 size_t
 device_loopback::receive(iq_window &buf, size_t len)
 {
    std::lock_guard<std::mutex> _l(g_mutex);
-   if (g_windows_vec.empty()) return 0;
-   buf = g_windows_vec.front();
-   g_windows_vec.pop_front();
-
-   return buf.size();
+   len = std::min(len, buf.size());
+   if (!len || g_windows_vec.empty()) return 0;
+   auto& window = g_windows_vec.front();
+   const auto count = std::min(len, window.size());
+   std::copy_n(window.begin(), count, buf.begin());
+   if (count == window.size())
+     g_windows_vec.pop_front();
+   else
+     window.erase(window.begin(), window.begin() + count);
+   return count;
 }
 
 // File source and sink device
@@ -298,6 +278,8 @@ device_file::set_rx_config(double freq, double rate, double gain)
 void
 device_file::send(const iq_window &buf, size_t len)
 {
+  len = std::min(len, buf.size());
+  if (!len || !output_file_stream || !(tx_rate > 0)) return;
   // Sleep for the appropriate amount of time
   std::this_thread::sleep_for(std::chrono::microseconds(static_cast<unsigned long>((len*1e6)/tx_rate)));
 
@@ -314,11 +296,14 @@ device_file::send(const iq_window &buf, size_t len)
 size_t
 device_file::receive(iq_window &buf, size_t len)
 {
+  len = std::min(len, buf.size());
+  if (!len || !input_file_stream || !(rx_rate > 0)) return 0;
   // Sleep for the appropriate amount of time
   std::this_thread::sleep_for(std::chrono::microseconds(static_cast<unsigned long>((len*1e6)/rx_rate)));
 
   // Read the file onto a buffer
   input_file_stream.read(reinterpret_cast<char *>(buf.data()), len * sizeof(iq_sample));
+  return size_t(input_file_stream.gcount()) / sizeof(iq_sample);
 }
 
 device_network::device_network(std::string host_addr, std::string remote_addr):
@@ -331,36 +316,37 @@ device_network::device_network(std::string host_addr, std::string remote_addr):
 void
 device_network::send(const iq_window &buf, size_t len)
 {
+  len = std::min(len, buf.size());
+  if (!len) return;
   if (!init_tx)
   {
     const size_t PORT = 5556;
-    zmq::context_t context;
     socket_tx = std::make_unique<zmq::socket_t>(context, ZMQ_PUSH);
+    socket_tx->set(zmq::sockopt::linger, 0);
+    socket_tx->set(zmq::sockopt::sndtimeo, 100);
 
     std::string addr = "tcp://" + g_host_addr + ":" + std::to_string(PORT);
     logger.debug("device_network recv:" + addr);
 
-    socket_tx->connect("tcp://" + addr);
+    socket_tx->connect(addr);
     init_tx = true;
   }
 
-  zmq::message_t message(buf.size() * sizeof(iq_sample));
-
-  iq_sample *tmp = static_cast<iq_sample *>(message.data());
-  for (size_t i = 0; i < buf.size(); ++i)
-    tmp[i] = buf[i];
-
-  socket_tx->send(message);
+  zmq::message_t message(buf.data(), len * sizeof(iq_sample));
+  socket_tx->send(message, zmq::send_flags::none);
 }
 
 size_t
 device_network::receive(iq_window &buf, size_t len)
 {
+  len = std::min(len, buf.size());
+  if (!len) return 0;
   if (!init_rx)
   {
     const size_t PORT = 5556;
-    zmq::context_t context;
     socket_rx = std::make_unique<zmq::socket_t>(context, ZMQ_PULL);
+    socket_rx->set(zmq::sockopt::linger, 0);
+    socket_rx->set(zmq::sockopt::rcvtimeo, 100);
 
     std::string addr = "tcp://" + g_remote_addr + ":" + std::to_string(PORT);
     logger.debug("device_network recv:" + addr);
@@ -369,25 +355,26 @@ device_network::receive(iq_window &buf, size_t len)
     init_rx = true;
   }
 
-  zmq::message_t message;
-  socket_rx->recv(&message);
-
-  if  (message.size() != len)
-    logger.warning("Message size does not equal to len");
-
-  if (message.size() > 0)
+  if (pending_offset == pending_samples.size())
   {
-    iq_sample *tmp = static_cast<iq_sample *>(message.data());
-
-    if (message.size() % sizeof(iq_sample) != 0)
+    zmq::message_t message;
+    if (!socket_rx->recv(message, zmq::recv_flags::none)) return 0;
+    if (message.size() % sizeof(iq_sample))
+    {
       logger.warning("Message not complete");
-
-    buf.insert(buf.begin(),
-        tmp,
-        tmp + (message.size()/sizeof(iq_sample)));
+      return 0;
+    }
+    pending_samples.resize(message.size() / sizeof(iq_sample));
+    if (message.size())
+      std::memcpy(pending_samples.data(), message.data(), message.size());
+    pending_offset = 0;
   }
 
-  return message.size();
+  const auto count = std::min(len, pending_samples.size() - pending_offset);
+  if (count)
+    std::copy_n(pending_samples.begin() + pending_offset, count, buf.begin());
+  pending_offset += count;
+  return count;
 }
 
 

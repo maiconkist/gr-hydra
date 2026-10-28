@@ -1,5 +1,7 @@
 #include "hydra/hydra_socket.h"
 
+#include <cstring>
+
 namespace hydra
 {
 
@@ -50,7 +52,7 @@ zmq_source::run()
   socket.connect(addr.c_str());
 
   // Create temporary variables outsize the loop
-  div_t type_size_div;
+  iq_window samples;
   // Received message flag
   int rc;
 
@@ -63,19 +65,16 @@ zmq_source::run()
     // If we received a message and the thread should be alive
     if (rc and g_th_run)
     {
-      // Divide the message size by the size of an IQ sample
-      type_size_div = std::div(static_cast<int>(message.size()), sizeof(iq_sample));
-
-      // If there's a remainder
-      if (type_size_div.rem)
+      if (message.size() % sizeof(iq_sample))
       {
         logger.warning("Incomplete message.");
       }
-
-      // Write the amount of IQ samples to the buffer
-      p_output_buffer->write(
-          static_cast<iq_sample *>(message.data()),
-          type_size_div.quot);
+      else if (message.size())
+      {
+        samples.resize(message.size() / sizeof(iq_sample));
+        std::memcpy(samples.data(), message.data(), message.size());
+        p_output_buffer->write(samples.begin(), samples.end());
+      }
     }
     // Clear message data
     message.rebuild();
