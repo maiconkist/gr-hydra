@@ -24,6 +24,7 @@ namespace hydra {
 
 VirtualRadio::VirtualRadio(size_t _idx, Hypervisor *hypervisor):
    g_idx(_idx),
+   state_mutex(hypervisor->state_mutex),
    p_hypervisor(hypervisor),
    b_receiver(false),
    b_transmitter(false),
@@ -42,8 +43,11 @@ void
 VirtualRadio::stop()
 {
   std::lock_guard<std::mutex> lock(g_mutex);
-  b_transmitter = false;
-  b_receiver = false;
+  {
+    auto state_lock = lock_state();
+    b_transmitter = false;
+    b_receiver = false;
+  }
   if (tx_socket) tx_socket->stop();
   if (tx_resampler) tx_resampler->stop();
   if (rx_resampler) rx_resampler->stop();
@@ -57,6 +61,8 @@ VirtualRadio::set_rx_chain(unsigned int u_rx_udp,
                            const std::string &server_addr,
                            const std::string &remote_addr)
 {
+  std::lock_guard<std::mutex> lifecycle_lock(g_mutex);
+  auto state_lock = lock_state();
   // If already receiving
   if (b_receiver) { return 1; }
 
@@ -104,6 +110,8 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
                            const std::string &server_addr,
                            const std::string &remote_addr)
 {
+   std::lock_guard<std::mutex> lifecycle_lock(g_mutex);
+   auto state_lock = lock_state();
    // If already transmitting
    if (b_transmitter)
       // Return error
@@ -147,6 +155,7 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
 int
 VirtualRadio::set_tx_freq(double cf)
 {
+  auto lock = lock_state();
   if (cf == g_tx_cf) return 0;
 
    double old_cf = g_tx_cf;
@@ -162,6 +171,7 @@ VirtualRadio::set_tx_freq(double cf)
 void
 VirtualRadio::set_tx_bandwidth(double bw)
 {
+  auto lock = lock_state();
   if (bw == g_tx_bw) return;
 
 
@@ -176,12 +186,14 @@ VirtualRadio::set_tx_bandwidth(double bw)
 void
 VirtualRadio::set_tx_mapping(const iq_map_vec &iq_map)
 {
+  auto lock = lock_state();
   g_tx_map = iq_map;
 }
 
 bool
 VirtualRadio::map_tx_samples(iq_sample *samples_buf)
 {
+  auto lock = lock_state();
   // If the transmitter chain was not defined
   if (not b_transmitter){return false;}
 
@@ -210,6 +222,7 @@ VirtualRadio::map_tx_samples(iq_sample *samples_buf)
 int
 VirtualRadio::set_rx_freq(double cf)
 {
+  auto lock = lock_state();
   double old_cf = g_rx_cf;
   g_rx_cf = cf;
 
@@ -223,6 +236,7 @@ VirtualRadio::set_rx_freq(double cf)
 void
 VirtualRadio::set_rx_bandwidth(double bw)
 {
+  auto lock = lock_state();
   double old_bw = g_rx_bw;
   g_rx_bw = bw;
 
@@ -234,12 +248,14 @@ VirtualRadio::set_rx_bandwidth(double bw)
 void
 VirtualRadio::set_rx_mapping(const iq_map_vec &iq_map)
 {
+  auto lock = lock_state();
   g_rx_map = iq_map;
 }
 
 void
 VirtualRadio::demap_iq_samples(const iq_sample *samples_buf, size_t len)
 {
+  auto lock = lock_state();
   // If the receiver chain was not defined
   if (not b_receiver){ return;}
 

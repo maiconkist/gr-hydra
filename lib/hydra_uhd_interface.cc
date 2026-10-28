@@ -254,9 +254,8 @@ device_loopback::send(const iq_window &buf, size_t len)
 size_t
 device_loopback::receive(iq_window &buf, size_t len)
 {
-   while (g_windows_vec.size() == 0) { return 0; };
-
    std::lock_guard<std::mutex> _l(g_mutex);
+   if (g_windows_vec.empty()) return 0;
    buf = g_windows_vec.front();
    g_windows_vec.pop_front();
 

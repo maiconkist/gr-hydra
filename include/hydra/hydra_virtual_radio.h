@@ -65,27 +65,27 @@ class VirtualRadio
      */
     int const get_id() {return g_idx;}
 
-    bool const get_tx_enabled(){ return g_tx_udp_port; };
-    size_t const get_tx_udp_port(){ return g_tx_udp_port; }
-    size_t const get_tx_fft() {return g_rx_fft_size;}
-    double const get_tx_freq() { return g_tx_cf; }
-    double const get_tx_bandwidth() {return g_tx_bw;}
+    bool const get_tx_enabled(){ auto lock = lock_state(); return g_tx_udp_port; };
+    size_t const get_tx_udp_port(){ auto lock = lock_state(); return g_tx_udp_port; }
+    size_t const get_tx_fft() { auto lock = lock_state(); return g_rx_fft_size; }
+    double const get_tx_freq() { auto lock = lock_state(); return g_tx_cf; }
+    double const get_tx_bandwidth() { auto lock = lock_state(); return g_tx_bw; }
     int set_tx_freq(double cf);
     void set_tx_bandwidth(double bw);
     void set_tx_mapping(const iq_map_vec &iq_map);
-    size_t const set_tx_fft(size_t n) {return g_tx_fft_size = n;}
+    size_t const set_tx_fft(size_t n) { auto lock = lock_state(); return g_tx_fft_size = n; }
     bool map_tx_samples(iq_sample *samples_buf); // called by the hypervisor
 
 
-    bool const get_rx_enabled(){ return g_rx_udp_port; };
-    size_t const get_rx_udp_port(){ return g_rx_udp_port; }
-    size_t const get_rx_fft() {return g_rx_fft_size;}
-    double const get_rx_freq() { return g_rx_cf; }
-    double const get_rx_bandwidth() {return g_rx_bw;}
+    bool const get_rx_enabled(){ auto lock = lock_state(); return g_rx_udp_port; };
+    size_t const get_rx_udp_port(){ auto lock = lock_state(); return g_rx_udp_port; }
+    size_t const get_rx_fft() { auto lock = lock_state(); return g_rx_fft_size; }
+    double const get_rx_freq() { auto lock = lock_state(); return g_rx_cf; }
+    double const get_rx_bandwidth() { auto lock = lock_state(); return g_rx_bw; }
     int set_rx_freq(double cf);
     void set_rx_bandwidth(double bw);
     void set_rx_mapping(const iq_map_vec &iq_map);
-    size_t const set_rx_fft(size_t n) {return g_rx_fft_size = n;}
+    size_t const set_rx_fft(size_t n) { auto lock = lock_state(); return g_rx_fft_size = n; }
     void demap_iq_samples(const iq_sample *samples_buf, size_t len); // called by the hypervisor
 
     /**
@@ -93,12 +93,17 @@ class VirtualRadio
     bool const ready_to_demap_iq_samples();
 
   private:
+    std::unique_lock<std::recursive_mutex> lock_state() const
+    {
+      return std::unique_lock<std::recursive_mutex>(*state_mutex);
+    }
+
     iq_map_vec g_rx_map;
-    size_t g_rx_fft_size; // Subcarriers used by this VRadio
+    size_t g_rx_fft_size = 0; // Subcarriers used by this VRadio
     size_t g_rx_udp_port;
     std::atomic<bool> b_receiver;
-    double g_rx_cf;      // Central frequency
-    double g_rx_bw;      // Bandwidth
+    double g_rx_cf = 0;      // Central frequency
+    double g_rx_bw = 0;      // Bandwidth
     samples_vec g_rx_samples;
     sfft_complex g_ifft_complex;
     zmq_sink_ptr rx_socket;
@@ -107,18 +112,19 @@ class VirtualRadio
     ReportPtr rx_report;
 
     iq_map_vec g_tx_map;
-    size_t g_tx_fft_size; // Subcarriers used by this VRadio
+    size_t g_tx_fft_size = 0; // Subcarriers used by this VRadio
     size_t g_tx_udp_port;
     std::atomic<bool> b_transmitter;
     ReportPtr tx_report;
-    double g_tx_cf;      // Central frequency
-    double g_tx_bw;      // Bandwidth
+    double g_tx_cf = 0;      // Central frequency
+    double g_tx_bw = 0;      // Bandwidth
     sfft_complex g_fft_complex;
     std::unique_ptr<resampler<iq_sample, iq_window>> tx_resampler;
     zmq_source_ptr tx_socket;
 
     int g_idx;        // Radio unique ID
     std::mutex g_mutex;
+    std::shared_ptr<std::recursive_mutex> state_mutex;
 
     hydra_log logger;
 

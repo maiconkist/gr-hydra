@@ -248,14 +248,6 @@ not measured performance improvements.
   potentially processing stale samples after short reads.
   Sources: `lib/hydra_uhd_interface.cc`, `lib/hydra_hypervisor.cc`.
 
-- **Worker state is not consistently synchronized.** Stop flags are ordinary
-  booleans shared across threads, and radio-vector and mapping accesses do not
-  consistently use the same synchronization. Allocation, retuning, streaming,
-  and shutdown can therefore race.
-  Sources: `include/hydra/hydra_hypervisor.h`,
-  `include/hydra/hydra_resampler.hpp`, `lib/hydra_hypervisor.cc`,
-  `lib/hydra_virtual_radio.cc`, `lib/hydra_socket.cc`.
-
 - **Allocation responses have inconsistent success semantics.** TX response
   parsing returns success (`0`) on malformed JSON, leaving endpoint fields
   unset. Reconfiguring an existing radio returns `1`, which the server publishes

@@ -176,7 +176,7 @@ public:
   boost::asio::io_service io_service;
   std::unique_ptr<boost::asio::ip::tcp::socket> p_socket;
 
-  bool g_th_run;
+  std::atomic<bool> g_th_run;
 
   // UDP thread to handle the transmitting datagrams
   std::unique_ptr<std::thread> tx_udp_thread;
@@ -304,7 +304,7 @@ public:
   std::unique_ptr<boost::asio::ip::udp::socket> p_socket;
   boost::asio::ip::udp::endpoint endpoint_;
 
-  bool g_th_run;
+  std::atomic<bool> g_th_run;
 
   // UDP thread to handle the transmitting datagrams
   std::unique_ptr<std::thread> tx_udp_thread;

@@ -1,14 +1,26 @@
 #define BOOST_TEST_MODULE hydra_hypervisor_tests
 #include <boost/test/included/unit_test.hpp>
+#include <boost/log/core.hpp>
 
 #include "hydra/hydra_core.h"
 #include "hydra/hydra_hypervisor.h"
 
 #include <memory>
+#include <atomic>
 #include <chrono>
+#include <future>
 #include <thread>
 
 namespace {
+
+struct QuietLogs
+{
+  bool previously_enabled = boost::log::core::get()->set_logging_enabled(false);
+  ~QuietLogs()
+  {
+    boost::log::core::get()->set_logging_enabled(previously_enabled);
+  }
+};
 
 class IdleDevice : public hydra::abstract_device
 {
@@ -113,4 +125,63 @@ BOOST_AUTO_TEST_CASE(hypervisor_shutdown_stops_attached_radio_workers)
     BOOST_CHECK_NO_THROW(hypervisor.stop());
   }
   BOOST_CHECK_NO_THROW(radio->stop());
+}
+
+BOOST_AUTO_TEST_CASE(concurrent_retuning_streaming_membership_and_shutdown)
+{
+  QuietLogs quiet;
+  boost::asio::io_service io;
+  boost::asio::ip::tcp::acceptor reservation(
+      io, {boost::asio::ip::address_v4::loopback(), 0});
+  const auto port = reservation.local_endpoint().port();
+  reservation.close();
+
+  hydra::Hypervisor hypervisor(64, 1000, 64);
+  auto radio = std::make_shared<hydra::VirtualRadio>(1, &hypervisor);
+  BOOST_REQUIRE_EQUAL(radio->set_rx_chain(port, 1000, 16, "127.0.0.1", "127.0.0.1"), 0);
+  BOOST_REQUIRE_EQUAL(radio->set_tx_chain(port, 1000, 16, "127.0.0.1", "127.0.0.1"), 0);
+  hypervisor.attach_virtual_radio(radio);
+
+  std::atomic<bool> valid{true};
+  std::promise<void> start;
+  auto ready = start.get_future().share();
+  std::thread stream([&] {
+    ready.wait();
+    hydra::iq_window input(64, hydra::iq_sample(0.25f, 0));
+    hydra::iq_window output(64);
+    for (int i = 0; i < 200; ++i)
+    {
+      hypervisor.forward_rx_window(input, input.size());
+      hypervisor.get_tx_window(output, output.size());
+    }
+  });
+  std::thread configure([&] {
+    ready.wait();
+    for (int i = 0; i < 200; ++i)
+    {
+      if (radio->set_rx_freq(i % 2 ? 992 : 1008) < 0 ||
+          radio->set_tx_freq(i % 2 ? 992 : 1008) < 0)
+        valid = false;
+    }
+  });
+  std::thread membership([&] {
+    ready.wait();
+    for (int i = 0; i < 32; ++i)
+    {
+      auto temporary = std::make_shared<hydra::VirtualRadio>(2, &hypervisor);
+      hypervisor.attach_virtual_radio(temporary);
+      if (hypervisor.get_vradio(2) != temporary ||
+          !hypervisor.detach_virtual_radio(2))
+        valid = false;
+    }
+  });
+  std::thread stop_first([&] { ready.wait(); hypervisor.stop(); });
+  std::thread stop_second([&] { ready.wait(); hypervisor.stop(); });
+  start.set_value();
+  stream.join();
+  configure.join();
+  membership.join();
+  stop_first.join();
+  stop_second.join();
+  BOOST_CHECK(valid.load());
 }

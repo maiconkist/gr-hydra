@@ -71,6 +71,7 @@ HydraServer::auto_discovery()
 
   // Output debug information
   // ad_logger.info("Stopped autodiscovery");
+  return 0;
 }
 
 // Run the server
@@ -330,6 +331,7 @@ HydraServer::run()
   // context.close();
 
   // Join the autodiscovery thread
+  thr_stop = true;
   autod.join();
 
   // Output message when server stops

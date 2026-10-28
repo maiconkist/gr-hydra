@@ -1,5 +1,6 @@
 #include "hydra/hydra_core.h"
 
+#include <atomic>
 
 
 namespace hydra {
@@ -21,6 +22,7 @@ HydraCore::set_rx_resources(uhd_hydra_sptr usrp,
                             double d_norm_gain,
                             unsigned int u_fft_size)
 {
+  std::lock_guard<std::mutex> lock(g_mutex);
   // Initialise the RX resources
   p_resource_manager->set_rx_resources(d_centre_freq, d_bandwidth);
   usrp->set_rx_config(d_centre_freq, d_bandwidth, d_norm_gain);
@@ -37,6 +39,7 @@ HydraCore::set_tx_resources(uhd_hydra_sptr usrp,
                             double d_norm_gain,
                             unsigned int u_fft_size)
 {
+   std::lock_guard<std::mutex> lock(g_mutex);
    // Initialise the RX resources
    p_resource_manager->set_tx_resources(d_centre_freq, d_bandwidth);
    usrp->set_tx_config(d_centre_freq, d_bandwidth, d_norm_gain);
@@ -88,7 +91,8 @@ HydraCore::request_rx_resources(unsigned int u_id,
   }
 
   // Create RX UDP port
-  static size_t u_udp_port = 33000;
+  static std::atomic<unsigned int> next_port{33000};
+  const auto u_udp_port = next_port.fetch_add(1);
   if (vr == nullptr)
   {
       vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
@@ -99,7 +103,7 @@ HydraCore::request_rx_resources(unsigned int u_id,
 
    // If able to create all of it, return the port number
   logger.info("RX Resources allocated successfully.");
-  return u_udp_port++;
+  return u_udp_port;
 }
 
 int
@@ -143,7 +147,8 @@ HydraCore::request_tx_resources(unsigned int u_id,
     return 0;
   }
 
-  static size_t u_udp_port = 33500;
+  static std::atomic<unsigned int> next_port{33500};
+  const auto u_udp_port = next_port.fetch_add(1);
   if (vr == nullptr)
   {
      vr = std::make_shared<VirtualRadio>(u_id, p_hypervisor.get());
@@ -157,13 +162,15 @@ HydraCore::request_tx_resources(unsigned int u_id,
 
   // If able to create all of it, return the port number
   logger.info("TX Resources allocated successfully.");
-  return u_udp_port++;
+  return u_udp_port;
 }
 
 // Query the virtual radios (and add their UDP port)
 boost::property_tree::ptree
 HydraCore::query_resources()
-{  // Get the query from the RM
+{
+  std::lock_guard<std::mutex> lock(g_mutex);
+  // Get the query from the RM
   boost::property_tree::ptree query_message = \
     p_resource_manager->query_resources();
 
@@ -231,6 +238,7 @@ HydraCore::query_resources()
 int
 HydraCore::free_resources(size_t radio_id)
 {
+  std::lock_guard<std::mutex> lock(g_mutex);
   logger.info("Freeing resources for radio: " + std::to_string(radio_id));
   p_resource_manager->free_rx_resources(radio_id);
   p_resource_manager->free_tx_resources(radio_id);

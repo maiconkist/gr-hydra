@@ -75,12 +75,12 @@ class Hypervisor
   void stop();
 
   // TX related methods
-  double const get_tx_central_frequency() { return g_tx_cf; }
-  double const get_tx_bandwidth() { return g_tx_bw; }
-  size_t const get_tx_fft() { return tx_fft_len; }
+  double const get_tx_central_frequency() { auto lock = lock_state(); return g_tx_cf; }
+  double const get_tx_bandwidth() { auto lock = lock_state(); return g_tx_bw; }
+  size_t const get_tx_fft() { auto lock = lock_state(); return tx_fft_len; }
   void set_tx_resources(uhd_hydra_sptr tx_dev, double cf, double bw, size_t fft_len);
-  void set_tx_bandwidth(double bw){ g_tx_bw = bw; }
-  void set_tx_central_frequency(double cf){ g_tx_cf = cf; }
+  void set_tx_bandwidth(double bw){ auto lock = lock_state(); g_tx_bw = bw; }
+  void set_tx_central_frequency(double cf){ auto lock = lock_state(); g_tx_cf = cf; }
   void set_tx_mapping();
   int set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map);
   void tx_run();
@@ -88,12 +88,12 @@ class Hypervisor
 
 
   // RX related methods
-  double const get_rx_central_frequency() { return g_rx_cf; }
-  double const get_rx_bandwidth() { return g_rx_bw; }
-  size_t const get_rx_fft() { return rx_fft_len; }
+  double const get_rx_central_frequency() { auto lock = lock_state(); return g_rx_cf; }
+  double const get_rx_bandwidth() { auto lock = lock_state(); return g_rx_bw; }
+  size_t const get_rx_fft() { auto lock = lock_state(); return rx_fft_len; }
   void set_rx_resources(uhd_hydra_sptr rx_dev, double cf, double bw, size_t fft_len);
-  void set_rx_bandwidth(double bw){ g_rx_bw = bw; }
-  void set_rx_central_frequency(double cf){ g_rx_cf = cf; }
+  void set_rx_bandwidth(double bw){ auto lock = lock_state(); g_rx_bw = bw; }
+  void set_rx_central_frequency(double cf){ auto lock = lock_state(); g_rx_cf = cf; }
   void set_rx_mapping();
   int set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map);
   void rx_run();
@@ -101,6 +101,13 @@ class Hypervisor
 
 
 private:
+  friend class VirtualRadio;
+
+  std::unique_lock<std::recursive_mutex> lock_state() const
+  {
+    return std::unique_lock<std::recursive_mutex>(*state_mutex);
+  }
+
   // All TX structures
   size_t tx_fft_len = 0; // FFT M length
   double g_tx_cf = 0; // Hypervisor central frequency
@@ -127,7 +134,9 @@ private:
   hydra_log logger;
 
    vradio_vec g_vradios;
-   std::mutex vradios_mtx;
+   // Radio configuration callbacks re-enter their owner's state.
+   std::shared_ptr<std::recursive_mutex> state_mutex =
+       std::make_shared<std::recursive_mutex>();
    std::mutex stop_mutex;
 };
 

@@ -6,6 +6,7 @@
 #include "hydra/util/udp.h"
 
 #include <string>
+#include <atomic>
 #include <iostream>
 #include <unistd.h>
 #include <boost/property_tree/json_parser.hpp>
@@ -71,7 +72,7 @@ class HydraServer
 
     hydra_log logger;
 
-    bool thr_stop;
+    std::atomic<bool> thr_stop;
 };
 
 

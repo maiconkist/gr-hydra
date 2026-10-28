@@ -82,8 +82,11 @@ class HydraCore
     // Stop the Core threads
     void stop()
     {
+      std::lock_guard<std::mutex> lock(g_mutex);
       // Stop the hypervisor
       p_hypervisor->stop();
+      b_receiver = false;
+      b_transmitter = false;
     }
 
 }; // Class definition
