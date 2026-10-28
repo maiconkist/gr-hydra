@@ -138,6 +138,8 @@ BOOST_AUTO_TEST_CASE(concurrent_retuning_streaming_membership_and_shutdown)
       if (radio->set_rx_freq(i % 2 ? 992 : 1008) < 0 ||
           radio->set_tx_freq(i % 2 ? 992 : 1008) < 0)
         valid = false;
+      radio->set_rx_bandwidth(i % 2 ? 16 : 32);
+      radio->set_tx_bandwidth(i % 2 ? 32 : 16);
     }
   });
   std::thread membership([&] {
@@ -272,4 +274,51 @@ BOOST_AUTO_TEST_CASE(mapping_conflicts_leave_frequency_and_candidate_maps_unchan
   BOOST_CHECK(map == before);
   BOOST_CHECK_LT(hypervisor.set_tx_mapping(*first, map), 0);
   BOOST_CHECK(map == before);
+}
+
+BOOST_AUTO_TEST_CASE(framing_reconfiguration_discards_old_windows_and_keeps_buffer_connections)
+{
+  QuietLogs quiet;
+  auto input = std::make_shared<hydra::hydra_buffer<hydra::iq_sample>>(8000);
+  hydra::resampler<hydra::iq_sample, hydra::iq_window> pack(input, 64, 8);
+  auto output = pack.buffer();
+  hydra::iq_window old_samples(16, {9, 9});
+  input->write(old_samples.begin(), old_samples.end());
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+  while (output->size() != 2 && std::chrono::steady_clock::now() < deadline)
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  BOOST_REQUIRE_EQUAL(output->size(), 2);
+  BOOST_CHECK_THROW(pack.reconfigure(0), std::invalid_argument);
+  BOOST_CHECK_THROW(pack.reconfigure(std::numeric_limits<size_t>::max()),
+                    std::invalid_argument);
+  BOOST_CHECK_EQUAL(output->size(), 2);
+  for (const size_t size : {16, 4})
+  {
+    pack.reconfigure(size);
+    BOOST_CHECK_EQUAL(output->size(), 0);
+    BOOST_CHECK_EQUAL(input->capacity(), 1000 * size);
+    hydra::iq_window expected(size, {0.25f, -0.5f});
+    input->write(expected.begin(), expected.end());
+    const auto limit = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+    hydra::iq_window actual;
+    while (actual.empty() && std::chrono::steady_clock::now() < limit)
+    {
+      actual = output->read_one();
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+  }
+
+  auto windows = std::make_shared<hydra::hydra_buffer<hydra::iq_window>>(1000);
+  hydra::resampler<hydra::iq_window, hydra::iq_sample> unpack(windows, 64, 8);
+  auto samples = unpack.buffer();
+  unpack.reconfigure(32);
+  BOOST_CHECK_EQUAL(samples->capacity(), 32000);
+  hydra::iq_window expected(32, {0.5f, 0.25f});
+  windows->write(expected);
+  const auto limit = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+  while (samples->size() != expected.size() && std::chrono::steady_clock::now() < limit)
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  const auto actual = samples->read(expected.size());
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
 }

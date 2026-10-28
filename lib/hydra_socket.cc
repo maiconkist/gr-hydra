@@ -134,27 +134,15 @@ zmq_sink::run()
   // Bind address
   socket.bind(addr.c_str());
 
-  // Initialize temporary variables outside the loop
-  unsigned int u_buffer_size;
-  unsigned int u_message_size;
-
   // Event loop
   while (g_th_run)
   {
-    // Get the buffer size
-    u_buffer_size = p_input_buffer->size();
-    // If there is anything to transmit
-    if (u_buffer_size)
+    auto samples = p_input_buffer->read(p_input_buffer->size());
+    if (!samples.empty())
     {
-      // Calculate the message size
-      u_message_size = u_buffer_size * sizeof(iq_sample);
-      // Allocate enough memory for this message
+      const auto u_message_size = samples.size() * sizeof(iq_sample);
       message.rebuild(u_message_size);
-
-      // Copy the samples onto the message object
-      std::memcpy(message.data(),
-          &p_input_buffer->read(u_buffer_size).front(),
-          u_message_size);
+      std::memcpy(message.data(), samples.data(), u_message_size);
 
       // If we are still running
       if (g_th_run)

@@ -88,7 +88,7 @@ Hypervisor::rx_fft_size_for(double cf, double bandwidth) const
 {
   auto lock = lock_state();
   const auto range = bin_range(cf, bandwidth, g_rx_cf, g_rx_bw, rx_fft_len);
-  return range ? range->count : 0;
+  return range && range->count <= resampler<>::max_fft_size ? range->count : 0;
 }
 
 size_t
@@ -96,7 +96,7 @@ Hypervisor::tx_fft_size_for(double cf, double bandwidth) const
 {
   auto lock = lock_state();
   const auto range = bin_range(cf, bandwidth, g_tx_cf, g_tx_bw, tx_fft_len);
-  return range ? range->count : 0;
+  return range && range->count <= resampler<>::max_fft_size ? range->count : 0;
 }
 
 Hypervisor::Hypervisor()
@@ -344,7 +344,6 @@ Hypervisor::set_tx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
      return -1;
    iq_map_vec the_map(fft_n);
    std::iota(the_map.begin(), the_map.end(), sc);
-   vr.set_tx_fft(fft_n);
    vr.set_tx_mapping(the_map);
    for (const auto bin : the_map) subcarriers_map[bin] = vr.get_id();
 
@@ -484,7 +483,6 @@ Hypervisor::set_rx_mapping(VirtualRadio &vr, iq_map_vec &subcarriers_map)
      return -1;
    iq_map_vec the_map(fft_n);
    std::iota(the_map.begin(), the_map.end(), sc);
-   vr.set_rx_fft(fft_n);
    vr.set_rx_mapping(the_map);
    for (const auto bin : the_map) subcarriers_map[bin] = vr.get_id();
 

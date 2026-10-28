@@ -67,14 +67,14 @@ class VirtualRadio
 
     bool const get_tx_enabled(){ auto lock = lock_state(); return g_tx_udp_port; };
     size_t const get_tx_udp_port(){ auto lock = lock_state(); return g_tx_udp_port; }
-    size_t const get_tx_fft() { auto lock = lock_state(); return g_rx_fft_size; }
+    size_t const get_tx_fft() { auto lock = lock_state(); return g_tx_fft_size; }
     double const get_tx_freq() { auto lock = lock_state(); return g_tx_cf; }
     double const get_tx_bandwidth() { auto lock = lock_state(); return g_tx_bw; }
     int set_tx_freq(double cf);
     void set_tx_bandwidth(double bw);
     int reconfigure_tx(double cf, double bw);
     void set_tx_mapping(const iq_map_vec &iq_map);
-    size_t const set_tx_fft(size_t n) { auto lock = lock_state(); return g_tx_fft_size = n; }
+    size_t const set_tx_fft(size_t n);
     bool map_tx_samples(iq_sample *samples_buf); // called by the hypervisor
 
 
@@ -87,7 +87,7 @@ class VirtualRadio
     void set_rx_bandwidth(double bw);
     int reconfigure_rx(double cf, double bw);
     void set_rx_mapping(const iq_map_vec &iq_map);
-    size_t const set_rx_fft(size_t n) { auto lock = lock_state(); return g_rx_fft_size = n; }
+    size_t const set_rx_fft(size_t n);
     void demap_iq_samples(const iq_sample *samples_buf, size_t len); // called by the hypervisor
 
     /**

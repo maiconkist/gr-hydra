@@ -108,6 +108,11 @@ QA is a standalone CMake project under `tests/`. It uses Boost.Test and CTest
 and links against the separately built core library. The core project does not
 include QA sources or test targets.
 
+Native QA covers reservation and release boundaries, failed-retune rollback,
+worker lifetimes, concurrent reconfiguration, FFT round trips, malformed control
+requests and replies, short backend reads, and live RX/TX transport during
+bandwidth changes. These tests do not require a physical radio.
+
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build --target hydra
@@ -217,15 +222,6 @@ The following items come from a review of the current implementation. This is
 not an exhaustive bug inventory. Optimization ideas are candidates for profiling,
 not measured performance improvements.
 
-### Open bugs
-
-- **Bandwidth changes leave incompatible DSP state.** Updating a radio's
-  bandwidth changes its mapping and FFT length, but does not recreate its FFT
-  plans, framing configuration, or buffer capacities. Increasing bandwidth can
-  make processing access beyond the original sample windows or FFT buffers.
-  Sources: `lib/hydra_virtual_radio.cc`, `lib/hydra_hypervisor.cc`,
-  `include/hydra/hydra_resampler.hpp`.
-
 ### Possible optimizations
 
 - **Replace short polling loops with explicit wakeups.** Profile blocking
@@ -241,8 +237,8 @@ not measured performance improvements.
   `lib/hydra_hypervisor.cc`, `lib/hydra_socket.cc`.
 
 - **Reduce FFT memory and setup overhead.** Allocate using the single-precision
-  complex size rather than `sizeof(fftw_complex)` for float IQ buffers. After
-  fixing ownership, investigate FFTW wisdom or reusable planning information
+  complex size rather than `sizeof(fftw_complex)` for float IQ buffers.
+  Investigate FFTW wisdom or reusable planning information
   for repeated radio creation instead of repeating `FFTW_MEASURE` planning.
   Source: `lib/hydra_fft.cc`.
 
@@ -253,8 +249,8 @@ not measured performance improvements.
   Sources: `lib/hydra_virtual_radio.cc`,
   `include/hydra/hydra_resampler.hpp`.
 
-- **Reduce coarse-lock contention after fixing races.** Both streaming paths
-  hold the radio-list mutex while processing individual radios. Profile stable
+- **Reduce coarse-lock contention.** Both streaming paths hold the shared
+  state mutex while processing individual radios. Profile stable
   snapshots or per-radio ownership that permit DSP work outside that global
   critical section.
   Source: `lib/hydra_hypervisor.cc`.
@@ -267,11 +263,9 @@ not measured performance improvements.
 
 ### Other improvements
 
-- **Expand regression coverage.** Standalone QA and Linux Docker CI now cover
-  release boundaries, repeated release, unconfigured directions, Python
-  control-client round trips, and GRC definition loading. Add conflicting
-  reservations, malformed messages, bandwidth changes, FFT round trips, short
-  backend reads, and a headless IQ loopback integration scenario.
+- **Add a complete headless IQ loopback scenario.** Complement the standalone
+  reservation, protocol, DSP-reconfiguration, and backend regressions with
+  multi-radio, closed-loop streaming over an emulated front end.
   Sources: `tests/`, `.github/workflows/docker-build.yml`.
 
 - **Complete core build metadata.** Both builds now use C++17, and the GNU Radio

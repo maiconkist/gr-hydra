@@ -5,6 +5,9 @@
 #include <chrono>
 #include <atomic>
 #include <mutex>
+#include <limits>
+#include <stdexcept>
+#include <type_traits>
 
 #include "hydra/hydra_buffer.hpp"
 #include "hydra/hydra_log.h"
@@ -29,6 +32,7 @@ class resampler
     // Thread stop condition
     std::atomic<bool> stop_thread{false};
     std::mutex stop_mutex;
+    std::mutex configuration_mutex;
 
     // Event loop method
     void run();
@@ -50,6 +54,29 @@ class resampler
         size_t fft_size);
 
     ~resampler() { stop(); }
+
+    static constexpr size_t max_fft_size = std::numeric_limits<unsigned int>::max() / 1000;
+
+    static unsigned int buffer_capacity(size_t fft_size)
+    {
+      if (!fft_size || fft_size > max_fft_size)
+        throw std::invalid_argument("Invalid framing size");
+      return static_cast<unsigned int>(1000 * fft_size);
+    }
+
+    void reconfigure(size_t fft_size)
+    {
+      const auto capacity = buffer_capacity(fft_size);
+      hydra_buffer<input_data_type> input(
+          std::is_same_v<input_data_type, iq_sample> ? capacity : 1000);
+      hydra_buffer<output_data_type> output(
+          std::is_same_v<output_data_type, iq_sample> ? capacity : 1000);
+      std::lock_guard<std::mutex> lock(configuration_mutex);
+      // Socket workers retain these buffer objects across reconfiguration.
+      p_input_buffer->swap(input);
+      p_output_buffer->swap(output);
+      u_fft_size = fft_size;
+    }
 
    // Stop the thread
    void stop()
@@ -82,6 +109,7 @@ resampler<input_data_type, output_data_type>::resampler(
     double sampling_rate,
     size_t fft_size)
 {
+  buffer_capacity(fft_size);
   // Thread stop flag
   stop_thread = false;
 
@@ -115,7 +143,7 @@ void
 inline resampler<iq_window, iq_sample>::create_buffer()
 {
   // Create a buffer with enough capacity for 1000 windows
-  p_output_buffer = std::make_shared<hydra_buffer<iq_sample>>(1000*u_fft_size);
+  p_output_buffer = std::make_shared<hydra_buffer<iq_sample>>(buffer_capacity(u_fft_size));
 
 };
 
@@ -123,36 +151,20 @@ template <>
 void
 inline resampler<iq_sample, iq_window>::run()
 {
-  // Vector of IQ samples that comprise a FFT window
-  iq_window temp_object(u_fft_size);
-
-  // If the destructor has been called
   while (not stop_thread)
   {
-    // Check whether the buffer has enough IQ samples
-    if (p_input_buffer->size() >= u_fft_size)
+    bool produced = false;
     {
-      // Insert IQ samples from the input buffer into the window
-      temp_object = p_input_buffer->read(u_fft_size);
-
-      //TODO Check the need for resampling here
-
-      p_output_buffer->write(temp_object);
-
-      /*
-      for (auto it = temp_object.begin(); it != temp_object.end(); it++)
+      std::lock_guard<std::mutex> lock(configuration_mutex);
+      auto window = p_input_buffer->read(u_fft_size);
+      if (!window.empty())
       {
-        std::cout << (*it) << " ";
+        p_output_buffer->write(window);
+        produced = true;
       }
-      std::cout << std::endl;
-      */
     }
-    // Otherwise, we are not there yet
-    else
-    {
-      // Wait for a microssecond and prevent the thread to explode
+    if (!produced)
       std::this_thread::sleep_for(std::chrono::microseconds(1));
-    }
   }
 };
 
@@ -160,35 +172,20 @@ template <>
 void
 inline resampler<iq_window, iq_sample>::run()
 {
-  // Vector of IQ samples that comprise a FFT window
-  iq_window temp_object(u_fft_size);
-
-  // If the destructor has been called
   while (not stop_thread)
   {
-    // Check whether the buffer has windows
-    if (p_input_buffer->size())
+    bool produced = false;
     {
-      /*IMPORTANT
-       *
-       * Only consume a single window per time, required for resampling
-       *
-       */
-
-      // Insert IQ samples from the input buffer into the window
-      temp_object = p_input_buffer->read_one();
-
-      //TODO Check the need for resampling here
-
-      // Write all the IQ sample in this window
-      p_output_buffer->write(temp_object.begin(), temp_object.end());
+      std::lock_guard<std::mutex> lock(configuration_mutex);
+      auto window = p_input_buffer->read_one();
+      if (!window.empty())
+      {
+        p_output_buffer->write(window.begin(), window.end());
+        produced = true;
+      }
     }
-    // Otherwise, we are not there yet
-    else
-    {
-      // Wait for a microssecond and prevent the thread to explode
+    if (!produced)
       std::this_thread::sleep_for(std::chrono::microseconds(1));
-    }
   }
 };
 

@@ -271,3 +271,76 @@ BOOST_AUTO_TEST_CASE(rejected_retunes_keep_the_existing_rx_stream_alive)
       BOOST_CHECK_SMALL(std::abs(sample - hydra::iq_sample(0.25f, 0)), 1e-5f);
   }
 }
+
+BOOST_AUTO_TEST_CASE(bandwidth_changes_rebuild_rx_and_tx_dsp_without_changing_endpoints)
+{
+  hydra_test::QuietLogs quiet;
+  hydra::Hypervisor hypervisor(64, 1000, 64);
+  zmq::context_t rx_context, tx_context;
+  zmq::socket_t receiver(rx_context, ZMQ_PULL), sender(tx_context, ZMQ_PUSH);
+  receiver.set(zmq::sockopt::rcvtimeo, 3000);
+  receiver.set(zmq::sockopt::linger, 0);
+  sender.set(zmq::sockopt::sndtimeo, 3000);
+  sender.set(zmq::sockopt::linger, 0);
+  auto rx_monitor = handshake_monitor(receiver, rx_context);
+  auto tx_monitor = handshake_monitor(sender, tx_context);
+  sender.bind("tcp://127.0.0.1:*");
+  const auto tx_endpoint = sender.get(zmq::sockopt::last_endpoint);
+  const auto tx_port = std::stoi(tx_endpoint.substr(tx_endpoint.rfind(':') + 1));
+  const auto rx_port = hydra_test::unused_tcp_port();
+  auto radio = std::make_shared<hydra::VirtualRadio>(1, &hypervisor);
+  BOOST_REQUIRE_EQUAL(radio->set_rx_chain(rx_port, 1000, 8, "127.0.0.1", "127.0.0.1"), 0);
+  BOOST_REQUIRE_EQUAL(radio->set_tx_chain(tx_port, 1000, 16, "127.0.0.1", "127.0.0.1"), 0);
+  hypervisor.attach_virtual_radio(radio);
+  receiver.connect("tcp://127.0.0.1:" + std::to_string(rx_port));
+  await_handshake(*rx_monitor);
+  await_handshake(*tx_monitor);
+
+  const std::array<std::pair<size_t, size_t>, 4> widths{{{8, 16}, {32, 8}, {16, 32}, {8, 16}}};
+  for (const auto [rx_size, tx_size] : widths)
+  {
+    radio->set_rx_bandwidth(rx_size);
+    radio->set_tx_bandwidth(tx_size);
+    BOOST_REQUIRE_EQUAL(radio->get_rx_fft(), rx_size);
+    BOOST_REQUIRE_EQUAL(radio->get_tx_fft(), tx_size);
+    BOOST_CHECK_EQUAL(radio->get_rx_udp_port(), rx_port);
+    BOOST_CHECK_EQUAL(radio->get_tx_udp_port(), tx_port);
+
+    const hydra::iq_sample rx_value(float(rx_size) / 100, -0.25f);
+    hydra::iq_window wideband(64, rx_value);
+    hypervisor.forward_rx_window(wideband, wideband.size());
+    hydra::iq_window received;
+    while (received.size() < rx_size)
+    {
+      zmq::message_t message;
+      BOOST_REQUIRE(receiver.recv(message, zmq::recv_flags::none).has_value());
+      BOOST_REQUIRE_GT(message.size(), 0);
+      BOOST_REQUIRE_EQUAL(message.size() % sizeof(hydra::iq_sample), 0);
+      const auto offset = received.size();
+      received.resize(offset + message.size() / sizeof(hydra::iq_sample));
+      std::memcpy(received.data() + offset, message.data(), message.size());
+    }
+    BOOST_REQUIRE_EQUAL(received.size(), rx_size);
+    for (const auto sample : received)
+      BOOST_CHECK_SMALL(std::abs(sample - rx_value), 1e-5f);
+
+    const hydra::iq_sample tx_value(float(tx_size) / 100, 0.125f);
+    hydra::iq_window narrowband(tx_size + tx_size / 2, {9, 9});
+    std::fill_n(narrowband.begin(), tx_size, tx_value);
+    zmq::message_t message(narrowband.data(), narrowband.size() * sizeof(hydra::iq_sample));
+    BOOST_REQUIRE(sender.send(message, zmq::send_flags::none).has_value());
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+    bool produced = false;
+    do
+    {
+      hypervisor.get_tx_window(wideband, 64);
+      produced = std::any_of(wideband.begin(), wideband.end(),
+                            [](auto sample) { return std::abs(sample) > 1e-6f; });
+      if (!produced) std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    } while (!produced && std::chrono::steady_clock::now() < deadline);
+    BOOST_REQUIRE(produced);
+    for (const auto sample : wideband)
+      BOOST_CHECK_SMALL(std::abs(sample - tx_value), 1e-5f);
+  }
+  hypervisor.stop();
+}

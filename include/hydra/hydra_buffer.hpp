@@ -43,7 +43,18 @@ class hydra_buffer
     };
 
     // Return the capacity of the buffer
-    const unsigned int capacity(){return buffer.capacity();};
+    const unsigned int capacity()
+    {
+      std::lock_guard<std::mutex> lock(buffer_mutex);
+      return buffer.capacity();
+    };
+
+    void swap(hydra_buffer& other)
+    {
+      if (this == &other) return;
+      std::scoped_lock lock(buffer_mutex, other.buffer_mutex);
+      buffer.swap(other.buffer);
+    }
 
     // Read a number of elements
     std::vector<data_type> read(const unsigned int &num_elements = 1);

@@ -20,6 +20,8 @@
 
 #include "hydra/hydra_virtual_radio.h"
 
+#include <boost/make_shared.hpp>
+
 namespace hydra {
 
 VirtualRadio::VirtualRadio(size_t _idx, Hypervisor *hypervisor):
@@ -135,7 +137,7 @@ VirtualRadio::set_tx_chain(unsigned int u_tx_udp,
        server_addr,
        remote_addr,
        std::to_string(u_tx_udp),
-       1000*g_tx_fft_size);
+       resampler<iq_sample, iq_window>::buffer_capacity(g_tx_fft_size));
 
    // Create new resampler
    tx_resampler = std::make_unique<resampler<iq_sample, iq_window>>(
@@ -202,7 +204,22 @@ void
 VirtualRadio::set_tx_mapping(const iq_map_vec &iq_map)
 {
   auto lock = lock_state();
-  g_tx_map = iq_map;
+  auto mapping = iq_map;
+  set_tx_fft(mapping.size());
+  g_tx_map.swap(mapping);
+}
+
+size_t const
+VirtualRadio::set_tx_fft(size_t size)
+{
+  auto lock = lock_state();
+  if (size == g_tx_fft_size && g_fft_complex) return size;
+  resampler<iq_sample, iq_window>::buffer_capacity(size);
+  auto fft = boost::make_shared<fft_complex>(size);
+  if (tx_resampler) tx_resampler->reconfigure(size);
+  g_fft_complex.swap(fft);
+  g_tx_fft_size = size;
+  return size;
 }
 
 bool
@@ -216,7 +233,8 @@ VirtualRadio::map_tx_samples(iq_sample *samples_buf)
   iq_window buf  = tx_resampler->buffer()->read_one();
 
   // Return false if the window is empty
-  if (buf.empty()){return false;}
+  if (buf.size() != g_tx_fft_size || g_tx_map.size() != g_tx_fft_size)
+    return false;
 
   // Copy samples in TIME domain to FFT buffer, execute FFT
   g_fft_complex->set_data(&buf.front(), g_tx_fft_size);
@@ -278,7 +296,22 @@ void
 VirtualRadio::set_rx_mapping(const iq_map_vec &iq_map)
 {
   auto lock = lock_state();
-  g_rx_map = iq_map;
+  auto mapping = iq_map;
+  set_rx_fft(mapping.size());
+  g_rx_map.swap(mapping);
+}
+
+size_t const
+VirtualRadio::set_rx_fft(size_t size)
+{
+  auto lock = lock_state();
+  if (size == g_rx_fft_size && g_ifft_complex) return size;
+  resampler<iq_window, iq_sample>::buffer_capacity(size);
+  auto fft = boost::make_shared<fft_complex>(size, false);
+  if (rx_resampler) rx_resampler->reconfigure(size);
+  g_ifft_complex.swap(fft);
+  g_rx_fft_size = size;
+  return size;
 }
 
 void
@@ -286,7 +319,7 @@ VirtualRadio::demap_iq_samples(const iq_sample *samples_buf, size_t len)
 {
   auto lock = lock_state();
   // If the receiver chain was not defined
-  if (not b_receiver){ return;}
+  if (!b_receiver || g_rx_map.size() != g_rx_fft_size) return;
 
   /* Copy the samples used by this radio */
   for (size_t idx = 0; idx < g_rx_fft_size; ++idx)
